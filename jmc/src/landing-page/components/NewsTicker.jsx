@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 const newsItems = [
   { text: 'PHE WATER SUPPLY HELPLINE NUMBERS — Click to view contact details', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
   { text: 'Online Building Permission: Apply at JMC Portal for building plan sanction', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
+  { text: 'PHE WATER SUPPLY HELPLINE NUMBERS — Click to view contact details', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
+  { text: 'Online Building Permission: Apply at JMC Portal for building plan sanction', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
   { text: 'Pay Property Tax and other dues Online — Quick & Convenient', href: '/pay-online' },
   { text: 'Register your Grievance / Complaint online with Jammu Municipal Corporation', href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx' },
   { text: 'Smart City Mission: View latest Smart City projects and developments in Jammu', href: 'https://jmc.jk.gov.in/smartcity.aspx' },
