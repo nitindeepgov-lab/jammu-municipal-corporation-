@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 
 const newsItems = [
+  { text: 'Nitindeep branch — Click to view contact details', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
+  { text: 'Online Building Permission: Apply at JMC Portal for building plan sanction', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
   { text: 'PHE WATER SUPPLY HELPLINE NUMBERS — Click to view contact details', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
   { text: 'Online Building Permission: Apply at JMC Portal for building plan sanction', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
   { text: 'Pay Property Tax and other dues Online — Quick & Convenient', href: '/pay-online' },
