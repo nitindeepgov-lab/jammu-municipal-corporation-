@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bulletin_boards",
+  "info": {
+    "singularName": "bulletin-board",
+    "pluralName": "bulletin-boards",
+    "displayName": "Bulletin Board",
+    "description": "Press releases and notices for the JMC Bulletin Board"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "release_date": {
+      "type": "string",
+      "required": true
+    },
+    "link": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

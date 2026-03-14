@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "officials",
+  "info": {
+    "singularName": "official",
+    "pluralName": "officials",
+    "displayName": "Official",
+    "description": "Officers and officials with their name, designation, and picture"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "designation": {
+      "type": "string",
+      "required": true
+    },
+    "picture": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
