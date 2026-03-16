@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import SubpageTemplate from '../components/SubpageTemplate'
 import { getBulletinItemById } from '../services/strapiApi'
 
-const STRAPI_URL = 'http://localhost:1337'
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'
 
 function Skeleton() {
   return (
