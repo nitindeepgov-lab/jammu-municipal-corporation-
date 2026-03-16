@@ -4,8 +4,8 @@ import { useState } from 'react'
 import TopBar from './components/TopBar'
 import Header from './components/Header'
 import Navigation from './components/Navigation'
-import NewsTicker from './components/NewsTicker'
 import HeroSlider from './components/HeroSlider'
+import AboutMinistersSection from './components/AboutMinistersSection'
 import InfoCards from './components/InfoCards'
 import QuickInfoCards from './components/QuickInfoCards'
 import MyJammuApp from './components/MyJammuApp'
@@ -23,10 +23,10 @@ export default function LandingPage() {
       <TopBar />
       <Header />
       <Navigation mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
-      <NewsTicker />
 
       <main id="main-content">
         <HeroSlider />
+        <AboutMinistersSection />
         <InfoCards />
         <SlidingServices />
         <QuickInfoCards />

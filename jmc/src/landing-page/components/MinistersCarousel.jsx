@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 
 const ministerSlides = [
-  { image: '/officials/LG.jpg', title: "Hon'ble Minister, H&UD", name: 'Satish Sharma' },
+  { image: '/officials/LG.jpg', title: "Hon'ble Lt. Governor", name: 'Manoj Sinha' },
   { image: '/officials/cm.jpg', title: "Hon'ble Chief Minister", name: 'Omar Abdullah' },
-  { image: '/officials/cs.jpg', title: "Commissioner JMC", name: 'Devansh Yadav, IAS' },
-  { image: '/officials/minister3.jpg', title: "Mayor, JMC", name: 'Rajinder Sharma' },
-  { image: '/officials/minister4.jpg', title: "Dy. Mayor, JMC", name: 'Purnima Sharma' },
-  { image: '/officials/minister5.jpg', title: "Joint Commissioner", name: 'Rajeev Khajuria, JKAS' }
+  { image: '/officials/cs.jpg', title: 'Chief Secretary', name: 'Atul Dulloo, IAS' },
+  { image: '/officials/com.jpg', title: 'Commissioner JMC', name: 'Devansh Yadav, IAS' },
+  { image: '/officials/comSec.jpg', title: 'Commissioner Secretary, JKHUDD', name: 'Mandeep Kaur, IAS' }
 ]
 
 export default function MinistersCarousel() {
@@ -38,7 +37,7 @@ export default function MinistersCarousel() {
                   <img
                     src={minister.image}
                     alt={minister.name}
-                    className="w-full h-[120px] object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-[160px] sm:h-[180px] object-contain transition-transform group-hover:scale-105"
                     onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${minister.name}&size=200&background=003366&color=fff` }}
                   />
                 </div>
