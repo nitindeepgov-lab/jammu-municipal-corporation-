@@ -33,7 +33,7 @@ export default function MinistersCarousel() {
             const minister = ministerSlides[idx]
             return (
               <div key={offset} className="text-center group">
-                <div className="relative overflow-hidden rounded-lg border-2 border-gray-200 group-hover:border-[#FF6600] transition-colors">
+                <div className="relative overflow-hidden rounded-lg border-2 border-gray-200 transition-colors">
                   <img
                     src={minister.image}
                     alt={minister.name}

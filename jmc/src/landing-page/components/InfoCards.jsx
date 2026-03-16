@@ -3,8 +3,11 @@ import BulletinBoard from './BulletinBoard'
 
 export default function InfoCards() {
   return (
-    <section className="py-12 bg-gradient-to-b from-[#eef2f6] via-[#f6f8fb] to-white border-t border-slate-200/60">
-      <div className="max-w-[1200px] mx-auto px-4">
+    <section className="py-3 bg-gradient-to-b from-[#eef2f6] via-[#f6f8fb] to-white border-t border-slate-200/60">
+      <div className="max-w-[1250px] mx-auto px-4 space-y-6 md:space-y-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl md:text-3xl font-semibold text-[#0b3a73] tracking-tight">What&apos;s new</h2>
+        </div>
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* Bulletin Board */}
           <div className="relative h-full">

@@ -1,71 +1,10 @@
 import { useState, useRef } from 'react'
-import { BsBuildings } from 'react-icons/bs'
-import { MdOutlineCleaningServices } from 'react-icons/md'
-import { FaFileAlt, FaWater } from 'react-icons/fa'
+import { FaFileAlt } from 'react-icons/fa'
 import { RiMoneyRupeeCircleLine } from 'react-icons/ri'
 import SubpageTemplate from '../components/SubpageTemplate'
 
 const paymentOptions = [
-  {
-    id: 'building',
-    name: 'Building Permission Fee',
-    desc: 'Pay fee for building plan / construction permission',
-    href: 'https://jmc.jk.gov.in/PermissionForm.aspx',
-    icon: BsBuildings,
-    color: 'bg-blue-50 text-blue-700 border-blue-200',
-    activeRing: 'border-blue-600 bg-blue-50',
-    fields: [
-      { id: 'ownerName', label: 'Name of Property Owner', type: 'text', placeholder: 'Enter name of property owner', required: true },
-      { id: 'parentage', label: 'Parentage', type: 'text', placeholder: 'Enter parentage (S/o, D/o, W/o)', required: true },
-      { id: 'mobile', label: 'Mobile No.', type: 'tel', placeholder: 'Enter mobile number', required: true },
-      { id: 'email', label: 'Email ID', type: 'email', placeholder: 'Enter email address' },
-      { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter applicant address' },
-      { id: 'buildingPermNo', label: 'Building Permission No.', type: 'text', placeholder: 'Enter building permission number', required: true },
-      { id: 'buildingAddress', label: 'Building Address', type: 'textarea', placeholder: 'Enter building / property address' },
-      { id: 'details', label: 'Details', type: 'textarea', placeholder: 'Enter any additional details' },
-      {
-        id: 'feeItems',
-        label: 'Payment For',
-        type: 'fee-checkboxes',
-        feeItems: [
-          { id: 'septicTank', label: 'Septic Tank Security Fee' },
-          { id: 'mulba', label: 'Mulba Security Fee' },
-          { id: 'application', label: 'Application Fee' },
-          { id: 'constructionPlan', label: 'Building Construction Plan Fee' },
-          { id: 'betterment', label: 'Betterment Charges' },
-          { id: 'sanitation', label: 'Sanitation Charges' },
-          { id: 'license', label: 'License Fee' },
-          { id: 'professional', label: 'Professional Fee' },
-          { id: 'copying', label: 'Copying Fee' },
-          { id: 'labourCess', label: 'Labour Cess Fee' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'sanitation',
-    name: 'Sanitation Fee',
-    desc: 'Pay sanitation and solid waste management charges',
-    href: 'https://jmc.jk.gov.in/SanitationFee.aspx',
-    icon: MdOutlineCleaningServices,
-    color: 'bg-green-50 text-green-700 border-green-200',
-    activeRing: 'border-green-600 bg-green-50',
-    fields: [
-      { id: 'ownerName', label: 'Name of Property Owner', type: 'text', placeholder: 'Enter name of property owner', required: true },
-      { id: 'mobile', label: 'Mobile No.', type: 'tel', placeholder: 'Enter mobile number', required: true },
-      { id: 'email', label: 'Email ID', type: 'email', placeholder: 'Enter email address' },
-      { id: 'propertyAddress', label: 'Property Address', type: 'textarea', placeholder: 'Enter property address' },
-      {
-        id: 'location',
-        label: 'Select Location',
-        type: 'select',
-        options: ['Select', 'Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'],
-        required: true,
-      },
-      { id: 'period', label: 'Period', type: 'text', placeholder: 'Enter period (e.g. Jan 2026 – Mar 2026)', required: true },
-      { id: 'amount', label: 'Amount (₹)', type: 'number', placeholder: 'Enter amount', required: true },
-    ],
-  },
+  // Removed Building Permission Fee and Sanitation Fee per request
   {
     id: 'tender',
     name: 'Tender Fee',
@@ -103,23 +42,6 @@ const paymentOptions = [
       { id: 'mobile', label: 'Mobile Number', type: 'tel', placeholder: 'Enter 10-digit mobile number', required: true },
       { id: 'email', label: 'Email ID', type: 'email', placeholder: 'Enter email address' },
       { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter full address', required: true },
-      { id: 'amount', label: 'Amount (₹)', type: 'number', placeholder: 'Enter amount', required: true },
-    ],
-  },
-  {
-    id: 'water',
-    name: 'Water Connection Bill',
-    desc: 'Pay water connection and usage charges',
-    href: 'https://jmc.jk.gov.in/pddeservices.html',
-    icon: FaWater,
-    color: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-    activeRing: 'border-cyan-600 bg-cyan-50',
-    fields: [
-      { id: 'connNo', label: 'Consumer / Connection Number', type: 'text', placeholder: 'Enter consumer number', required: true },
-      { id: 'name', label: 'Consumer Name', type: 'text', placeholder: 'Enter full name', required: true },
-      { id: 'mobile', label: 'Mobile Number', type: 'tel', placeholder: 'Enter 10-digit mobile number', required: true },
-      { id: 'email', label: 'Email ID', type: 'email', placeholder: 'Enter email address' },
-      { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter full address' },
       { id: 'amount', label: 'Amount (₹)', type: 'number', placeholder: 'Enter amount', required: true },
     ],
   },
