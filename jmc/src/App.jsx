@@ -11,9 +11,10 @@ function ScrollToTop() {
 
 function AdminRedirect() {
   useEffect(() => {
-    window.location.href = 'http://localhost:1337/admin';
-  }, []);
-  return null;
+    const adminUrl = import.meta.env.VITE_STRAPI_ADMIN_URL || `${import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'}/admin`
+    window.location.href = adminUrl
+  }, [])
+  return null
 }
 
 import LandingPage from './landing-page'
