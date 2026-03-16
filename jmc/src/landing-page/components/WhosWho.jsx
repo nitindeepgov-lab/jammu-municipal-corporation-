@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getOfficials } from '../../services/strapiApi'
 
-const STRAPI_URL = 'http://localhost:1337'
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'
 
 function getInitials(name) {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
