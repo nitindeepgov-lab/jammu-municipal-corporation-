@@ -18,8 +18,12 @@ module.exports = [
     name: 'strapi::cors',
     config: {
       enabled: true,
-      origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+      origin: process.env.CORS_ORIGIN
+        ? process.env.CORS_ORIGIN.split(',')
+        : ['https://jammu-municipal-corporation.vercel.app', 'https://jammu-municipal-corporation.onrender.com', 'http://localhost:5173'],
       headers: '*',
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      keepHeadersOnError: true,
     },
   },
   'strapi::poweredBy',
