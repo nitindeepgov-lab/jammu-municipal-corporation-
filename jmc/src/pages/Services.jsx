@@ -149,7 +149,6 @@ const categories = [
     ),
     items: [
       { name: 'Smart City Portal', href: 'https://jmc.jk.gov.in/smartcity.aspx', desc: 'Smart City Mission — Jammu' },
-      { name: 'Jammu Suraksha Yojana', href: 'http://www.jammusuraksha.com/', desc: 'Security and welfare scheme' },
     ],
   },
 ]
