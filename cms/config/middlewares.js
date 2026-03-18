@@ -22,7 +22,7 @@ module.exports = [
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'Access-Control-Allow-Origin'],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       keepHeadersOnError: true,
-      credentials: false,
+      credentials: true,
     },
   },
   'strapi::poweredBy',
