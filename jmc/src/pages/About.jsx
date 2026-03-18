@@ -7,24 +7,34 @@ export default function About() {
 
             {/* About section */}
             <section className="bg-white rounded shadow-sm p-6">
-              <h2 className="text-xl font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">About JMC</h2>
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                Jammu Municipal Corporation (JMC) is the urban local body responsible for the civic administration
-                of Jammu city — the winter capital of Jammu &amp; Kashmir Union Territory. JMC was established
-                under the Jammu &amp; Kashmir Municipal Corporation Act to ensure efficient delivery of municipal
-                services to citizens.
-              </p>
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                The Corporation is committed to improving the quality of life for residents through quality civic
-                services including sanitation, water supply, road maintenance, property tax management, solid waste
-                management, and public health initiatives.
-              </p>
-              <p className="text-gray-700 text-sm leading-relaxed">
-                JMC encompasses a large geographical area covering all wards of Jammu city and continually
-                strives to modernise its operations through e-governance, transparency, and citizen-centric
-                initiatives under various Government of India schemes including Smart Cities Mission and
-                Swachh Bharat Mission.
-              </p>
+              <h2 className="text-xl font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-6 inline-block">About JMC</h2>
+              <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start">
+                <div className="space-y-4">
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    Jammu Municipal Corporation (JMC) is the urban local body responsible for the civic administration
+                    of Jammu city — the winter capital of Jammu &amp; Kashmir Union Territory. JMC was established under
+                    the Jammu &amp; Kashmir Municipal Corporation Act to ensure efficient delivery of municipal services to citizens.
+                  </p>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    The Corporation is committed to improving the quality of life for residents through quality civic services
+                    including sanitation, water supply, road maintenance, property tax management, solid waste management, and
+                    public health initiatives.
+                  </p>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    JMC encompasses a large geographical area covering all wards of Jammu city and continually strives to modernise
+                    its operations through e-governance, transparency, and citizen-centric initiatives under various Government of India
+                    schemes including Smart Cities Mission and Swachh Bharat Mission.
+                  </p>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#FF6600]/10 via-transparent to-[#003366]/10 rounded-lg blur" aria-hidden />
+                  <img
+                    src="/app/aboutimage.png"
+                    alt="Jammu Municipal Corporation building"
+                    className="relative w-full h-full max-h-[320px] object-cover rounded-lg shadow-md"
+                  />
+                </div>
+              </div>
             </section>
 
             {/* Vision & Mission */}

@@ -34,6 +34,8 @@ import EGov from './pages/EGov'
 import News from './pages/News'
 import PayOnline from './pages/PayOnline'
 import WebInfoManager from './pages/WebInfoManager'
+import Information from './pages/Information'
+import InformationDetail from './pages/InformationDetail'
 
 export default function App() {
   return (
@@ -57,6 +59,8 @@ export default function App() {
         <Route path="/news/:id" element={<News />} />
         <Route path="/pay-online" element={<PayOnline />} />
         <Route path="/web-info-manager" element={<WebInfoManager />} />
+        <Route path="/information" element={<Information />} />
+        <Route path="/information/:slug" element={<InformationDetail />} />
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>

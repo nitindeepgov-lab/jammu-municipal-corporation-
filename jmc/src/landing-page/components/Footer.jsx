@@ -244,9 +244,6 @@ export default function Footer() {
                 <img src="footer/dic.png" alt="Digital India" className="h-10 w-auto"
                   onError={(e) => { e.target.outerHTML = '<span class="text-gray-500 text-xs border border-gray-700 px-2 py-1 rounded">Digital India</span>' }} />
               </a>
-              <a href="https://bhashini.gov.in/" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity">
-                <img src="/bhashini.png" alt="Bhashini" className="h-10 w-auto object-contain" />
-              </a>
             </div>
           </div>
         </div>
