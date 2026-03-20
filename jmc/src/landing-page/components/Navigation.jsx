@@ -21,31 +21,14 @@ const navLinks = [
     { name: 'Municipal Commissioner, JMC', to: '/commissioner' },
   ] },
   { name: 'E-Governance', to: '/egov', hasDropdown: true, dropdown: [
-    { name: 'Doorstep Governance', href: 'https://jmc.jk.gov.in/doorstep.aspx' },
-    { name: 'Online Public Grievance System', href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx' },
-    { name: 'Online Birth/Death Certificate', href: 'https://serviceonline.gov.in/jammu/' },
-    { name: 'Online Building Permission', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
-    { name: 'Online Pay Rent of Municipal Shop/Flat', href: 'https://jmc.jk.gov.in/online-payment.html' },
+    { name: 'Online Public Grievance System', href: 'https://myjammu.jk.gov.in/Login/Index' },
+    { name: 'Online Birth/Death Certificate', href: 'https://jansugam.jk.gov.in/login.do' },
+    { name: 'Online Building Permission', href: 'https://obps.jk.gov.in/BPAMSClient/Home.aspx' },
+    { name: 'Online Pay Rent of Municipal Shop/Flat', href: 'https://myjammu.jk.gov.in/Login/Index' },
     { name: 'Online User Charges', href: 'https://jmc.jk.gov.in/online-payment.html' },
     { name: 'E-Tendering', href: 'https://jktenders.gov.in/' },
     { name: 'Online NOC/License System', href: 'https://jmc.jk.gov.in/easedoing.html' },
     { name: 'Apply for Rehri License', href: 'https://jmc.jk.gov.in/easedoing.html' },
-    { name: 'PDD E-Services', href: 'https://jmc.jk.gov.in/pddeservices.html' },
-  ] },
-  { name: 'Departments', to: '/about', hasDropdown: true, dropdown: [
-    { name: 'Health & Sanitation', href: 'https://jmc.jk.gov.in/HealthDept.aspx' },
-    { name: 'Enforcement', href: 'https://jmc.jk.gov.in/enforcement.aspx' },
-    { name: 'Establishment', href: 'https://jmc.jk.gov.in/establishment.aspx' },
-    { name: 'Electric', href: 'https://jmc.jk.gov.in/electric.aspx' },
-    { name: 'Civil Works', href: 'https://jmc.jk.gov.in/developwork.aspx' },
-    { name: 'UEED', href: 'https://jmc.jk.gov.in/ueed.aspx' },
-    { name: 'Census', href: 'https://jmc.jk.gov.in/census.aspx' },
-    { name: 'Revenue', href: 'https://jmc.jk.gov.in/taxassessment.aspx' },
-    { name: 'Building', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
-    { name: 'Accounts', href: 'https://jmc.jk.gov.in/accounts.aspx' },
-    { name: 'Transport', href: 'https://jmc.jk.gov.in/transport.aspx' },
-    { name: 'Legal', href: 'https://jmc.jk.gov.in/legal.aspx' },
-    { name: 'Veterinary', href: 'https://jmc.jk.gov.in/veterinary.aspx' },
   ] },
   { name: 'Orders & Circulars', to: '/notices', hasDropdown: true, dropdown: [
     { name: 'Public Notices', to: '/notices' },
@@ -55,7 +38,7 @@ const navLinks = [
     { name: 'Swachh Mission', to: '/swachh-mission' },
     { name: 'Development Works', to: '/development-works' },
   ] },
-  { name: 'Tenders', href: 'https://jmc.jk.gov.in/tenders.aspx' },
+  { name: 'Tenders', href: '/notices' },
   { name: 'RTI', to: '/rti', hasDropdown: true, dropdown: [
     { name: 'Disclosure of information Under Sec 4 of RTI Act.', href: 'https://jmc.jk.gov.in/RTI.aspx' },
     { name: "Details of APIO's/PIO/FAA of JMC.", to: '/rti' },
@@ -86,7 +69,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
     <>
       {/* Navigation bar */}
       <nav className="bg-[#003366] sticky top-0 z-50 shadow-md" style={{ borderBottom: '3px solid #FF6600' }}>
-        <div className="max-w-[1300px] mx-auto px-3 md:px-4">
+        <div className="max-w-[1300px] mx-auto px-3 md:px-10">
           <div className="flex items-center h-12 md:h-auto md:min-h-[46px]">
 
             {/* Hamburger — mobile only */}

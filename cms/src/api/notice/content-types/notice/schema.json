@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notices",
+  "info": {
+    "singularName": "notice",
+    "pluralName": "notices",
+    "displayName": "Notice",
+    "description": "Public notices and council updates published by JMC"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "notice_type": {
+      "type": "enumeration",
+      "enum": ["public", "council"],
+      "required": true,
+      "default": "public"
+    },
+    "notice_date": {
+      "type": "date",
+      "required": true
+    },
+    "link": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "document": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files", "images"]
+    }
+  }
+}

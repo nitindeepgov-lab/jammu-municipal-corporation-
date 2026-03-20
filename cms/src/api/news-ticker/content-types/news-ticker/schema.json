@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "news_tickers",
+  "info": {
+    "singularName": "news-ticker",
+    "pluralName": "news-tickers",
+    "displayName": "News Ticker",
+    "description": "Scrolling news ticker items on the homepage"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true
+    },
+    "link": {
+      "type": "string",
+      "required": false
+    },
+    "is_external": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "required": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    }
+  }
+}
