@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const navLinks = [
-  { name: 'Home', to: '/' },
+  {  name: 'Home', to: '/' , className: 'bg-orange-500' },
   { name: 'About JMC', to: '/about', hasDropdown: true, dropdown: [
     { name: 'About JMC', to: '/about' },
     { name: 'History', to: '/about#history' },
@@ -70,7 +70,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
       {/* Main Navigation Bar */}
       <nav className="bg-[#002B5E] sticky top-0 z-50 shadow-lg border-b-2 border-[#FF6600]">
         <div className="max-w-[1300px] mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between lg:justify-start h-[52px]">
+          <div className="flex items-center justify-between lg:justify-start h-[45px]">
 
             {/* Mobile: Hamburger Button */}
             <button
@@ -108,7 +108,8 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center px-4 h-full text-[13px] font-semibold tracking-wide transition-all duration-200 group relative
+                        className={`flex items-center px-4 h-full text-[13px] font-bold tracking-wide transition-all duration-200 group relative
+                          ${item.className || ''}
                           ${isNavActive ? 'text-white' : 'text-slate-200 hover:text-white'}`}
                       >
                         {item.name}
@@ -124,7 +125,8 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
                     ) : (
                       <Link
                         to={item.to || '/'}
-                        className={`flex items-center px-4 h-full text-[13px] font-semibold tracking-wide transition-all duration-200 group relative
+                        className={`flex items-center px-5 h-full text-[13px] font-bold tracking-wide transition-all duration-200 group relative
+                          ${item.className || ''}
                           ${isNavActive ? 'text-white' : 'text-slate-200 hover:text-white'}`}
                       >
                         {item.name}
@@ -222,7 +224,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={closeMobileMenu}
-                      className="flex-1 flex items-center px-6 py-3.5 text-slate-200 text-sm font-medium hover:bg-white/5 hover:text-white transition-colors"
+                      className={`flex-1 flex items-center px-6 py-3.5 text-slate-200 text-sm font-medium hover:bg-white/5 hover:text-white transition-colors ${item.className || ''}`}
                     >
                       <span className="text-[#FF6600] mr-3 text-lg leading-none opacity-80">·</span>
                       {item.name}
@@ -231,7 +233,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
                     <Link
                       to={item.to || '/'}
                       onClick={() => !item.hasDropdown && closeMobileMenu()}
-                      className={`flex-1 flex items-center px-6 py-3.5 text-sm font-medium transition-colors ${
+                      className={`flex-1 flex items-center px-6 py-3.5 text-sm font-medium transition-colors ${item.className || ''} ${
                         isNavActive
                           ? 'bg-gradient-to-r from-[#FF6600]/10 to-transparent text-white border-l-2 border-[#FF6600]'
                           : 'text-slate-200 hover:bg-white/5 hover:text-white border-l-2 border-transparent'
