@@ -70,7 +70,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
       {/* Main Navigation Bar */}
       <nav className="bg-[#002B5E] sticky top-0 z-50 shadow-lg border-b-2 border-[#FF6600]">
         <div className="max-w-[1300px] mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between lg:justify-start h-[45px]">
+          <div className="flex items-center justify-between lg:justify-start h-[48px]">
 
             {/* Mobile: Hamburger Button */}
             <button
@@ -108,7 +108,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center px-4 h-full text-[13px] font-bold tracking-wide transition-all duration-200 group relative
+                        className={`flex items-center px-3 h-full text-[13px] font-bold tracking-wide transition-all duration-200 group relative whitespace-nowrap
                           ${item.className || ''}
                           ${isNavActive ? 'text-white' : 'text-slate-200 hover:text-white'}`}
                       >
@@ -125,7 +125,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
                     ) : (
                       <Link
                         to={item.to || '/'}
-                        className={`flex items-center px-5 h-full text-[13px] font-bold tracking-wide transition-all duration-200 group relative
+                        className={`flex items-center px-3 h-full text-[13px] font-bold tracking-wide transition-all duration-200 group relative whitespace-nowrap
                           ${item.className || ''}
                           ${isNavActive ? 'text-white' : 'text-slate-200 hover:text-white'}`}
                       >

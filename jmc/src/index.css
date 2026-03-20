@@ -73,6 +73,15 @@ body {
   animation: slideUp 30s linear infinite;
 }
 
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
 /* ── Accessibility contrast modes ── */
 body.ac-high-contrast {
   filter: contrast(150%) brightness(1.1);
