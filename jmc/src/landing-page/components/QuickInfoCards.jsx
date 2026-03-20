@@ -101,7 +101,7 @@ const cards = [
 
 export default function QuickInfoCards() {
   return (
-    <section className="py-16 bg-white border-b border-gray-100">
+    <section className="py-4 bg-white border-b border-gray-100">
       <div className="max-w-[1250px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
