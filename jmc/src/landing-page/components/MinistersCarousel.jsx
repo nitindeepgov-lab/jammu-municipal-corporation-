@@ -1,10 +1,10 @@
 import { useMemo, useState, useEffect } from 'react'
 
 const ministerSlides = [
-  { image: '/officials/LG.jpg', title: "Hon'ble Lt. Governor", name: 'Manoj Sinha', gender: 'M', social: { facebook: '#', twitter: '#', linkedin: '#' } },
-  { image: '/officials/cm.jpg', title: "Hon'ble Chief Minister", name: 'Omar Abdullah', gender: 'M', social: { facebook: '#', twitter: '#', linkedin: '#' } },
+  { image: '/officials/Lg.webp', title: "Hon'ble Lt. Governor", name: 'Manoj Sinha', gender: 'M', social: { facebook: '#', twitter: '#', linkedin: '#' } },
+  { image: '/officials/cm.jpeg', title: "Hon'ble Chief Minister", name: 'Omar Abdullah', gender: 'M', social: { facebook: '#', twitter: '#', linkedin: '#' } },
   { image: '/officials/cs.jpg', title: 'Chief Secretary', name: 'Atul Dulloo, IAS', gender: 'M', social: { facebook: '#', twitter: '#', linkedin: '#' } },
-    { image: '/officials/comSec.jpg', title: 'Commissioner Secretary', name: 'Mandeep Kaur, IAS', gender: 'F', social: { facebook: '#', twitter: '#', linkedin: '#' } },
+    { image: '/officials/comSec.png', title: 'Commissioner Secretary', name: 'Mandeep Kaur, IAS', gender: 'F', social: { facebook: '#', twitter: '#', linkedin: '#' } },
   { image: '/officials/com.jpg', title: 'Commissioner JMC', name: 'Devansh Yadav, IAS', gender: 'M', social: { facebook: '#', twitter: '#', linkedin: '#' } },
 ]
 
