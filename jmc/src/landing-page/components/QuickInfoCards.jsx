@@ -4,200 +4,181 @@ const cards = [
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
       </svg>
     ),
     title: 'Property Tax',
     description: 'Pay dues online, download receipts and check outstanding balances.',
     href: 'https://myjammu.jk.gov.in/Login/Index',
-    tag: 'Online Payment',
-    color: '#003366',
+    color: '#003366', // navy
     bg: '#eef2f7',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z"/>
       </svg>
     ),
-    title: 'Register a complaint',
+    title: 'Register Grievance',
     description: 'Report issues, pay water bills and check area supply schedules.',
     href: 'https://myjammu.jk.gov.in/Login/Index',
-    tag: 'Utility',
-    color: '#1a6fa8',
-    bg: '#e8f4fb',
+    color: '#0284c7', // light blue
+    bg: '#f0f9ff',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
       </svg>
     ),
     title: 'Certificates',
     description: 'Apply for birth, death and marriage certificates via the govt portal.',
     href: 'https://jansugam.jk.gov.in/login.do',
-    tag: 'Registration',
-    color: '#2e7d32',
-    bg: '#e8f5e9',
+    color: '#16a34a', // green
+    bg: '#f0fdf4',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
       </svg>
     ),
     title: 'Orders & Notices',
     description: 'Access official orders, circulars, govt notifications and public notices.',
     href: '/notices',
-    tag: 'Information',
-    color: '#6a1b9a',
-    bg: '#f3e5f5',
+    color: '#9333ea', // purple
+    bg: '#faf5ff',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
       </svg>
     ),
     title: 'Building Permission',
     description: 'Submit and track applications for plan sanction and construction permits.',
     href: 'https://obps.jk.gov.in/BPAMSClient/Home.aspx',
-    tag: 'Approval',
-    color: '#e65100',
-    bg: '#fff3e0',
+    color: '#ea580c', // orange
+    bg: '#fff7ed',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
       </svg>
     ),
     title: 'File a Grievance',
     description: 'Register complaints online and track the resolution status in real time.',
     href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx',
-    tag: 'Complaint',
-    color: '#c62828',
-    bg: '#ffebee',
+    color: '#dc2626', // red
+    bg: '#fef2f2',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
       </svg>
     ),
     title: 'Tenders',
     description: 'View latest JMC tenders, NIT notices and e-procurement opportunities.',
     href: '/notices',
-    tag: 'Procurement',
-    color: '#00695c',
-    bg: '#e0f2f1',
+    color: '#0d9488', // teal
+    bg: '#f0fdfa',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
     ),
     title: 'Smart City',
     description: 'View Jammu Smart City Limited tenders, RFPs, and procurement opportunities.',
     to: '/smart-city-tenders',
-    tag: 'Tenders',
-    color: '#1565c0',
-    bg: '#e3f2fd',
+    color: '#2563eb', // blue
+    bg: '#eff6ff',
   },
 ]
 
 export default function QuickInfoCards() {
   return (
-    <section className="py-0 bg-white">
-      {/* Section header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-6">
-        <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-4">
-            <div className="w-1 h-10 bg-[#FF6600] rounded-full flex-shrink-0" />
-            <div>
-              <p className="text-[11px] font-semibold text-[#FF6600] uppercase tracking-widest mb-0.5">Jammu Municipal Corporation</p>
-              <h2 className="text-[#003366] text-xl sm:text-2xl font-bold leading-tight">Citizen Services</h2>
-              <p className="text-gray-500 text-xs mt-0.5">Quick access to all civic services — online, fast and paperless</p>
-            </div>
+    <section className="py-16 bg-white border-b border-gray-100">
+      <div className="max-w-[1250px] mx-auto px-4 sm:px-6">
+        
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight mb-2">
+              Citizen Services
+            </h2>
+            <p className="text-gray-500 text-sm md:text-base">
+              Quick access to essential municipal services.
+            </p>
           </div>
           <Link
             to="/services"
-            className="flex-shrink-0 self-start sm:self-center inline-flex items-center gap-2 border-2 border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all duration-200"
+            className="group hidden md:inline-flex items-center gap-2 text-sm font-medium text-[#003366] hover:text-[#FF6600] transition-colors"
           >
-            View All Services
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            View all services
+            <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
             </svg>
           </Link>
         </div>
-      </div>
 
-      {/* Cards grid */}
-      <div className="bg-[#f0f4f8] px-4 py-8">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            {cards.map((card, idx) => {
-              const isInternal = card.to || (card.href && card.href.startsWith('/'))
-              const cardCls = "group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 hover:border-transparent transition-all duration-200 hover:-translate-y-0.5 flex flex-col"
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {cards.map((card, idx) => {
+            const isInternal = card.to || (card.href && card.href.startsWith('/'))
+            
+            const cardInner = (
+              <div 
+                className="group h-full bg-white rounded-xl p-6 border border-gray-200 hover:shadow-sm transition-all duration-200 flex flex-col"
+                style={{ '--hover-color': card.color }}
+              >
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-5 transition-colors"
+                  style={{ backgroundColor: card.bg, color: card.color }}
+                >
+                  {card.icon}
+                </div>
+                <h3 className="text-[15px] font-semibold text-gray-900 mb-2 transition-colors">
+                  {card.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">
+                  {card.description}
+                </p>
+                <div 
+                  className="mt-auto flex items-center text-sm font-medium text-gray-400 transition-colors"
+                  style={{ color: card.color }}
+                >
+                  Access Portal
+                  <svg className="w-4 h-4 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+            )
 
-              const cardInner = (
-                <>
-                  {/* Top accent bar */}
-                  <div className="h-1 w-full" style={{ backgroundColor: card.color }} />
+            return isInternal ? (
+              <Link key={idx} to={card.to || card.href} className="block h-full outline-none focus:ring-2 focus:ring-[#003366] rounded-xl cursor-pointer">
+                {cardInner}
+              </Link>
+            ) : (
+              <a key={idx} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full outline-none focus:ring-2 focus:ring-[#003366] rounded-xl cursor-pointer">
+                {cardInner}
+              </a>
+            )
+          })}
+        </div>
 
-                  <div className="p-4 sm:p-5 flex flex-col flex-1">
-                    {/* Icon + tag row */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div
-                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
-                        style={{ backgroundColor: card.bg, color: card.color }}
-                      >
-                        {card.icon}
-                      </div>
-                      <span
-                        className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded hidden sm:inline-block"
-                        style={{ backgroundColor: card.bg, color: card.color }}
-                      >
-                        {card.tag}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3
-                      className="font-bold text-sm sm:text-[15px] mb-1.5 leading-snug transition-colors group-hover:text-[#FF6600]"
-                      style={{ color: card.color }}
-                    >
-                      {card.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-gray-500 text-[11px] sm:text-xs leading-relaxed flex-1 hidden sm:block">
-                      {card.description}
-                    </p>
-
-                    {/* CTA */}
-                    <div className="flex items-center gap-1 mt-3 sm:mt-4">
-                      <span className="text-[11px] sm:text-xs font-semibold text-[#FF6600]">Learn More</span>
-                      <svg className="w-3.5 h-3.5 text-[#FF6600] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
-                      </svg>
-                    </div>
-                  </div>
-                </>
-              )
-
-              return isInternal ? (
-                <Link key={idx} to={card.to || card.href} className={cardCls}>
-                  {cardInner}
-                </Link>
-              ) : (
-                <a key={idx} href={card.href} target="_blank" rel="noopener noreferrer" className={cardCls}>
-                  {cardInner}
-                </a>
-              )
-            })}
-          </div>
+        {/* Mobile View All Button */}
+        <div className="mt-8 md:hidden">
+          <Link
+            to="/services"
+            className="block w-full text-center bg-gray-50 hover:bg-gray-100 text-[#003366] font-medium py-3 rounded-xl transition-colors"
+          >
+            View all services
+          </Link>
         </div>
       </div>
     </section>
