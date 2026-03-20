@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import SubpageTemplate from '../components/SubpageTemplate'
-import { getNotices, getTenders } from '../services/strapiApi'
+import { getNotices, getTenders ,getBulletinItems } from '../services/strapiApi'
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'
 
@@ -36,6 +36,18 @@ export default function Notices() {
         return { title: a.title, date: formatDate(a.notice_date), href }
       })
 
+    const mapBulletinItems = (res) =>
+      (res.data?.data || []).map((item) => {
+        const a = item.attributes || item
+        let href = a.link || '#'
+        if (a.document?.data?.attributes?.url) {
+          href = `${STRAPI_URL}${a.document.data.attributes.url}`
+        } else if (a.document?.url) {
+          href = `${STRAPI_URL}${a.document.url}`
+        }
+        return { title: a.title, date: formatDate(a.release_date || a.notice_date), href }
+      })
+
     const mapTenderItems = (res) =>
       (res.data?.data || []).map((item) => {
         const a = item.attributes || item
@@ -49,13 +61,13 @@ export default function Notices() {
       })
 
     Promise.all([
-      getNotices('public').catch(() => ({ data: { data: [] } })),
+      getBulletinItems().catch(() => ({ data: { data: [] } })),
       getTenders().catch(() => ({ data: { data: [] } })),
       getNotices('council').catch(() => ({ data: { data: [] } })),
     ])
-      .then(([publicRes, tenderRes, councilRes]) => {
+      .then(([bulletinRes, tenderRes, councilRes]) => {
         setNotices({
-          public: mapNoticeItems(publicRes),
+          public: mapBulletinItems(bulletinRes),
           tender: mapTenderItems(tenderRes),
           council: mapNoticeItems(councilRes),
         })
