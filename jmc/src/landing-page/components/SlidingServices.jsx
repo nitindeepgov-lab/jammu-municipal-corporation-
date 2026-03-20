@@ -63,102 +63,106 @@ const importantLinks = [
   },
 ]
 
+function LinkItem({ link }) {
+  const cls = "flex items-center gap-3 text-sm text-gray-600 hover:text-[#003366] py-2.5 transition-colors group"
+  const inner = (
+    <>
+      <span className="text-gray-400 group-hover:text-[#FF6600] transition-colors">{link.icon}</span>
+      <span className="font-medium">{link.name}</span>
+      <svg className="w-3.5 h-3.5 ml-auto opacity-0 group-hover:opacity-50 transition-opacity text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+      </svg>
+    </>
+  )
+  if (link.to) return <Link to={link.to} className={cls}>{inner}</Link>
+  return <a href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a>
+}
+
 export default function SlidingServices() {
   const [mobileTab, setMobileTab] = useState('departments')
 
   return (
-    <section className="py-8 md:py-10 bg-white border-t-4 border-[#003366]">
+    <section className="py-10 md:py-14 bg-white">
       <div className="max-w-[1200px] mx-auto px-4">
 
-        {/* Mobile Tab Switcher — hidden on md+ */}
-        <div className="flex md:hidden mb-4 rounded overflow-hidden border border-gray-200">
-          <button
-            onClick={() => setMobileTab('departments')}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${mobileTab === 'departments' ? 'bg-[#003366] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-          >
-            Departments
-          </button>
-          <button
-            onClick={() => setMobileTab('links')}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors border-l border-gray-200 ${mobileTab === 'links' ? 'bg-[#003366] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-          >
-            Important Links
-          </button>
+        {/* Section Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-[#003366] tracking-tight">Directory</h2>
+          <p className="text-gray-500 text-sm mt-1">Browse departments, important links, and more.</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+        {/* Mobile Tab Switcher */}
+        <div className="flex md:hidden mb-5 bg-gray-100 rounded-lg p-1 gap-1">
+          {['departments', 'links', 'about'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setMobileTab(tab)}
+              className={`flex-1 py-2 text-xs font-semibold rounded-md transition-all ${
+                mobileTab === tab
+                  ? 'bg-white text-[#003366] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab === 'departments' ? 'Departments' : tab === 'links' ? 'Important Links' : 'About Jammu'}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
 
           {/* Col 1: Departments */}
-          <div className={`md:block md:pr-6 pb-6 md:pb-0 ${mobileTab === 'departments' ? 'block' : 'hidden'}`}>
-            <h2 className="text-xl font-bold text-[#003366] mb-1 pb-2 border-b-2 border-[#FF6600] inline-block">
-              Departments
-            </h2>
-            <ul className="mt-4 space-y-1">
+          <div className={`md:block ${mobileTab === 'departments' ? 'block' : 'hidden'}`}>
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+              <div className="w-1 h-5 bg-[#003366] rounded-full" />
+              <h3 className="font-bold text-[#003366] text-[15px] uppercase tracking-wide">Departments</h3>
+            </div>
+            <div className="divide-y divide-gray-100">
               {departments.map((dept, idx) => (
-                <li key={idx}>
-                  <a
-                    href={dept.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2.5 text-sm text-gray-700 hover:text-[#003366] hover:font-semibold transition-all py-1.5 border-b border-gray-100 group"
-                  >
-                    <span className="text-[#FF6600] group-hover:scale-110 transition-transform">{dept.icon}</span>
-                    {dept.name}
-                  </a>
-                </li>
+                <LinkItem key={idx} link={{ ...dept, href: dept.href }} />
               ))}
-            </ul>
+            </div>
             <a
               href="https://jmc.jk.gov.in/information.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 inline-block border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-4 py-1.5 rounded transition-colors"
+              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6600] hover:text-[#003366] transition-colors"
             >
-              View All
+              View all departments
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
             </a>
           </div>
 
           {/* Col 2: Important Links */}
-          <div className={`md:block md:px-6 py-6 md:py-0 ${mobileTab === 'links' ? 'block' : 'hidden'}`}>
-            <h2 className="text-xl font-bold text-[#003366] mb-1 pb-2 border-b-2 border-[#FF6600] inline-block">
-              Important Links
-            </h2>
-            <ul className="mt-4 space-y-1">
+          <div className={`md:block ${mobileTab === 'links' ? 'block' : 'hidden'}`}>
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+              <div className="w-1 h-5 bg-[#FF6600] rounded-full" />
+              <h3 className="font-bold text-[#003366] text-[15px] uppercase tracking-wide">Important Links</h3>
+            </div>
+            <div className="divide-y divide-gray-100">
               {importantLinks.map((link, idx) => (
-                <li key={idx}>
-                  {link.to ? (
-                    <Link
-                      to={link.to}
-                      className="flex items-center gap-2.5 text-sm text-gray-700 hover:text-[#003366] hover:font-semibold transition-all py-1.5 border-b border-gray-100 group"
-                    >
-                      <span className="text-[#FF6600] group-hover:scale-110 transition-transform">{link.icon}</span>
-                      {link.name}
-                    </Link>
-                  ) : (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2.5 text-sm text-gray-700 hover:text-[#003366] hover:font-semibold transition-all py-1.5 border-b border-gray-100 group"
-                    >
-                      <span className="text-[#FF6600] group-hover:scale-110 transition-transform">{link.icon}</span>
-                      {link.name}
-                    </a>
-                  )}
-                </li>
+                <LinkItem key={idx} link={link} />
               ))}
-            </ul>
+            </div>
             <Link
               to="/quick-links"
-              className="mt-4 inline-block border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-4 py-1.5 rounded transition-colors"
+              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6600] hover:text-[#003366] transition-colors"
             >
-              View All
+              View all links
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
             </Link>
           </div>
 
-          {/* Col 3: City image + about — always visible */}
-          <div className="md:pl-6 pt-6 md:pt-0">
-            <div className="rounded overflow-hidden border border-gray-200 shadow-sm">
+          {/* Col 3: About Card */}
+          <div className={`md:block ${mobileTab === 'about' ? 'block' : 'hidden'}`}>
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+              <div className="w-1 h-5 bg-green-600 rounded-full" />
+              <h3 className="font-bold text-[#003366] text-[15px] uppercase tracking-wide">About Jammu</h3>
+            </div>
+            <div className="rounded-lg overflow-hidden border border-gray-100">
               <div className="relative h-44 overflow-hidden">
                 <img
                   src="circle/circle.jpeg"
@@ -168,20 +172,26 @@ export default function SlidingServices() {
                     e.target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900'
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#003366]/80 via-transparent to-transparent" />
-                <div className="absolute bottom-3 left-3">
-                  <p className="text-white font-bold text-sm">Jammu City</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute bottom-3 left-4">
+                  <p className="text-white font-bold text-sm drop-shadow-sm">Jammu City</p>
                 </div>
               </div>
-              <div className="p-4 bg-white">
-                <h3 className="font-bold text-[#003366] text-sm mb-2">Welcome to Jammu Municipal Corporation</h3>
+              <div className="p-5 bg-white">
+                <h3 className="font-bold text-[#003366] text-sm mb-2">Welcome to JMC</h3>
                 <p className="text-xs text-gray-500 leading-relaxed">
                   Jammu, the winter capital of J&K Union Territory, is served by JMC for all civic
                   needs — from sanitation to infrastructure, property services to public health.
                 </p>
-                <a href="https://jmc.jk.gov.in/information.html" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-xs text-[#FF6600] hover:underline font-semibold">
-                  Know More →
-                </a>
+                <Link
+                  to="/about"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-[#FF6600] hover:text-[#003366] font-semibold transition-colors"
+                >
+                  Know more
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                  </svg>
+                </Link>
               </div>
             </div>
           </div>
