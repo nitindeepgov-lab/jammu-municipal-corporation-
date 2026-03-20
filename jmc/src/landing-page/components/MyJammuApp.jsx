@@ -106,7 +106,7 @@ export default function MyJammuApp() {
 
             {/* Heading */}
             <h2 className="text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-4">
-              <span className="text-[#003366]">Your City,{' '}</span>
+              <span className="text-[#003366]">{'Jammu City'}</span>
               <br className="hidden sm:block" />
               <span style={{ background: 'linear-gradient(135deg, #FF6600, #ff8533, #FF6600)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 One Tap Away
