@@ -1,20 +1,38 @@
 import { useState, useEffect, useRef } from 'react'
+import { getNewsTickerItems } from '../../services/strapiApi'
 
-const newsItems = [
-  { text: 'PHE WATER SUPPLY HELPLINE NUMBERS — Click to view contact details', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
-  { text: 'Online Building Permission: Apply at JMC Portal for building plan sanction', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
-  { text: 'PHE WATER SUPPLY HELPLINE NUMBERS — Click to view contact details', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
-  { text: 'Online Building Permission: Apply at JMC Portal for building plan sanction', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
-  { text: 'Pay Property Tax and other dues Online — Quick & Convenient', href: '/pay-online' },
-  { text: 'Register your Grievance / Complaint online with Jammu Municipal Corporation', href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx' },
-  { text: 'Smart City Mission: View latest Smart City projects and developments in Jammu', href: 'https://jmc.jk.gov.in/smartcity.aspx' },
-  { text: 'Download the latest E-Newsletter of Jammu Municipal Corporation', href: 'https://jmc.jk.gov.in/newsletter.aspx' },
+// Fallback items shown while loading or if the API is unavailable
+const FALLBACK_ITEMS = [
+  { text: 'Loading latest news...', href: '#' },
 ]
 
 export default function NewsTicker() {
+  const [newsItems, setNewsItems] = useState(FALLBACK_ITEMS)
   const [current, setCurrent] = useState(0)
   const [animKey, setAnimKey] = useState(0)
   const timerRef = useRef(null)
+
+  // Fetch from backend on mount
+  useEffect(() => {
+    getNewsTickerItems()
+      .then((res) => {
+        const items = (res.data?.data || []).map((item) => {
+          const a = item.attributes || item
+          return {
+            text: a.text,
+            href: a.link || '#',
+            isExternal: a.is_external !== false, // default true
+          }
+        })
+        if (items.length > 0) {
+          setNewsItems(items)
+          setCurrent(0)
+        }
+      })
+      .catch(() => {
+        // Keep fallback — news ticker stays functional
+      })
+  }, [])
 
   const goTo = (idx) => {
     setCurrent(idx)
@@ -26,13 +44,19 @@ export default function NewsTicker() {
   useEffect(() => {
     clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
-      setCurrent(c => (c + 1) % newsItems.length)
+      setCurrent(c => {
+        const n = (c + 1) % newsItems.length
+        return n
+      })
       setAnimKey(k => k + 1)
     }, 4500)
     return () => clearInterval(timerRef.current)
-  }, [current])
+  }, [current, newsItems.length])
 
   const item = newsItems[current]
+  const linkProps = item.isExternal !== false
+    ? { target: '_blank', rel: 'noopener noreferrer' }
+    : {}
 
   return (
     <div
@@ -104,8 +128,7 @@ export default function NewsTicker() {
               <a
                 key={animKey}
                 href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...linkProps}
                 className="ticker-text text-gray-200 text-[12px] hover:text-[#FF6600] transition-colors"
               >
                 {item.text}
@@ -161,8 +184,7 @@ export default function NewsTicker() {
             <a
               key={animKey}
               href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...linkProps}
               className="ticker-text text-gray-200 hover:text-[#FF6600] transition-colors font-medium tracking-wide"
               style={{ fontSize: '13px' }}
             >
@@ -214,4 +236,3 @@ export default function NewsTicker() {
     </div>
   )
 }
-

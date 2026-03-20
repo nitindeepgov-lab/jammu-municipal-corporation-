@@ -9,7 +9,7 @@ const cards = [
     ),
     title: 'Property Tax',
     description: 'Pay dues online, download receipts and check outstanding balances.',
-    href: 'https://jmc.jk.gov.in/online-payment.html',
+    href: 'https://myjammu.jk.gov.in/Login/Index',
     tag: 'Online Payment',
     color: '#003366',
     bg: '#eef2f7',
@@ -20,9 +20,9 @@ const cards = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z"/>
       </svg>
     ),
-    title: 'Water Supply',
+    title: 'Register a complaint',
     description: 'Report issues, pay water bills and check area supply schedules.',
-    href: 'https://jmc.jk.gov.in/pddeservices.html',
+    href: 'https://myjammu.jk.gov.in/Login/Index',
     tag: 'Utility',
     color: '#1a6fa8',
     bg: '#e8f4fb',
@@ -35,7 +35,7 @@ const cards = [
     ),
     title: 'Certificates',
     description: 'Apply for birth, death and marriage certificates via the govt portal.',
-    href: 'https://serviceonline.gov.in/jammu/',
+    href: 'https://jansugam.jk.gov.in/login.do',
     tag: 'Registration',
     color: '#2e7d32',
     bg: '#e8f5e9',
@@ -48,7 +48,7 @@ const cards = [
     ),
     title: 'Orders & Notices',
     description: 'Access official orders, circulars, govt notifications and public notices.',
-    href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Public',
+    href: '/notices',
     tag: 'Information',
     color: '#6a1b9a',
     bg: '#f3e5f5',
@@ -61,7 +61,7 @@ const cards = [
     ),
     title: 'Building Permission',
     description: 'Submit and track applications for plan sanction and construction permits.',
-    href: 'https://jmc.jk.gov.in/PermissionForm.aspx',
+    href: 'https://obps.jk.gov.in/BPAMSClient/Home.aspx',
     tag: 'Approval',
     color: '#e65100',
     bg: '#fff3e0',
@@ -87,7 +87,7 @@ const cards = [
     ),
     title: 'Tenders',
     description: 'View latest JMC tenders, NIT notices and e-procurement opportunities.',
-    href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Tender',
+    href: '/notices',
     tag: 'Procurement',
     color: '#00695c',
     bg: '#e0f2f1',
@@ -99,9 +99,9 @@ const cards = [
       </svg>
     ),
     title: 'Smart City',
-    description: 'Explore Smart City Mission projects and development initiatives in Jammu.',
-    href: 'https://jmc.jk.gov.in/smartcity.aspx',
-    tag: 'Initiative',
+    description: 'View Jammu Smart City Limited tenders, RFPs, and procurement opportunities.',
+    to: '/smart-city-tenders',
+    tag: 'Tenders',
     color: '#1565c0',
     bg: '#e3f2fd',
   },
@@ -137,57 +137,66 @@ export default function QuickInfoCards() {
       <div className="bg-[#f0f4f8] px-4 py-8">
         <div className="max-w-[1200px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            {cards.map((card, idx) => (
-              <a
-                key={idx}
-                href={card.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 hover:border-transparent transition-all duration-200 hover:-translate-y-0.5 flex flex-col"
-              >
-                {/* Top accent bar */}
-                <div className="h-1 w-full" style={{ backgroundColor: card.color }} />
+            {cards.map((card, idx) => {
+              const isInternal = card.to || (card.href && card.href.startsWith('/'))
+              const cardCls = "group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 hover:border-transparent transition-all duration-200 hover:-translate-y-0.5 flex flex-col"
 
-                <div className="p-4 sm:p-5 flex flex-col flex-1">
-                  {/* Icon + tag row */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
-                      style={{ backgroundColor: card.bg, color: card.color }}
-                    >
-                      {card.icon}
+              const cardInner = (
+                <>
+                  {/* Top accent bar */}
+                  <div className="h-1 w-full" style={{ backgroundColor: card.color }} />
+
+                  <div className="p-4 sm:p-5 flex flex-col flex-1">
+                    {/* Icon + tag row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                        style={{ backgroundColor: card.bg, color: card.color }}
+                      >
+                        {card.icon}
+                      </div>
+                      <span
+                        className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded hidden sm:inline-block"
+                        style={{ backgroundColor: card.bg, color: card.color }}
+                      >
+                        {card.tag}
+                      </span>
                     </div>
-                    <span
-                      className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded hidden sm:inline-block"
-                      style={{ backgroundColor: card.bg, color: card.color }}
+
+                    {/* Title */}
+                    <h3
+                      className="font-bold text-sm sm:text-[15px] mb-1.5 leading-snug transition-colors group-hover:text-[#FF6600]"
+                      style={{ color: card.color }}
                     >
-                      {card.tag}
-                    </span>
+                      {card.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-gray-500 text-[11px] sm:text-xs leading-relaxed flex-1 hidden sm:block">
+                      {card.description}
+                    </p>
+
+                    {/* CTA */}
+                    <div className="flex items-center gap-1 mt-3 sm:mt-4">
+                      <span className="text-[11px] sm:text-xs font-semibold text-[#FF6600]">Learn More</span>
+                      <svg className="w-3.5 h-3.5 text-[#FF6600] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </div>
                   </div>
+                </>
+              )
 
-                  {/* Title */}
-                  <h3
-                    className="font-bold text-sm sm:text-[15px] mb-1.5 leading-snug transition-colors group-hover:text-[#FF6600]"
-                    style={{ color: card.color }}
-                  >
-                    {card.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-gray-500 text-[11px] sm:text-xs leading-relaxed flex-1 hidden sm:block">
-                    {card.description}
-                  </p>
-
-                  {/* CTA */}
-                  <div className="flex items-center gap-1 mt-3 sm:mt-4">
-                    <span className="text-[11px] sm:text-xs font-semibold text-[#FF6600]">Learn More</span>
-                    <svg className="w-3.5 h-3.5 text-[#FF6600] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
-                    </svg>
-                  </div>
-                </div>
-              </a>
-            ))}
+              return isInternal ? (
+                <Link key={idx} to={card.to || card.href} className={cardCls}>
+                  {cardInner}
+                </Link>
+              ) : (
+                <a key={idx} href={card.href} target="_blank" rel="noopener noreferrer" className={cardCls}>
+                  {cardInner}
+                </a>
+              )
+            })}
           </div>
         </div>
       </div>

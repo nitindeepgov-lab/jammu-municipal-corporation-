@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "smart_city_tenders",
+  "info": {
+    "singularName": "smart-city-tender",
+    "pluralName": "smart-city-tenders",
+    "displayName": "Smart City Tender",
+    "description": "Jammu Smart City Limited tender listings"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "tender_id": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "category": {
+      "type": "string",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["Active", "Under Evaluation", "Awarded", "Closed", "Cancelled"],
+      "required": true,
+      "default": "Active"
+    },
+    "department": {
+      "type": "string",
+      "required": false
+    },
+    "published_date": {
+      "type": "date",
+      "required": true
+    },
+    "closing_date": {
+      "type": "date",
+      "required": false
+    },
+    "estimated_cost": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
+    },
+    "document": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"]
+    }
+  }
+}

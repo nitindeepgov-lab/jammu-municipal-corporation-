@@ -148,14 +148,12 @@ export default function SlidingServices() {
                 </li>
               ))}
             </ul>
-            <a
-              href="https://jmc.jk.gov.in/quick-links.html"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/quick-links"
               className="mt-4 inline-block border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-4 py-1.5 rounded transition-colors"
             >
               View All
-            </a>
+            </Link>
           </div>
 
           {/* Col 3: City image + about — always visible */}

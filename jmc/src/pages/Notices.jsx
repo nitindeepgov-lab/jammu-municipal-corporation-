@@ -1,42 +1,69 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SubpageTemplate from '../components/SubpageTemplate'
+import { getNotices, getTenders } from '../services/strapiApi'
 
-const noticeData = {
-  public: [
-    { title: 'PHE Water Supply Helpline Numbers — Important Notice', date: '20 May 2025', href: 'https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf' },
-    { title: 'Notice regarding Property Tax Assessment for Financial Year 2025-26', date: '15 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Public' },
-    { title: 'Public Notice: Trade License Renewal — All Traders to Apply', date: '10 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Public' },
-    { title: 'Important: Solid Waste Management Guidelines for Residents', date: '05 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Public' },
-    { title: 'Notification regarding Garbage Collection Timings', date: '01 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Public' },
-    { title: 'Online Building Permission — Apply via JMC Portal', date: '25 Apr 2025', href: 'https://jmc.jk.gov.in/PermissionForm.aspx' },
-    { title: 'Swachh Bharat Mission — Citizen Participation Drive', date: '20 Apr 2025', href: 'https://jmc.jk.gov.in/swachhgallery.aspx' },
-    { title: 'Street Light Repair Grievance — Report via Helpline', date: '15 Apr 2025', href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx' },
-  ],
-  tenders: [
-    { title: 'Tender for Street Light Repair and Maintenance Works in Jammu City', date: '22 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Tender' },
-    { title: 'Tender for Supply and Installation of Solid Waste Management Equipment', date: '18 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Tender' },
-    { title: 'Tender for Construction of Public Toilet Complexes at Multiple Locations', date: '12 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Tender' },
-    { title: 'Tender for Road Repair and Development Works in Jammu City', date: '08 May 2025', href: 'https://jmc.jk.gov.in/developwork.aspx' },
-    { title: 'Tender for Horticulture Development and Maintenance of Gardens', date: '03 May 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Tender' },
-    { title: 'Tender for Supply of Uniform and Safety Equipment for Sanitation Workers', date: '28 Apr 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Tender' },
-  ],
-  council: [
-    { title: 'Council Meeting Proceedings — April 2025', date: '30 Apr 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Council' },
-    { title: 'Resolutions Passed in General House Meeting — March 2025', date: '28 Mar 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Council' },
-    { title: 'Standing Committee Meeting Minutes — February 2025', date: '25 Feb 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Council' },
-    { title: 'Special Session on Development Works — January 2025', date: '20 Jan 2025', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Council' },
-    { title: 'Budget Approval Meeting — December 2024', date: '15 Dec 2024', href: 'https://jmc.jk.gov.in/notices.aspx?noticetype=Council' },
-  ],
-}
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'
 
 const tabs = [
   { id: 'public', label: 'Public Notices' },
-  { id: 'tenders', label: 'Tenders' },
+  { id: 'tender', label: 'Tenders' },
   { id: 'council', label: 'Council Updates' },
 ]
 
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
 export default function Notices() {
   const [active, setActive] = useState('public')
+  const [notices, setNotices] = useState({ public: [], tender: [], council: [] })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+
+    const mapNoticeItems = (res) =>
+      (res.data?.data || []).map((item) => {
+        const a = item.attributes || item
+        let href = a.link || '#'
+        if (a.document?.data?.attributes?.url) {
+          href = `${STRAPI_URL}${a.document.data.attributes.url}`
+        } else if (a.document?.url) {
+          href = `${STRAPI_URL}${a.document.url}`
+        }
+        return { title: a.title, date: formatDate(a.notice_date), href }
+      })
+
+    const mapTenderItems = (res) =>
+      (res.data?.data || []).map((item) => {
+        const a = item.attributes || item
+        let href = a.link || '#'
+        if (a.document?.data?.attributes?.url) {
+          href = `${STRAPI_URL}${a.document.data.attributes.url}`
+        } else if (a.document?.url) {
+          href = `${STRAPI_URL}${a.document.url}`
+        }
+        return { title: a.title, date: formatDate(a.tender_date), href }
+      })
+
+    Promise.all([
+      getNotices('public').catch(() => ({ data: { data: [] } })),
+      getTenders().catch(() => ({ data: { data: [] } })),
+      getNotices('council').catch(() => ({ data: { data: [] } })),
+    ])
+      .then(([publicRes, tenderRes, councilRes]) => {
+        setNotices({
+          public: mapNoticeItems(publicRes),
+          tender: mapTenderItems(tenderRes),
+          council: mapNoticeItems(councilRes),
+        })
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const currentItems = notices[active] || []
 
   return (
     <SubpageTemplate title="Notices &amp; Tenders" breadcrumb={[{ name: 'Notices & Tenders' }]}>
@@ -55,50 +82,70 @@ export default function Notices() {
                 }`}
               >
                 {tab.label}
+                {notices[tab.id]?.length > 0 && (
+                  <span className="ml-2 text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full font-bold">
+                    {notices[tab.id].length}
+                  </span>
+                )}
               </button>
             ))}
           </div>
 
-          {/* Notice list */}
+          {/* Content */}
           <div className="p-6">
-            <ul className="divide-y divide-gray-100">
-              {noticeData[active].map((notice, idx) => (
-                <li key={idx} className="py-4 flex items-start gap-4">
-                  <div className="flex-shrink-0 bg-[#003366] text-white text-center px-3 py-1.5 rounded text-xs min-w-[80px]">
-                    {notice.date}
+
+            {/* Loading */}
+            {loading && (
+              <div className="py-12 text-center">
+                <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#003366] rounded-full animate-spin mb-3" />
+                <p className="text-gray-500 text-sm">Loading...</p>
+              </div>
+            )}
+
+            {/* Notice list */}
+            {!loading && (
+              <>
+                {currentItems.length === 0 ? (
+                  <div className="py-12 text-center">
+                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-gray-500 text-sm">
+                      No {tabs.find(t => t.id === active)?.label.toLowerCase()} available at the moment.
+                    </p>
                   </div>
-                  <div className="flex-1">
-                    <a
-                      href={notice.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#003366] hover:text-[#FF6600] text-sm font-medium hover:underline transition-colors"
-                    >
-                      <span className="text-[#FF6600] mr-1">►</span>
-                      {notice.title}
-                    </a>
-                  </div>
-                  <a
-                    href={notice.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded transition-colors"
-                  >
-                    View
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 pt-4 border-t border-gray-100 text-right">
-              <a
-                href={`https://jmc.jk.gov.in/notices.aspx?noticetype=${active === 'public' ? 'Public' : active === 'tenders' ? 'Tender' : 'Council'}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-[#003366] text-white text-sm px-6 py-2 rounded hover:bg-[#004080] transition-colors"
-              >
-                View All on JMC Portal →
-              </a>
-            </div>
+                ) : (
+                  <ul className="divide-y divide-gray-100">
+                    {currentItems.map((notice, idx) => (
+                      <li key={idx} className="py-4 flex items-start gap-4">
+                        <div className="flex-shrink-0 bg-[#003366] text-white text-center px-3 py-1.5 rounded text-xs min-w-[80px]">
+                          {notice.date}
+                        </div>
+                        <div className="flex-1">
+                          <a
+                            href={notice.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#003366] hover:text-[#FF6600] text-sm font-medium hover:underline transition-colors"
+                          >
+                            <span className="text-[#FF6600] mr-1">►</span>
+                            {notice.title}
+                          </a>
+                        </div>
+                        <a
+                          href={notice.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded transition-colors"
+                        >
+                          View
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -36,6 +36,8 @@ import PayOnline from './pages/PayOnline'
 import WebInfoManager from './pages/WebInfoManager'
 import Information from './pages/Information'
 import InformationDetail from './pages/InformationDetail'
+import QuickLinksPage from './pages/QuickLinksPage'
+import SmartCityTenders from './pages/SmartCityTenders'
 
 export default function App() {
   return (
@@ -61,6 +63,8 @@ export default function App() {
         <Route path="/web-info-manager" element={<WebInfoManager />} />
         <Route path="/information" element={<Information />} />
         <Route path="/information/:slug" element={<InformationDetail />} />
+        <Route path="/quick-links" element={<QuickLinksPage />} />
+        <Route path="/smart-city-tenders" element={<SmartCityTenders />} />
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>
