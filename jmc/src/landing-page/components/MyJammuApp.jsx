@@ -149,7 +149,7 @@ export default function MyJammuApp() {
             {/* Download buttons */}
             <div className="flex flex-wrap items-center gap-3 justify-center lg:justify-start">
               <a
-                href="#"
+                href="https://play.google.com/store/apps/details?id=com.jammu.jammucitizenapp&hl=en_IN"
                 className="group flex items-center gap-3 bg-[#003366] text-white px-5 py-3 rounded-xl hover:bg-[#004080] hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
                 style={{ boxShadow: '0 4px 14px rgba(0,51,102,0.25)' }}
               >
@@ -158,7 +158,7 @@ export default function MyJammuApp() {
                 </svg>
                 <div className="text-left leading-tight">
                   <div className="text-[9px] text-white/60 uppercase tracking-wider font-medium">Get it on</div>
-                  <div className="text-sm font-bold">Google Play</div>
+                  <div href="" className="text-sm font-bold">Google Play</div>
                 </div>
               </a>
               <a
