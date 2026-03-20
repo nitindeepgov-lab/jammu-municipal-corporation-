@@ -7,7 +7,7 @@ const footerNavLinks = [
   { name: 'Website Policies', href: 'https://jmc.jk.gov.in/information.html' },
   { name: 'Contact Us', href: 'https://jmc.jk.gov.in/contactus.aspx' },
   { name: 'Help', href: 'https://jmc.jk.gov.in/information.html' },
-  { name: 'Sitemap', href: 'https://jmc.jk.gov.in/quick-links.html' },
+  { name: 'Sitemap', to: '/sitemap' },
   { name: 'Web Information Manager', to: '/web-info-manager' },
   { name: 'Hyperlinking Policy', href: 'https://jmc.jk.gov.in/information.html' },
   { name: 'Privacy Policy', href: 'https://jmc.jk.gov.in/information.html' },

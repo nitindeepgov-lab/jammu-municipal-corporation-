@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 // Icon button for accessibility panel
 function AccessBtn({ onClick, active, label, children }) {
@@ -153,11 +154,11 @@ export default function TopBar() {
           </div>
 
           {/* Sitemap */}
-          <a href="#" className="h-full px-3 flex items-center hover:bg-[#FF6600] transition-colors" aria-label="Sitemap">
+          <Link to="/sitemap" className="h-full px-3 flex items-center hover:bg-[#FF6600] transition-colors" aria-label="Sitemap">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
               <path d="M3 9h4V5H3v4zm0 5h4v-4H3v4zm5 0h4v-4H8v4zm5 0h4v-4h-4v4zM8 9h4V5H8v4zm5-4v4h4V5h-4zM3 19h4v-4H3v4zm5 0h4v-4H8v4zm5 0h4v-4h-4v4z"/>
             </svg>
-          </a>
+          </Link>
           {/* Accessibility Tools */}
           <div className="relative" ref={accessRef}>
             <button

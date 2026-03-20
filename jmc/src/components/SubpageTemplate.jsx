@@ -93,42 +93,6 @@ function Sidebar() {
           ))}
         </ul>
       </div>
-
-      {/* Helpline */}
-      <div className="bg-[#003366] text-white rounded shadow-sm p-4">
-        <h3 className="font-bold text-sm mb-3 border-b border-blue-400 pb-2 text-[#FF6600] uppercase tracking-wide">
-          Helpline
-        </h3>
-        <div className="space-y-2 text-sm">
-          <div>
-            <p className="text-blue-200 text-xs">Toll Free</p>
-            <a href="tel:18001807207" className="font-bold text-white hover:text-[#FF6600]">1800-180-7207</a>
-          </div>
-          <div>
-            <p className="text-blue-200 text-xs">Commissioner's Office</p>
-            <a href="tel:01912520677" className="font-bold text-white hover:text-[#FF6600]">0191-252-0677</a>
-          </div>
-          <div>
-            <p className="text-blue-200 text-xs">Email</p>
-            <a href="mailto:commissionerjmc@jk.gov.in" className="text-xs text-blue-200 hover:text-white break-all">commissionerjmc@jk.gov.in</a>
-          </div>
-        </div>
-      </div>
-
-      {/* Download App */}
-      <div className="bg-white shadow-sm rounded p-4 text-center">
-        <p className="text-[#003366] font-bold text-sm mb-1">JMC Citizen App</p>
-        <p className="text-gray-500 text-xs mb-3">Register complaints, pay taxes & track services</p>
-        <a
-          href="https://jmc.jk.gov.in/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-[#003366] text-white text-xs px-4 py-2 rounded hover:bg-[#FF6600] transition-colors"
-        >
-          Visit Portal →
-        </a>
-      </div>
-
     </aside>
   )
 }
@@ -141,7 +105,7 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
         className="relative overflow-hidden border-t-4 border-[#FF6600]"
         style={{
           background: 'linear-gradient(135deg, #001f4d 0%, #003366 60%, #004080 100%)',
-          backgroundImage: `url('/banner/banner1.jpg')`,
+          backgroundImage: `url('/banner/banner6.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

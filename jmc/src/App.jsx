@@ -38,6 +38,7 @@ import Information from './pages/Information'
 import InformationDetail from './pages/InformationDetail'
 import QuickLinksPage from './pages/QuickLinksPage'
 import SmartCityTenders from './pages/SmartCityTenders'
+import Sitemap from './pages/Sitemap'
 
 export default function App() {
   return (
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="/information/:slug" element={<InformationDetail />} />
         <Route path="/quick-links" element={<QuickLinksPage />} />
         <Route path="/smart-city-tenders" element={<SmartCityTenders />} />
+        <Route path="/sitemap" element={<Sitemap />} />
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>
