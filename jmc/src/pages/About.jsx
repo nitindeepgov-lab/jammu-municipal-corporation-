@@ -29,7 +29,7 @@ export default function About() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#FF6600]/10 via-transparent to-[#003366]/10 rounded-lg blur" aria-hidden />
                   <img
-                    src="/app/aboutimage.png"
+                    src="/logo.jpeg"
                     alt="Jammu Municipal Corporation building"
                     className="relative w-full h-full max-h-[320px] object-cover rounded-lg shadow-md"
                   />

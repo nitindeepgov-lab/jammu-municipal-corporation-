@@ -33,27 +33,23 @@ function Sidebar() {
   const location = useLocation()
 
   return (
-    <aside className="space-y-5">
+    <aside className="space-y-4">
 
-      {/* Page Navigation */}
-      <div className="bg-white shadow-sm rounded overflow-hidden">
-        <div className="bg-[#003366] text-white px-4 py-3 text-sm font-bold uppercase tracking-wide border-l-4 border-[#FF6600]">
-          Navigate
-        </div>
-        <ul className="divide-y divide-gray-100">
-          {PAGE_NAV.map((item) => {
+      {/* Page Navigation — styled like the main nav bar */}
+      <div className="bg-[#002B5E] rounded-md overflow-hidden shadow-sm">
+        <ul>
+          {PAGE_NAV.map((item, idx) => {
             const active = location.pathname === item.to
             return (
-              <li key={item.to}>
+              <li key={item.to} className={idx !== 0 ? 'border-t border-white/10' : ''}>
                 <Link
                   to={item.to}
-                  className={`flex items-center px-4 py-2.5 text-sm transition-colors ${
+                  className={`flex items-center px-4 py-2.5 text-[13px] font-medium transition-colors ${
                     active
-                      ? 'bg-[#FF6600] text-white font-medium'
-                      : 'text-[#003366] hover:bg-[#f5f5f5] hover:text-[#FF6600]'
+                      ? 'bg-[#FF6600] text-white'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
                   }`}
                 >
-                  <span className={`mr-2 text-xs ${active ? 'text-white' : 'text-[#FF6600]'}`}>›</span>
                   {item.name}
                 </Link>
               </li>
@@ -63,19 +59,18 @@ function Sidebar() {
       </div>
 
       {/* Important Links */}
-      <div className="bg-white shadow-sm rounded overflow-hidden">
-        <div className="bg-[#FF6600] text-white px-4 py-3 text-sm font-bold uppercase tracking-wide">
+      <div className="rounded-md overflow-hidden shadow-sm border border-gray-200">
+        <div className="bg-[#FF6600] text-white px-4 py-2.5 text-[13px] font-bold uppercase tracking-wider">
           Important Links
         </div>
-        <ul className="divide-y divide-gray-100">
-          {IMPORTANT_LINKS.map((link) => (
-            <li key={link.to || link.href}>
+        <ul className="bg-white">
+          {IMPORTANT_LINKS.map((link, idx) => (
+            <li key={link.to || link.href} className={idx !== 0 ? 'border-t border-gray-100' : ''}>
               {link.to ? (
                 <Link
                   to={link.to}
-                  className="flex items-center px-4 py-2.5 text-sm text-[#003366] hover:bg-[#f5f5f5] hover:text-[#FF6600] transition-colors"
+                  className="block px-4 py-2.5 text-[13px] text-gray-600 hover:text-[#FF6600] hover:bg-gray-50 transition-colors"
                 >
-                  <span className="mr-2 text-[#FF6600] text-xs">›</span>
                   {link.name}
                 </Link>
               ) : (
@@ -83,9 +78,8 @@ function Sidebar() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center px-4 py-2.5 text-sm text-[#003366] hover:bg-[#f5f5f5] hover:text-[#FF6600] transition-colors"
+                  className="block px-4 py-2.5 text-[13px] text-gray-600 hover:text-[#FF6600] hover:bg-gray-50 transition-colors"
                 >
-                  <span className="mr-2 text-[#FF6600] text-xs">›</span>
                   {link.name}
                 </a>
               )}
@@ -100,61 +94,44 @@ function Sidebar() {
 export default function SubpageTemplate({ title, breadcrumb = [], children }) {
   return (
     <PageLayout>
-      {/* S3WaaS-style Inner Banner */}
-      <div
-        className="relative overflow-hidden border-t-4 border-[#FF6600]"
-        style={{
-          background: 'linear-gradient(135deg, #001f4d 0%, #003366 60%, #004080 100%)',
-          backgroundImage: `url('/banner/banner6.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,33,80,0.92) 0%, rgba(0,51,102,0.85) 100%)' }} />
-        {/* Subtle diagonal stripe texture */}
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #ffffff 0, #ffffff 1px, transparent 0, transparent 50%)', backgroundSize: '12px 12px' }} />
-
-        <div className="relative max-w-[1200px] mx-auto px-4 py-10 md:py-14">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+      {/* Clean Banner */}
+      <div className="bg-[#002B5E] border-b-[3px] border-[#FF6600]">
+        <div className="max-w-[1200px] mx-auto px-4 py-7 md:py-9">
+          <h1 className="text-xl md:text-2xl font-bold text-white leading-tight mb-2">
             {title}
           </h1>
-          {/* Breadcrumb */}
           <nav aria-label="Breadcrumb">
-            <ol className="flex flex-wrap items-center gap-1.5 text-sm">
+            <ol className="flex flex-wrap items-center gap-1 text-[12px]">
               <li>
-                <Link to="/" className="text-blue-200 hover:text-white transition-colors">Home</Link>
+                <Link to="/" className="text-slate-400 hover:text-white transition-colors">Home</Link>
               </li>
               {breadcrumb.map((crumb, i) => (
-                <li key={i} className="flex items-center gap-1.5">
-                  <span className="text-[#FF6600]">›</span>
+                <li key={i} className="flex items-center gap-1">
+                  <span className="text-slate-500">/</span>
                   {crumb.to ? (
-                    <Link to={crumb.to} className="text-blue-200 hover:text-white transition-colors">{crumb.name}</Link>
+                    <Link to={crumb.to} className="text-slate-400 hover:text-white transition-colors">{crumb.name}</Link>
                   ) : (
-                    <span className="text-white font-medium">{crumb.name}</span>
+                    <span className="text-[#FF6600] font-medium">{crumb.name}</span>
                   )}
                 </li>
               ))}
             </ol>
           </nav>
         </div>
-
-        {/* Bottom orange accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#FF6600]" />
       </div>
 
-      {/* Two-column content area */}
-      <div className="bg-[#f5f5f5] py-8">
+      {/* Content area */}
+      <div className="bg-white py-6">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-6">
 
-            {/* Main content — 75% */}
-            <main className="flex-1 min-w-0 space-y-5">
+            {/* Main content */}
+            <main className="flex-1 min-w-0">
               {children}
             </main>
 
-            {/* Sidebar — 25% */}
-            <div className="w-full lg:w-72 xl:w-80 flex-shrink-0">
+            {/* Sidebar */}
+            <div className="w-full lg:w-64 xl:w-72 flex-shrink-0">
               <Sidebar />
             </div>
 
