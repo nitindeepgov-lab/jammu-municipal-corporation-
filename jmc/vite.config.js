@@ -1,23 +1,33 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from 'tailwindcss'
-import autoprefixer from 'autoprefixer'
-import tailwindConfig from './tailwind.config.js'
+import { defineConfig } from "vite";
+import { loadEnv } from "vite";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
+import tailwindConfig from "./tailwind.config.js";
+
+const rootDir = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  css: {
-    postcss: {
-      plugins: [tailwindcss(tailwindConfig), autoprefixer],
-    },
-  },
-  server: {
-    proxy: {
-      '/admin': {
-        target: 'http://localhost:1337',
-        changeOrigin: true,
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, rootDir, "");
+  const strapiTarget = env.VITE_STRAPI_URL || "http://localhost:1338";
+
+  return {
+    plugins: [react()],
+    css: {
+      postcss: {
+        plugins: [tailwindcss(tailwindConfig), autoprefixer],
       },
     },
-  },
-})
+    server: {
+      proxy: {
+        "/admin": {
+          target: strapiTarget,
+          changeOrigin: true,
+        },
+      },
+    },
+  };
+});

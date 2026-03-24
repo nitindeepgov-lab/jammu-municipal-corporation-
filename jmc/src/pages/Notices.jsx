@@ -1,96 +1,113 @@
-import { useState, useEffect } from 'react'
-import SubpageTemplate from '../components/SubpageTemplate'
-import { getNotices, getTenders ,getBulletinItems } from '../services/strapiApi'
+import { useState, useEffect } from "react";
+import SubpageTemplate from "../components/SubpageTemplate";
+import {
+  getNotices,
+  getTenders,
+  getBulletinItems,
+} from "../services/strapiApi";
 
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
 
 const tabs = [
-  { id: 'public', label: 'Public Notices' },
-  { id: 'tender', label: 'Tenders' },
-  { id: 'council', label: 'Council Updates' },
-]
+  { id: "public", label: "Public Notices" },
+  { id: "tender", label: "Tenders" },
+  { id: "council", label: "Council Updates" },
+];
 
 function formatDate(dateStr) {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function Notices() {
-  const [active, setActive] = useState('public')
-  const [notices, setNotices] = useState({ public: [], tender: [], council: [] })
-  const [loading, setLoading] = useState(true)
+  const [active, setActive] = useState("public");
+  const [notices, setNotices] = useState({
+    public: [],
+    tender: [],
+    council: [],
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true)
-
     const mapNoticeItems = (res) =>
       (res.data?.data || []).map((item) => {
-        const a = item.attributes || item
-        let href = a.link || '#'
+        const a = item.attributes || item;
+        let href = a.link || "#";
         if (a.document?.data?.attributes?.url) {
-          href = `${STRAPI_URL}${a.document.data.attributes.url}`
+          href = `${STRAPI_URL}${a.document.data.attributes.url}`;
         } else if (a.document?.url) {
-          href = `${STRAPI_URL}${a.document.url}`
+          href = `${STRAPI_URL}${a.document.url}`;
         }
-        return { title: a.title, date: formatDate(a.notice_date), href }
-      })
+        return { title: a.title, date: formatDate(a.notice_date), href };
+      });
 
     const mapBulletinItems = (res) =>
       (res.data?.data || []).map((item) => {
-        const a = item.attributes || item
-        let href = a.link || '#'
+        const a = item.attributes || item;
+        let href = a.link || "#";
         if (a.document?.data?.attributes?.url) {
-          href = `${STRAPI_URL}${a.document.data.attributes.url}`
+          href = `${STRAPI_URL}${a.document.data.attributes.url}`;
         } else if (a.document?.url) {
-          href = `${STRAPI_URL}${a.document.url}`
+          href = `${STRAPI_URL}${a.document.url}`;
         }
-        return { title: a.title, date: formatDate(a.release_date || a.notice_date), href }
-      })
+        return {
+          title: a.title,
+          date: formatDate(a.release_date || a.notice_date),
+          href,
+        };
+      });
 
     const mapTenderItems = (res) =>
       (res.data?.data || []).map((item) => {
-        const a = item.attributes || item
-        let href = a.link || '#'
+        const a = item.attributes || item;
+        let href = a.link || "#";
         if (a.document?.data?.attributes?.url) {
-          href = `${STRAPI_URL}${a.document.data.attributes.url}`
+          href = `${STRAPI_URL}${a.document.data.attributes.url}`;
         } else if (a.document?.url) {
-          href = `${STRAPI_URL}${a.document.url}`
+          href = `${STRAPI_URL}${a.document.url}`;
         }
-        return { title: a.title, date: formatDate(a.tender_date), href }
-      })
+        return { title: a.title, date: formatDate(a.tender_date), href };
+      });
 
     Promise.all([
       getBulletinItems().catch(() => ({ data: { data: [] } })),
       getTenders().catch(() => ({ data: { data: [] } })),
-      getNotices('council').catch(() => ({ data: { data: [] } })),
+      getNotices("council").catch(() => ({ data: { data: [] } })),
     ])
       .then(([bulletinRes, tenderRes, councilRes]) => {
         setNotices({
           public: mapBulletinItems(bulletinRes),
           tender: mapTenderItems(tenderRes),
           council: mapNoticeItems(councilRes),
-        })
+        });
       })
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => setLoading(false));
+  }, []);
 
-  const currentItems = notices[active] || []
+  const currentItems = notices[active] || [];
 
   return (
-    <SubpageTemplate title="Notices &amp; Tenders" breadcrumb={[{ name: 'Notices & Tenders' }]}>
+    <SubpageTemplate
+      title="Notices &amp; Tenders"
+      breadcrumb={[{ name: "Notices & Tenders" }]}
+    >
       <div>
         <div className="bg-white rounded shadow-sm overflow-hidden">
           {/* Tab bar */}
           <div className="flex border-b border-gray-200">
-            {tabs.map(tab => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActive(tab.id)}
                 className={`px-6 py-4 text-sm font-semibold transition-colors border-b-2 ${
                   active === tab.id
-                    ? 'border-[#FF6600] text-[#FF6600] bg-orange-50'
-                    : 'border-transparent text-gray-600 hover:text-[#003366] hover:bg-gray-50'
+                    ? "border-[#FF6600] text-[#FF6600] bg-orange-50"
+                    : "border-transparent text-gray-600 hover:text-[#003366] hover:bg-gray-50"
                 }`}
               >
                 {tab.label}
@@ -105,7 +122,6 @@ export default function Notices() {
 
           {/* Content */}
           <div className="p-6">
-
             {/* Loading */}
             {loading && (
               <div className="py-12 text-center">
@@ -119,11 +135,23 @@ export default function Notices() {
               <>
                 {currentItems.length === 0 ? (
                   <div className="py-12 text-center">
-                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <svg
+                      className="w-12 h-12 mx-auto text-gray-300 mb-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
                     </svg>
                     <p className="text-gray-500 text-sm">
-                      No {tabs.find(t => t.id === active)?.label.toLowerCase()} available at the moment.
+                      No{" "}
+                      {tabs.find((t) => t.id === active)?.label.toLowerCase()}{" "}
+                      available at the moment.
                     </p>
                   </div>
                 ) : (
@@ -162,5 +190,5 @@ export default function Notices() {
         </div>
       </div>
     </SubpageTemplate>
-  )
+  );
 }
