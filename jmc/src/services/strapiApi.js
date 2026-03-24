@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Point to deployed Strapi; falls back to local for dev
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1338';
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1337";
 
 const api = axios.create({
   baseURL: `${STRAPI_URL}/api`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -14,15 +14,17 @@ const api = axios.create({
 
 /** Fetch all published bulletin board entries (newest first) */
 export const getBulletinItems = () =>
-  api.get('/bulletin-boards?sort=release_date:desc&populate=*&status=published');
+  api.get(
+    "/bulletin-boards?sort=release_date:desc&populate=*&status=published",
+  );
 
 /** Fetch a single published bulletin board entry by documentId */
 export const getBulletinItemById = (documentId) =>
   api.get(`/bulletin-boards/${documentId}?populate=*&status=published`);
 
 /** Add a new bulletin board entry */
-export const addBulletinItem = (title, release_date, link = '') =>
-  api.post('/bulletin-boards', {
+export const addBulletinItem = (title, release_date, link = "") =>
+  api.post("/bulletin-boards", {
     data: { title, release_date, link },
   });
 
@@ -38,13 +40,25 @@ export const deleteBulletinItem = (documentId) =>
 
 /** Fetch all published officials ordered by the 'order' field */
 export const getOfficials = () =>
-  api.get('/officials?populate=picture&sort=order:asc&filters[publishedAt][$notNull]=true');
+  api.get(
+    "/officials?populate=picture&sort=order:asc&filters[publishedAt][$notNull]=true",
+  );
+
+// ── Ex-Municipal Councillors ───────────────────────────────
+
+/** Fetch all published councillor details ordered by ward number */
+export const getCouncillors = () =>
+  api.get(
+    "/councillor-details?populate=photo&sort=ward_no:asc&pagination[pageSize]=100&status=published",
+  );
 
 // ── Smart City Tenders ──────────────────────────────────────
 
 /** Fetch all published smart city tenders (newest first) */
 export const getSmartCityTenders = () =>
-  api.get('/smart-city-tenders?sort=published_date:desc&populate=*&status=published');
+  api.get(
+    "/smart-city-tenders?sort=published_date:desc&populate=*&status=published",
+  );
 
 /** Fetch a single smart city tender by documentId */
 export const getSmartCityTenderById = (documentId) =>
@@ -52,7 +66,7 @@ export const getSmartCityTenderById = (documentId) =>
 
 /** Add a new smart city tender */
 export const addSmartCityTender = (data) =>
-  api.post('/smart-city-tenders', { data });
+  api.post("/smart-city-tenders", { data });
 
 /** Update an existing smart city tender */
 export const updateSmartCityTender = (documentId, fields) =>
@@ -66,15 +80,16 @@ export const deleteSmartCityTender = (documentId) =>
 
 /** Fetch all published news ticker items (ordered by 'order' field) */
 export const getNewsTickerItems = () =>
-  api.get('/news-tickers?sort=order:asc&status=published&filters[is_active][$eq]=true');
+  api.get(
+    "/news-tickers?sort=order:asc&status=published&filters[is_active][$eq]=true",
+  );
 
 /** Fetch all news ticker items (including inactive, for admin) */
 export const getAllNewsTickerItems = () =>
-  api.get('/news-tickers?sort=order:asc&status=published');
+  api.get("/news-tickers?sort=order:asc&status=published");
 
 /** Add a new news ticker item */
-export const addNewsTickerItem = (data) =>
-  api.post('/news-tickers', { data });
+export const addNewsTickerItem = (data) => api.post("/news-tickers", { data });
 
 /** Update an existing news ticker item */
 export const updateNewsTickerItem = (documentId, fields) =>
@@ -88,8 +103,8 @@ export const deleteNewsTickerItem = (documentId) =>
 
 /** Fetch all published notices (newest first), optionally filtered by type */
 export const getNotices = (noticeType) => {
-  let url = '/notices?sort=notice_date:desc&populate=*&status=published';
-  if (noticeType && noticeType !== 'all') {
+  let url = "/notices?sort=notice_date:desc&populate=*&status=published";
+  if (noticeType && noticeType !== "all") {
     url += `&filters[notice_type][$eq]=${noticeType}`;
   }
   return api.get(url);
@@ -100,8 +115,7 @@ export const getNoticeById = (documentId) =>
   api.get(`/notices/${documentId}?populate=*&status=published`);
 
 /** Add a new notice */
-export const addNotice = (data) =>
-  api.post('/notices', { data });
+export const addNotice = (data) => api.post("/notices", { data });
 
 /** Update an existing notice */
 export const updateNotice = (documentId, fields) =>
@@ -115,15 +129,14 @@ export const deleteNotice = (documentId) =>
 
 /** Fetch all published JMC tenders (newest first) */
 export const getTenders = () =>
-  api.get('/tenders?sort=tender_date:desc&populate=*&status=published');
+  api.get("/tenders?sort=tender_date:desc&populate=*&status=published");
 
 /** Fetch a single tender by documentId */
 export const getTenderById = (documentId) =>
   api.get(`/tenders/${documentId}?populate=*&status=published`);
 
 /** Add a new tender */
-export const addTender = (data) =>
-  api.post('/tenders', { data });
+export const addTender = (data) => api.post("/tenders", { data });
 
 /** Update an existing tender */
 export const updateTender = (documentId, fields) =>

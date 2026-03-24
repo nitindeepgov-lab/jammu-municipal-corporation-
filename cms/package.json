@@ -11,6 +11,8 @@
     "develop": "strapi develop",
     "seed:example": "node ./scripts/seed.js",
     "seed:officials": "node ./scripts/seed-officials.js",
+    "seed:councillors": "node ./scripts/seed-councillorDetails.js",
+    "grant:councillors": "node ./scripts/grant-councillors-permissions.js",
     "grant:officials": "node ./scripts/grant-officials-permissions.js",
     "start": "strapi start",
     "strapi": "strapi",
