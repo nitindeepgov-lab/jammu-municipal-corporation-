@@ -4,8 +4,8 @@
   "info": {
     "singularName": "smart-city-tender",
     "pluralName": "smart-city-tenders",
-    "displayName": "Smart City Tender",
-    "description": "Jammu Smart City Limited tender listings"
+    "displayName": "🏗️ Smart City Tender",
+    "description": "Jammu Smart City Limited (JSCL) tender listings with ID, status tracking, and document uploads."
   },
   "options": {
     "draftAndPublish": true

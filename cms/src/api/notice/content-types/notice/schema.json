@@ -4,8 +4,8 @@
   "info": {
     "singularName": "notice",
     "pluralName": "notices",
-    "displayName": "Notice",
-    "description": "Public notices and council updates published by JMC"
+    "displayName": "📢 Public Notice",
+    "description": "Official public and council notices published by JMC. Visible on the Notices page."
   },
   "options": {
     "draftAndPublish": true

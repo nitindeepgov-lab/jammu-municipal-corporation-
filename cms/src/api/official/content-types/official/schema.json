@@ -4,8 +4,8 @@
   "info": {
     "singularName": "official",
     "pluralName": "officials",
-    "displayName": "Official",
-    "description": "Officers and officials with their name, designation, and picture"
+    "displayName": "👤 JMC Official",
+    "description": "Municipal officers displayed in Who's Who section. Use the order field to control display priority."
   },
   "options": {
     "draftAndPublish": true

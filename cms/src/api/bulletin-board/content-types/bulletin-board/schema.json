@@ -4,8 +4,8 @@
   "info": {
     "singularName": "bulletin-board",
     "pluralName": "bulletin-boards",
-    "displayName": "Bulletin Board",
-    "description": "Press releases and notices for the JMC Bulletin Board"
+    "displayName": "📋 Bulletin Board",
+    "description": "Press releases, circulars and notices displayed on the JMC homepage bulletin board section"
   },
   "options": {
     "draftAndPublish": true
@@ -17,7 +17,7 @@
       "required": true
     },
     "release_date": {
-      "type": "string",
+      "type": "date",
       "required": true
     },
     "link": {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Point to deployed Strapi; falls back to local for dev
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1338';
 
 const api = axios.create({
   baseURL: `${STRAPI_URL}/api`,

@@ -20,6 +20,7 @@ const PAGE_NAV = [
 
 const IMPORTANT_LINKS = [
   { name: 'Pay Online', to: '/pay-online' },
+  { name: "Commissioner's Desk", to: '/commissioner' },
   { name: 'Online Grievance', href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx' },
   { name: 'JAKSMAC e-Services', href: 'https://serviceonline.gov.in/jammu/' },
   { name: 'PDD E-Services', href: 'https://jmc.jk.gov.in/pddeservices.html' },
