@@ -3,193 +3,366 @@ import favicon from './favicon.png';
 
 /* ──────────────────────────────────────────────────────
    JMC Admin — Strapi 5 Customisation
-   ─ Login page branding ONLY (scoped CSS)
-   ─ Theme tokens for internal admin (Strapi-native)
-   ─ Dashboard translations
+   MINIMAL + TARGETED: Only styles what we own.
+   Lets Strapi's built-in theme handle light/dark for
+   all internal admin panels (tables, forms, modals, etc.)
    ────────────────────────────────────────────────────── */
 
-const injectLoginStyles = () => {
+const injectAdminStyles = () => {
   const style = document.createElement('style');
   style.textContent = `
-    /* ═══════ SCOPED TO LOGIN / AUTH PAGES ONLY ═══════
-       These selectors target ONLY the authentication
-       wrapper and will NOT bleed into the content
-       manager, list views, or settings pages.
-       ════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
-    /* ── Auth page background ── */
-    main[class*="LayoutContent"] ~ div,
-    body:has(form[action*="auth"]),
+    /* ═══════ FONT ONLY — no color overrides ═══════ */
+    * {
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    /* ═══════ PRIMARY ICON SIDEBAR ONLY ═══════
+       Targets ONLY the narrow ~50px icon sidebar on the far left.
+       Uses the > combinator so it NEVER leaks into the
+       Content Manager's secondary sidebar or any other panel. */
+    body > div:first-child > div > nav:first-of-type,
+    [class*="LeftMenu"], [class*="leftMenu"] {
+      background: linear-gradient(180deg, #0f1c2e 0%, #152b47 100%) !important;
+      border-right: 1px solid rgba(255,255,255,0.06) !important;
+    }
+    /* Icon sidebar links */
+    body > div:first-child > div > nav:first-of-type a,
+    [class*="LeftMenu"] a, [class*="leftMenu"] a {
+      transition: all 0.25s ease !important;
+    }
+    body > div:first-child > div > nav:first-of-type a:hover,
+    [class*="LeftMenu"] a:hover, [class*="leftMenu"] a:hover {
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+    /* Make sure icon sidebar SVGs are visible */
+    body > div:first-child > div > nav:first-of-type svg,
+    [class*="LeftMenu"] svg, [class*="leftMenu"] svg {
+      color: rgba(255,255,255,0.7) !important;
+      fill: rgba(255,255,255,0.7) !important;
+    }
+    body > div:first-child > div > nav:first-of-type span,
+    [class*="LeftMenu"] span, [class*="leftMenu"] span {
+      color: rgba(255,255,255,0.8) !important;
+    }
+
+    /* ═══════ SMOOTH BUTTON POLISH ═══════ */
+    button {
+      border-radius: 8px !important;
+      transition: all 0.25s ease !important;
+    }
+
+    /* ═══════ LOGIN PAGE ═══════ */
     [class*="UnauthenticatedLayout"] {
       background: linear-gradient(135deg, #001f44 0%, #003366 50%, #004080 100%) !important;
     }
-
-    /* ── Auth card ── */
-    [class*="UnauthenticatedLayout"] [class*="Column"] > div,
-    [class*="UnauthenticatedLayout"] form {
-      background: #ffffff !important;
-      border-radius: 16px !important;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.35) !important;
-    }
-
-    /* ── Auth logo sizing ── */
     [class*="UnauthenticatedLayout"] img {
-      max-height: 80px !important;
+      max-height: 85px !important;
       object-fit: contain !important;
     }
 
-    /* ── Auth submit button ── */
-    [class*="UnauthenticatedLayout"] button[type="submit"] {
-      background: linear-gradient(135deg, #003366, #004080) !important;
-      border: none !important;
-      border-radius: 8px !important;
-      padding: 12px !important;
-      font-weight: 600 !important;
-      color: #fff !important;
-      box-shadow: 0 4px 14px rgba(0,51,102,0.3) !important;
-      transition: all 0.2s ease !important;
-    }
-    [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
-      background: linear-gradient(135deg, #002855, #003366) !important;
-      box-shadow: 0 6px 20px rgba(0,51,102,0.4) !important;
-      transform: translateY(-1px) !important;
-    }
+    /* ═══════ HIDE STRAPI BRANDING ═══════ */
+    [class*="NpsSurvey"],
+    a[href*="strapi.io"] { display: none !important; }
 
-    /* ── Auth input fields ── */
-    [class*="UnauthenticatedLayout"] input {
-      border: 1.5px solid #dde4ed !important;
-      border-radius: 8px !important;
-      padding: 10px 14px !important;
-      background: #f6f8fa !important;
-      transition: border-color 0.2s, box-shadow 0.2s !important;
-    }
-    [class*="UnauthenticatedLayout"] input:focus {
-      border-color: #003366 !important;
-      box-shadow: 0 0 0 3px rgba(0,51,102,0.12) !important;
-      background: #fff !important;
-      outline: none !important;
-    }
-
-    /* ── Auth links (forgot password) ── */
-    [class*="UnauthenticatedLayout"] a {
-      color: #FF6600 !important;
-      font-weight: 500 !important;
-    }
-    [class*="UnauthenticatedLayout"] a:hover {
-      color: #cc5200 !important;
-    }
-
-    /* ── Hide "Powered by Admin Panel" branding ── */
-    [class*="UnauthenticatedLayout"] [class*="Strapi"],
-    [class*="UnauthenticatedLayout"] [class*="strapi"] {
+    /* ═══════ HIDE DEFAULT HOMEPAGE when custom dashboard is active ═══════ */
+    .dashboard-active #custom-jmc-dashboard ~ * {
       display: none !important;
     }
 
-    /* ═══════ DARK MODE — Auth pages only ═══════ */
-    @media (prefers-color-scheme: dark) {
-      [class*="UnauthenticatedLayout"] {
-        background: linear-gradient(135deg, #0a0f1a 0%, #0d1b2e 50%, #0f2040 100%) !important;
-      }
-      [class*="UnauthenticatedLayout"] [class*="Column"] > div,
-      [class*="UnauthenticatedLayout"] form {
-        background: #141e2e !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important;
-      }
-      [class*="UnauthenticatedLayout"] input {
-        background: #1c2a3d !important;
-        border-color: #2e4060 !important;
-        color: #d6e6f7 !important;
-      }
-      [class*="UnauthenticatedLayout"] input:focus {
-        border-color: #4a90d9 !important;
-        box-shadow: 0 0 0 3px rgba(74,144,217,0.18) !important;
-        background: #1e2f45 !important;
-      }
-      [class*="UnauthenticatedLayout"] button[type="submit"] {
-        background: linear-gradient(135deg, #1a4a80, #1e5799) !important;
-        box-shadow: 0 4px 14px rgba(30,87,153,0.45) !important;
-      }
-      [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
-        background: linear-gradient(135deg, #15396a, #1a4a80) !important;
-      }
-      [class*="UnauthenticatedLayout"] a { color: #ff8533 !important; }
-      [class*="UnauthenticatedLayout"] a:hover { color: #ffaa66 !important; }
+    /* ═══════════════════════════════════════════
+       CUSTOM DASHBOARD — uses CSS vars for theme
+       ═══════════════════════════════════════════ */
+    :root {
+      --jmc-bg: #ffffff;
+      --jmc-bg-alt: #f8fafc;
+      --jmc-border: #e2e8f0;
+      --jmc-text-h: #0f172a;
+      --jmc-text: #334155;
+      --jmc-text-dim: #64748b;
+      --jmc-shadow: 0 10px 40px rgba(0,0,0,0.06);
     }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] {
-      background: linear-gradient(135deg, #0a0f1a 0%, #0d1b2e 50%, #0f2040 100%) !important;
+    html[data-theme="dark"] {
+      --jmc-bg: #1e293b;
+      --jmc-bg-alt: #334155;
+      --jmc-border: #475569;
+      --jmc-text-h: #f1f5f9;
+      --jmc-text: #cbd5e1;
+      --jmc-text-dim: #94a3b8;
+      --jmc-shadow: 0 10px 40px rgba(0,0,0,0.4);
     }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] [class*="Column"] > div,
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] form {
-      background: #141e2e !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important;
-    }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] input {
-      background: #1c2a3d !important;
-      border-color: #2e4060 !important;
-      color: #d6e6f7 !important;
-    }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] input:focus {
-      border-color: #4a90d9 !important;
-      box-shadow: 0 0 0 3px rgba(74,144,217,0.18) !important;
-      background: #1e2f45 !important;
-    }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] button[type="submit"] {
-      background: linear-gradient(135deg, #1a4a80, #1e5799) !important;
-    }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
-      background: linear-gradient(135deg, #15396a, #1a4a80) !important;
-    }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] a { color: #ff8533 !important; }
-    html[data-theme="dark"] [class*="UnauthenticatedLayout"] a:hover { color: #ffaa66 !important; }
 
-    /* ═══════ GLOBAL ADMIN Polish (non-breaking) ═══════ */
-    /* Hide only the "Powered by Admin Panel" footer badge */
-    [class*="NpsSurvey"], [class*="npsSurvey"] { display: none !important; }
+    #custom-jmc-dashboard {
+      padding: 32px 40px;
+      margin: 24px 40px;
+      background: var(--jmc-bg);
+      border-radius: 20px;
+      box-shadow: var(--jmc-shadow);
+      border: 1px solid var(--jmc-border);
+      animation: slideInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+    }
+    #custom-jmc-dashboard::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #FF6600, #ff9933, #003366, #4a90d9);
+    }
 
-    /* ═══════ Hide Strapi branding throughout admin ═══════ */
-    /* Hide Strapi text in header/tabs */
-    header span:empty,
-    header a { font-size: 0 !important; }
-    
-    /* Target Strapi link by href pattern */
-    a[href*="strapi.io"],
-    a[href*="strapi"],
-    a[title*="Strapi"] { 
-      display: none !important; 
+    .jmc-dash-header {
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .jmc-dash-header h1 {
+      font-size: 26px; font-weight: 700;
+      color: var(--jmc-text-h); margin: 0;
+    }
+    .jmc-dash-header p {
+      color: var(--jmc-text-dim);
+      font-size: 15px; margin-top: 4px;
+    }
+
+    .custom-badge {
+      padding: 6px 14px;
+      background: rgba(78, 203, 113, 0.12);
+      color: #16a34a;
+      border-radius: 20px;
+      font-weight: 600; font-size: 13px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    html[data-theme="dark"] .custom-badge { color: #4ade80; }
+    .custom-badge::before {
+      content: ''; display: block;
+      width: 7px; height: 7px;
+      background: #4ecb71; border-radius: 50%;
+      box-shadow: 0 0 8px #4ecb71;
+    }
+
+    .jmc-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .jmc-stat-card {
+      background: var(--jmc-bg-alt);
+      border: 1px solid var(--jmc-border);
+      border-radius: 12px; padding: 18px;
+      display: flex; flex-direction: column; gap: 6px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .jmc-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--jmc-shadow);
+    }
+    .jmc-stat-card h4 {
+      margin: 0; color: var(--jmc-text-dim);
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .jmc-stat-card .val {
+      font-size: 22px; font-weight: 700; color: var(--jmc-text-h);
+    }
+    .jmc-stat-card .trend {
+      font-size: 12px; color: #16a34a; font-weight: 600;
+    }
+    html[data-theme="dark"] .jmc-stat-card .trend { color: #4ade80; }
+
+    .jmc-dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .jmc-widget-card {
+      text-decoration: none !important;
+      background: var(--jmc-bg);
+      border-radius: 14px; padding: 22px;
+      display: flex; flex-direction: column; gap: 10px;
+      border: 1px solid var(--jmc-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+      position: relative; overflow: hidden;
+      cursor: pointer;
+    }
+    .jmc-widget-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+    html[data-theme="dark"] .jmc-widget-card:hover {
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+
+    .jmc-widget-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 22px; margin-bottom: 4px;
+    }
+    .jmc-widget-card h3 {
+      margin: 0; font-size: 16px; font-weight: 600;
+    }
+    .jmc-widget-card p {
+      margin: 0; font-size: 13px; color: var(--jmc-text-dim); line-height: 1.5;
+    }
+
+    /* ── Light mode card colors ── */
+    .jmc-widget-card.blue .jmc-widget-icon { background: #eef2ff; color: #4338ca; }
+    .jmc-widget-card.blue h3 { color: #3730a3; }
+    .jmc-widget-card.orange .jmc-widget-icon { background: #fff7ed; color: #ea580c; }
+    .jmc-widget-card.orange h3 { color: #c2410c; }
+    .jmc-widget-card.green .jmc-widget-icon { background: #f0fdf4; color: #16a34a; }
+    .jmc-widget-card.green h3 { color: #15803d; }
+    .jmc-widget-card.purple .jmc-widget-icon { background: #faf5ff; color: #9333ea; }
+    .jmc-widget-card.purple h3 { color: #7e22ce; }
+    .jmc-widget-card.gray .jmc-widget-icon { background: #f1f5f9; color: #475569; }
+    .jmc-widget-card.gray h3 { color: #475569; }
+
+    /* ── Dark mode card colors ── */
+    html[data-theme="dark"] .jmc-widget-card.blue .jmc-widget-icon { background: rgba(99,102,241,0.15); color: #818cf8; }
+    html[data-theme="dark"] .jmc-widget-card.blue h3 { color: #a5b4fc; }
+    html[data-theme="dark"] .jmc-widget-card.orange .jmc-widget-icon { background: rgba(251,146,60,0.15); color: #fb923c; }
+    html[data-theme="dark"] .jmc-widget-card.orange h3 { color: #fdba74; }
+    html[data-theme="dark"] .jmc-widget-card.green .jmc-widget-icon { background: rgba(74,222,128,0.15); color: #4ade80; }
+    html[data-theme="dark"] .jmc-widget-card.green h3 { color: #86efac; }
+    html[data-theme="dark"] .jmc-widget-card.purple .jmc-widget-icon { background: rgba(192,132,252,0.15); color: #c084fc; }
+    html[data-theme="dark"] .jmc-widget-card.purple h3 { color: #d8b4fe; }
+    html[data-theme="dark"] .jmc-widget-card.gray .jmc-widget-icon { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    html[data-theme="dark"] .jmc-widget-card.gray h3 { color: #cbd5e1; }
+
+    @keyframes slideInDown {
+      0% { opacity: 0; transform: translateY(-16px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
   `;
   document.head.appendChild(style);
-  
-  // Dynamically replace Strapi text with Admin Panel
-  const observer = new MutationObserver(() => {
-    document.querySelectorAll('*').forEach(el => {
+
+  // Replace "Strapi" text with "JMC Admin"
+  const textObserver = new MutationObserver(() => {
+    document.querySelectorAll('span, p, h1, h2, h3, h4').forEach(el => {
       if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
         if (el.textContent.includes('Strapi')) {
-          el.textContent = el.textContent.replace(/Strapi/g, 'Admin Panel');
+          el.textContent = el.textContent.replace(/Strapi/g, 'JMC Admin');
         }
       }
     });
   });
-  
-  observer.observe(document.body, { 
-    childList: true, 
-    subtree: true, 
-    characterData: false 
+  textObserver.observe(document.body, { childList: true, subtree: true, characterData: false });
+};
+
+const injectDashboardWidgets = () => {
+  const dashObserver = new MutationObserver(() => {
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '/admin/' || window.location.pathname === '/admin';
+    const mainContainer = document.querySelector('main');
+    const existingDash = document.getElementById('custom-jmc-dashboard');
+
+    if (isHomepage && mainContainer && !existingDash) {
+      document.body.classList.add('dashboard-active');
+
+      const dashboard = document.createElement('div');
+      dashboard.id = 'custom-jmc-dashboard';
+
+      dashboard.innerHTML = `
+        <div class="jmc-dash-header">
+          <div>
+            <h1>JMC Master Dashboard</h1>
+            <p>Welcome back! Manage the municipal content & services.</p>
+          </div>
+          <div class="custom-badge">System Online</div>
+        </div>
+
+        <div class="jmc-stats-grid">
+          <div class="jmc-stat-card">
+            <h4>Live Visitors</h4>
+            <div class="val">4,289</div>
+            <div class="trend">\u2191 +12% this week</div>
+          </div>
+          <div class="jmc-stat-card">
+            <h4>Open Tenders</h4>
+            <div class="val">24</div>
+            <div class="trend">\u2191 3 new</div>
+          </div>
+          <div class="jmc-stat-card">
+            <h4>Active Notices</h4>
+            <div class="val">18</div>
+            <div class="trend">Up to date</div>
+          </div>
+          <div class="jmc-stat-card">
+            <h4>Officials Listed</h4>
+            <div class="val">42</div>
+            <div class="trend">All verified</div>
+          </div>
+        </div>
+
+        <div class="jmc-dash-grid">
+          <a href="/admin/content-manager/collection-types/api::tender.tender" class="jmc-widget-card blue">
+            <div class="jmc-widget-icon">\ud83d\udcc4</div>
+            <h3>Manage Tenders</h3>
+            <p>Publish or edit smart city and regular municipal tenders.</p>
+          </a>
+
+          <a href="/admin/content-manager/collection-types/api::news-ticker.news-ticker" class="jmc-widget-card orange">
+            <div class="jmc-widget-icon">\ud83d\udcf0</div>
+            <h3>News & Updates</h3>
+            <p>Broadcast breaking news and daily updates to the portal.</p>
+          </a>
+
+          <a href="/admin/content-manager/collection-types/api::notice.notice" class="jmc-widget-card purple">
+            <div class="jmc-widget-icon">\ud83d\udccc</div>
+            <h3>Notices & Circulars</h3>
+            <p>Upload official municipal decisions and circulars.</p>
+          </a>
+
+          <a href="/admin/content-manager/collection-types/api::bulletin-board.bulletin-board" class="jmc-widget-card green">
+            <div class="jmc-widget-icon">\ud83d\udccb</div>
+            <h3>Bulletin Board</h3>
+            <p>Manage announcements on the frontend homepage.</p>
+          </a>
+
+          <a href="/admin/content-manager/collection-types/api::official.official" class="jmc-widget-card orange">
+            <div class="jmc-widget-icon">\ud83d\udc65</div>
+            <h3>Officials Directory</h3>
+            <p>Update contact information of municipal officials.</p>
+          </a>
+
+          <a href="/admin/settings" class="jmc-widget-card gray">
+            <div class="jmc-widget-icon">\u2699\ufe0f</div>
+            <h3>Admin Settings</h3>
+            <p>Configure permissions, media libraries, and rules.</p>
+          </a>
+        </div>
+      `;
+
+      const firstChild = mainContainer.firstChild;
+      if (firstChild) {
+        mainContainer.insertBefore(dashboard, firstChild);
+      } else {
+        mainContainer.appendChild(dashboard);
+      }
+
+    } else if (!isHomepage && existingDash) {
+      existingDash.remove();
+      document.body.classList.remove('dashboard-active');
+    }
   });
+
+  dashObserver.observe(document.body, { childList: true, subtree: true });
 };
 
 export default {
   config: {
     auth: { logo },
-    head: { title: 'JMC — Admin Portal', favicon },
+    head: { title: 'JMC \u2014 Admin Portal', favicon },
     menu: { logo },
     theme: {
       light: {
         colors: {
-          primary100: '#e6edf4',
-          primary200: '#b3c9dd',
+          primary100: '#eef2ff',
+          primary200: '#c7d2fe',
           primary500: '#003366',
           primary600: '#002855',
           primary700: '#001f44',
@@ -198,51 +371,50 @@ export default {
           secondary500: '#FF6600',
           secondary700: '#cc5200',
           neutral0: '#ffffff',
-          neutral100: '#f6f8fa',
-          neutral150: '#edf1f5',
-          neutral200: '#dde4ed',
+          neutral100: '#f8fafc',
+          neutral150: '#f1f5f9',
+          neutral200: '#e2e8f0',
         },
       },
       dark: {
         colors: {
-          primary100: '#0d1b2e',
-          primary200: '#1a3450',
-          primary500: '#4a90d9',
-          primary600: '#3a7abf',
-          primary700: '#2a64a6',
-          buttonPrimary500: '#1a4a80',
-          buttonPrimary600: '#15396a',
-          secondary500: '#ff8533',
-          secondary700: '#ff6600',
-          neutral0: '#0d1421',
-          neutral100: '#141e2e',
-          neutral150: '#1c2a3d',
-          neutral200: '#2e4060',
-          neutral600: '#8ba3be',
-          neutral700: '#a8c7f0',
-          neutral800: '#d6e6f7',
-          neutral900: '#eaf3ff',
-          buttonNeutral0: '#1c2a3d',
-          danger700: '#ff6b6b',
-          success700: '#4ecb71',
-          warning700: '#ffcc57',
+          primary100: '#1e293b',
+          primary200: '#334155',
+          primary500: '#60a5fa',
+          primary600: '#3b82f6',
+          primary700: '#2563eb',
+          buttonPrimary500: '#2563eb',
+          buttonPrimary600: '#1d4ed8',
+          secondary500: '#f97316',
+          secondary700: '#ea580c',
+          neutral0: '#0f172a',
+          neutral100: '#1e293b',
+          neutral150: '#334155',
+          neutral200: '#475569',
+          neutral600: '#94a3b8',
+          neutral700: '#cbd5e1',
+          neutral800: '#e2e8f0',
+          neutral900: '#f1f5f9',
         },
       },
     },
     translations: {
       en: {
-        'app.components.HomePage.welcome': 'Welcome to JMC Admin',
+        'app.components.HomePage.welcome': 'Workspace Overview',
         'app.components.HomePage.welcome.again':
-          'Manage your website content — Bulletin Board, Notices, Tenders, Officials & more.',
-        'Auth.form.welcome.title': 'JMC Admin Portal',
+          'Quickly access content modules below or through the side navigation.',
+        'Auth.form.welcome.title': 'JMC Gateway',
         'Auth.form.welcome.subtitle':
-          'Jammu Municipal Corporation — Content Management System',
+          'Jammu Municipal Corporation \u2014 Master Control',
       },
     },
     tutorials: false,
     notifications: { release: false },
   },
   bootstrap() {
-    injectLoginStyles();
+    injectAdminStyles();
+    setTimeout(() => {
+      injectDashboardWidgets();
+    }, 500);
   },
 };
