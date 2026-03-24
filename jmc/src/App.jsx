@@ -11,9 +11,10 @@ function ScrollToTop() {
 
 function AdminRedirect() {
   useEffect(() => {
+    const strapiBaseUrl =
+      import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
     const adminUrl =
-      import.meta.env.VITE_STRAPI_ADMIN_URL ||
-      `${import.meta.env.VITE_STRAPI_URL || "http://localhost:1337"}/admin`;
+      import.meta.env.VITE_STRAPI_ADMIN_URL || `${strapiBaseUrl}/admin`;
     window.location.href = adminUrl;
   }, []);
   return null;
