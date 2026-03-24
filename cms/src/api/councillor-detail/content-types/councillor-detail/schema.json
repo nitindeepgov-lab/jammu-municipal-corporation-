@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "councillor_details",
+  "info": {
+    "singularName": "councillor-detail",
+    "pluralName": "councillor-details",
+    "displayName": "🧑‍💼 Ex Municipal Councillor",
+    "description": "Ward-wise details of ex-municipal councillors displayed on the website."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "ward_no": {
+      "type": "integer",
+      "required": true,
+      "unique": true,
+      "min": 1
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "party_name": {
+      "type": "string",
+      "required": false
+    },
+    "address": {
+      "type": "text",
+      "required": false
+    },
+    "email_id": {
+      "type": "string",
+      "required": false
+    },
+    "contact_no": {
+      "type": "string",
+      "required": false
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

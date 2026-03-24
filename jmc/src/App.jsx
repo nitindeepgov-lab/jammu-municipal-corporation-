@@ -1,44 +1,47 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 function ScrollToTop() {
-  const { pathname } = useLocation()
+  const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-  return null
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
 }
 
 function AdminRedirect() {
   useEffect(() => {
-    const adminUrl = import.meta.env.VITE_STRAPI_ADMIN_URL || `${import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'}/admin`
-    window.location.href = adminUrl
-  }, [])
-  return null
+    const adminUrl =
+      import.meta.env.VITE_STRAPI_ADMIN_URL ||
+      `${import.meta.env.VITE_STRAPI_URL || "http://localhost:1337"}/admin`;
+    window.location.href = adminUrl;
+  }, []);
+  return null;
 }
 
-import LandingPage from './landing-page'
-import About from './pages/About'
-import Officials from './pages/Officials'
-import Commissioner from './pages/Commissioner'
-import Notices from './pages/Notices'
-import Gallery from './pages/Gallery'
-import Contact from './pages/Contact'
-import Services from './pages/Services'
-import SmartCity from './pages/SmartCity'
-import DevelopmentWorks from './pages/DevelopmentWorks'
-import Feedback from './pages/Feedback'
-import RTI from './pages/RTI'
-import SwachhMission from './pages/SwachhMission'
-import EGov from './pages/EGov'
-import News from './pages/News'
-import PayOnline from './pages/PayOnline'
-import WebInfoManager from './pages/WebInfoManager'
-import Information from './pages/Information'
-import InformationDetail from './pages/InformationDetail'
-import QuickLinksPage from './pages/QuickLinksPage'
-import SmartCityTenders from './pages/SmartCityTenders'
-import Sitemap from './pages/Sitemap'
+import LandingPage from "./landing-page";
+import About from "./pages/About";
+import Officials from "./pages/Officials";
+import Commissioner from "./pages/Commissioner";
+import Notices from "./pages/Notices";
+import Gallery from "./pages/Gallery";
+import Contact from "./pages/Contact";
+import Services from "./pages/Services";
+import SmartCity from "./pages/SmartCity";
+import DevelopmentWorks from "./pages/DevelopmentWorks";
+import Feedback from "./pages/Feedback";
+import RTI from "./pages/RTI";
+import SwachhMission from "./pages/SwachhMission";
+import EGov from "./pages/EGov";
+import News from "./pages/News";
+import PayOnline from "./pages/PayOnline";
+import WebInfoManager from "./pages/WebInfoManager";
+import Information from "./pages/Information";
+import InformationDetail from "./pages/InformationDetail";
+import QuickLinksPage from "./pages/QuickLinksPage";
+import SmartCityTenders from "./pages/SmartCityTenders";
+import Sitemap from "./pages/Sitemap";
+import CouncillorDetails from "./pages/CouncillorDetails";
 
 export default function App() {
   return (
@@ -67,9 +70,10 @@ export default function App() {
         <Route path="/quick-links" element={<QuickLinksPage />} />
         <Route path="/smart-city-tenders" element={<SmartCityTenders />} />
         <Route path="/sitemap" element={<Sitemap />} />
+        <Route path="/councillor-details" element={<CouncillorDetails />} />
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

@@ -464,6 +464,50 @@ export interface ApiBulletinBoardBulletinBoard
   };
 }
 
+export interface ApiCouncillorDetailCouncillorDetail
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'councillor_details';
+  info: {
+    description: 'Ward-wise details of ex-municipal councillors displayed on the website.';
+    displayName: '\uD83E\uDDD1\u200D\uD83D\uDCBC Ex Municipal Councillor';
+    pluralName: 'councillor-details';
+    singularName: 'councillor-detail';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    address: Schema.Attribute.Text;
+    contact_no: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email_id: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::councillor-detail.councillor-detail'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    party_name: Schema.Attribute.String;
+    photo: Schema.Attribute.Media<'images'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ward_no: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+  };
+}
+
 export interface ApiNewsTickerNewsTicker extends Struct.CollectionTypeSchema {
   collectionName: 'news_tickers';
   info: {
@@ -1156,6 +1200,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::bulletin-board.bulletin-board': ApiBulletinBoardBulletinBoard;
+      'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
       'api::notice.notice': ApiNoticeNotice;
       'api::official.official': ApiOfficialOfficial;
