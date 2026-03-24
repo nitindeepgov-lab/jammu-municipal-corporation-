@@ -4,8 +4,8 @@
   "info": {
     "singularName": "news-ticker",
     "pluralName": "news-tickers",
-    "displayName": "News Ticker",
-    "description": "Scrolling news ticker items on the homepage"
+    "displayName": "📰 News Ticker",
+    "description": "Scrolling headline items on the JMC homepage top bar. Set order and active status to control display."
   },
   "options": {
     "draftAndPublish": true

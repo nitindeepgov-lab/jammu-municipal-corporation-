@@ -4,8 +4,8 @@
   "info": {
     "singularName": "tender",
     "pluralName": "tenders",
-    "displayName": "Tender",
-    "description": "JMC general tenders and procurement notices"
+    "displayName": "📄 JMC Tender",
+    "description": "General JMC procurement and tender notices with associated documents."
   },
   "options": {
     "draftAndPublish": true

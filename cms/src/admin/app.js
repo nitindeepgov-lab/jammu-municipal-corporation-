@@ -1,229 +1,160 @@
 import logo from './logo.jpeg';
 
-const injectStyles = () => {
-  const style = document.createElement('style');
-  style.innerHTML = `
-    /* ══════════════════════════════════════
-       LIGHT MODE (default)
-    ══════════════════════════════════════ */
+/* ──────────────────────────────────────────────────────
+   JMC Admin — Strapi 5 Customisation
+   ─ Login page branding ONLY (scoped CSS)
+   ─ Theme tokens for internal admin (Strapi-native)
+   ─ Dashboard translations
+   ────────────────────────────────────────────────────── */
 
-    /* ── Login page background ── */
-    #auth-page, [class*="AuthPage"], [class*="Wrapper"] {
+const injectLoginStyles = () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* ═══════ SCOPED TO LOGIN / AUTH PAGES ONLY ═══════
+       These selectors target ONLY the authentication
+       wrapper and will NOT bleed into the content
+       manager, list views, or settings pages.
+       ════════════════════════════════════════════════ */
+
+    /* ── Auth page background ── */
+    main[class*="LayoutContent"] ~ div,
+    body:has(form[action*="auth"]),
+    [class*="UnauthenticatedLayout"] {
       background: linear-gradient(135deg, #001f44 0%, #003366 50%, #004080 100%) !important;
     }
 
-    /* ── Login card ── */
-    [class*="Box"][class*="Card"],
-    form > [class*="Box"],
-    [class*="LoginWrapper"] > [class*="Box"] {
+    /* ── Auth card ── */
+    [class*="UnauthenticatedLayout"] [class*="Column"] > div,
+    [class*="UnauthenticatedLayout"] form {
       background: #ffffff !important;
       border-radius: 16px !important;
       box-shadow: 0 25px 60px rgba(0,0,0,0.35) !important;
-      padding: 40px !important;
-      border: 1px solid rgba(255,255,255,0.15) !important;
     }
 
-    /* ── Logo area ── */
-    [class*="Logo"] img, [class*="AuthLogo"] img {
+    /* ── Auth logo sizing ── */
+    [class*="UnauthenticatedLayout"] img {
       max-height: 80px !important;
       object-fit: contain !important;
-      margin-bottom: 8px !important;
     }
 
-    /* ── Title & subtitle ── */
-    [class*="Title"], h1 {
-      color: #003366 !important;
-      font-weight: 700 !important;
-      font-size: 1.5rem !important;
-      letter-spacing: -0.3px !important;
+    /* ── Auth submit button ── */
+    [class*="UnauthenticatedLayout"] button[type="submit"] {
+      background: linear-gradient(135deg, #003366, #004080) !important;
+      border: none !important;
+      border-radius: 8px !important;
+      padding: 12px !important;
+      font-weight: 600 !important;
+      color: #fff !important;
+      box-shadow: 0 4px 14px rgba(0,51,102,0.3) !important;
+      transition: all 0.2s ease !important;
     }
-    [class*="Subtitle"], [class*="Description"], p[class] {
-      color: #5a6a7e !important;
-      font-size: 0.9rem !important;
+    [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
+      background: linear-gradient(135deg, #002855, #003366) !important;
+      box-shadow: 0 6px 20px rgba(0,51,102,0.4) !important;
+      transform: translateY(-1px) !important;
     }
 
-    /* ── Input fields ── */
-    input[type="email"], input[type="password"], input[type="text"] {
+    /* ── Auth input fields ── */
+    [class*="UnauthenticatedLayout"] input {
       border: 1.5px solid #dde4ed !important;
       border-radius: 8px !important;
       padding: 10px 14px !important;
-      font-size: 0.95rem !important;
-      transition: border-color 0.2s, box-shadow 0.2s !important;
       background: #f6f8fa !important;
-      color: #1a2d42 !important;
+      transition: border-color 0.2s, box-shadow 0.2s !important;
     }
-    input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+    [class*="UnauthenticatedLayout"] input:focus {
       border-color: #003366 !important;
       box-shadow: 0 0 0 3px rgba(0,51,102,0.12) !important;
       background: #fff !important;
       outline: none !important;
     }
 
-    /* ── Labels ── */
-    label {
-      color: #003366 !important;
-      font-weight: 600 !important;
-      font-size: 0.85rem !important;
-    }
-
-    /* ── Login button ── */
-    button[type="submit"] {
-      background: linear-gradient(135deg, #003366, #004080) !important;
-      border: none !important;
-      border-radius: 8px !important;
-      padding: 12px !important;
-      font-size: 0.95rem !important;
-      font-weight: 600 !important;
-      letter-spacing: 0.3px !important;
-      color: #fff !important;
-      transition: all 0.2s !important;
-      box-shadow: 0 4px 14px rgba(0,51,102,0.3) !important;
-    }
-    button[type="submit"]:hover {
-      background: linear-gradient(135deg, #002855, #003366) !important;
-      box-shadow: 0 6px 20px rgba(0,51,102,0.4) !important;
-      transform: translateY(-1px) !important;
-    }
-
-    /* ── Forgot password link ── */
-    a {
+    /* ── Auth links (forgot password) ── */
+    [class*="UnauthenticatedLayout"] a {
       color: #FF6600 !important;
       font-weight: 500 !important;
     }
-    a:hover {
+    [class*="UnauthenticatedLayout"] a:hover {
       color: #cc5200 !important;
     }
 
-    /* ── Left decorative panel (Strapi shows one on wide screens) ── */
-    [class*="LeftWrapper"], [class*="ContentWrapper"] > div:first-child {
-      background: linear-gradient(160deg, #002050 0%, #003366 60%, #FF6600 200%) !important;
+    /* ── Hide "Powered by Strapi" on auth page ── */
+    [class*="UnauthenticatedLayout"] [class*="Strapi"],
+    [class*="UnauthenticatedLayout"] [class*="strapi"] {
+      display: none !important;
     }
 
-    /* ── Divider line ── */
-    hr { border-color: #dde4ed !important; }
-
-    /* ── Bottom "Powered by" strip badge ── */
-    [class*="Strapi"], [class*="strapi"] { display: none !important; }
-
-
-    /* ══════════════════════════════════════
-       DARK MODE — system preference OR Strapi toggle
-    ══════════════════════════════════════ */
+    /* ═══════ DARK MODE — Auth pages only ═══════ */
     @media (prefers-color-scheme: dark) {
-      #auth-page, [class*="AuthPage"], [class*="Wrapper"] {
+      [class*="UnauthenticatedLayout"] {
         background: linear-gradient(135deg, #0a0f1a 0%, #0d1b2e 50%, #0f2040 100%) !important;
       }
-      [class*="Box"][class*="Card"],
-      form > [class*="Box"],
-      [class*="LoginWrapper"] > [class*="Box"] {
+      [class*="UnauthenticatedLayout"] [class*="Column"] > div,
+      [class*="UnauthenticatedLayout"] form {
         background: #141e2e !important;
         border: 1px solid rgba(255,255,255,0.08) !important;
         box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important;
       }
-      [class*="Title"], h1 {
-        color: #a8c7f0 !important;
-      }
-      [class*="Subtitle"], [class*="Description"], p[class] {
-        color: #8ba3be !important;
-      }
-      label {
-        color: #7fafd6 !important;
-      }
-      input[type="email"], input[type="password"], input[type="text"] {
+      [class*="UnauthenticatedLayout"] input {
         background: #1c2a3d !important;
         border-color: #2e4060 !important;
         color: #d6e6f7 !important;
       }
-      input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+      [class*="UnauthenticatedLayout"] input:focus {
         border-color: #4a90d9 !important;
         box-shadow: 0 0 0 3px rgba(74,144,217,0.18) !important;
         background: #1e2f45 !important;
       }
-      button[type="submit"] {
+      [class*="UnauthenticatedLayout"] button[type="submit"] {
         background: linear-gradient(135deg, #1a4a80, #1e5799) !important;
         box-shadow: 0 4px 14px rgba(30,87,153,0.45) !important;
       }
-      button[type="submit"]:hover {
+      [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
         background: linear-gradient(135deg, #15396a, #1a4a80) !important;
-        box-shadow: 0 6px 20px rgba(30,87,153,0.6) !important;
       }
-      a { color: #ff8533 !important; }
-      a:hover { color: #ffaa66 !important; }
-      hr { border-color: #2e4060 !important; }
-      [class*="LeftWrapper"], [class*="ContentWrapper"] > div:first-child {
-        background: linear-gradient(160deg, #080e1a 0%, #0d1b2e 60%, #7a3300 200%) !important;
-      }
+      [class*="UnauthenticatedLayout"] a { color: #ff8533 !important; }
+      [class*="UnauthenticatedLayout"] a:hover { color: #ffaa66 !important; }
     }
-
-    /* Strapi dark-mode toggle (data-theme="dark" on <html>) */
-    html[data-theme="dark"] #auth-page,
-    html[data-theme="dark"] [class*="AuthPage"],
-    html[data-theme="dark"] [class*="Wrapper"] {
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] {
       background: linear-gradient(135deg, #0a0f1a 0%, #0d1b2e 50%, #0f2040 100%) !important;
     }
-    html[data-theme="dark"] [class*="Box"][class*="Card"],
-    html[data-theme="dark"] form > [class*="Box"],
-    html[data-theme="dark"] [class*="LoginWrapper"] > [class*="Box"] {
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] [class*="Column"] > div,
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] form {
       background: #141e2e !important;
       border: 1px solid rgba(255,255,255,0.08) !important;
       box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important;
     }
-    html[data-theme="dark"] [class*="Title"],
-    html[data-theme="dark"] h1 {
-      color: #a8c7f0 !important;
-    }
-    html[data-theme="dark"] [class*="Subtitle"],
-    html[data-theme="dark"] [class*="Description"],
-    html[data-theme="dark"] p[class] {
-      color: #8ba3be !important;
-    }
-    html[data-theme="dark"] label {
-      color: #7fafd6 !important;
-    }
-    html[data-theme="dark"] input[type="email"],
-    html[data-theme="dark"] input[type="password"],
-    html[data-theme="dark"] input[type="text"] {
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] input {
       background: #1c2a3d !important;
       border-color: #2e4060 !important;
       color: #d6e6f7 !important;
     }
-    html[data-theme="dark"] input[type="email"]:focus,
-    html[data-theme="dark"] input[type="password"]:focus,
-    html[data-theme="dark"] input[type="text"]:focus {
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] input:focus {
       border-color: #4a90d9 !important;
       box-shadow: 0 0 0 3px rgba(74,144,217,0.18) !important;
       background: #1e2f45 !important;
     }
-    html[data-theme="dark"] button[type="submit"] {
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] button[type="submit"] {
       background: linear-gradient(135deg, #1a4a80, #1e5799) !important;
-      box-shadow: 0 4px 14px rgba(30,87,153,0.45) !important;
     }
-    html[data-theme="dark"] button[type="submit"]:hover {
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
       background: linear-gradient(135deg, #15396a, #1a4a80) !important;
-      box-shadow: 0 6px 20px rgba(30,87,153,0.6) !important;
     }
-    html[data-theme="dark"] a { color: #ff8533 !important; }
-    html[data-theme="dark"] a:hover { color: #ffaa66 !important; }
-    html[data-theme="dark"] hr { border-color: #2e4060 !important; }
-    html[data-theme="dark"] [class*="LeftWrapper"],
-    html[data-theme="dark"] [class*="ContentWrapper"] > div:first-child {
-      background: linear-gradient(160deg, #080e1a 0%, #0d1b2e 60%, #7a3300 200%) !important;
-    }
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] a { color: #ff8533 !important; }
+    html[data-theme="dark"] [class*="UnauthenticatedLayout"] a:hover { color: #ffaa66 !important; }
+
+    /* ═══════ GLOBAL ADMIN POLISH (non-breaking) ═══════ */
+    /* Hide only the "Powered by Strapi" footer badge */
+    [class*="NpsSurvey"], [class*="npsSurvey"] { display: none !important; }
   `;
   document.head.appendChild(style);
 };
 
 export default {
   config: {
-    auth: {
-      logo,
-    },
-    head: {
-      title: 'JMC — Admin Portal',
-    },
-    menu: {
-      logo,
-    },
+    auth: { logo },
+    head: { title: 'JMC — Admin Portal' },
+    menu: { logo },
     theme: {
       light: {
         colors: {
@@ -270,16 +201,18 @@ export default {
     },
     translations: {
       en: {
-        'app.components.HomePage.welcome': 'Hello Jammu Municipal Corporation',
-        'app.components.HomePage.welcome.again': 'Welcome to your administration panel',
-        'Auth.form.welcome.title': 'CMS Portal — JMC',
-        'Auth.form.welcome.subtitle': 'Jammu Municipal Corporation · Official Administration',
+        'app.components.HomePage.welcome': 'Welcome to JMC Admin',
+        'app.components.HomePage.welcome.again':
+          'Manage your website content — Bulletin Board, Notices, Tenders, Officials & more.',
+        'Auth.form.welcome.title': 'JMC Admin Portal',
+        'Auth.form.welcome.subtitle':
+          'Jammu Municipal Corporation — Content Management System',
       },
     },
     tutorials: false,
     notifications: { release: false },
   },
   bootstrap() {
-    injectStyles();
+    injectLoginStyles();
   },
 };
