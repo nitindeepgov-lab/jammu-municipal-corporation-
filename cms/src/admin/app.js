@@ -1,4 +1,5 @@
 import logo from './logo.jpeg';
+import favicon from './favicon.png';
 
 /* ──────────────────────────────────────────────────────
    JMC Admin — Strapi 5 Customisation
@@ -78,7 +79,7 @@ const injectLoginStyles = () => {
       color: #cc5200 !important;
     }
 
-    /* ── Hide "Powered by Strapi" on auth page ── */
+    /* ── Hide "Powered by Admin Panel" branding ── */
     [class*="UnauthenticatedLayout"] [class*="Strapi"],
     [class*="UnauthenticatedLayout"] [class*="strapi"] {
       display: none !important;
@@ -143,17 +144,46 @@ const injectLoginStyles = () => {
     html[data-theme="dark"] [class*="UnauthenticatedLayout"] a { color: #ff8533 !important; }
     html[data-theme="dark"] [class*="UnauthenticatedLayout"] a:hover { color: #ffaa66 !important; }
 
-    /* ═══════ GLOBAL ADMIN POLISH (non-breaking) ═══════ */
-    /* Hide only the "Powered by Strapi" footer badge */
+    /* ═══════ GLOBAL ADMIN Polish (non-breaking) ═══════ */
+    /* Hide only the "Powered by Admin Panel" footer badge */
     [class*="NpsSurvey"], [class*="npsSurvey"] { display: none !important; }
+
+    /* ═══════ Hide Strapi branding throughout admin ═══════ */
+    /* Hide Strapi text in header/tabs */
+    header span:empty,
+    header a { font-size: 0 !important; }
+    
+    /* Target Strapi link by href pattern */
+    a[href*="strapi.io"],
+    a[href*="strapi"],
+    a[title*="Strapi"] { 
+      display: none !important; 
+    }
   `;
   document.head.appendChild(style);
+  
+  // Dynamically replace Strapi text with Admin Panel
+  const observer = new MutationObserver(() => {
+    document.querySelectorAll('*').forEach(el => {
+      if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+        if (el.textContent.includes('Strapi')) {
+          el.textContent = el.textContent.replace(/Strapi/g, 'Admin Panel');
+        }
+      }
+    });
+  });
+  
+  observer.observe(document.body, { 
+    childList: true, 
+    subtree: true, 
+    characterData: false 
+  });
 };
 
 export default {
   config: {
     auth: { logo },
-    head: { title: 'JMC — Admin Portal' },
+    head: { title: 'JMC — Admin Portal', favicon },
     menu: { logo },
     theme: {
       light: {
