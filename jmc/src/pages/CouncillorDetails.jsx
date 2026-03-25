@@ -97,6 +97,10 @@ export default function CouncillorDetails() {
   const pageSize = 7;
 
   useEffect(() => {
+    // Set minimum loading time to 3 minutes (180000 milliseconds)
+    const minLoadingTime = 180000; // 3 minutes
+    const startTime = Date.now();
+
     getCouncillors()
       .then((res) => {
         const data = res.data.data || [];
@@ -113,7 +117,16 @@ export default function CouncillorDetails() {
         setCouncillors(localData);
         setSource("local");
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        // Calculate remaining time until 3 minutes have passed
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+        
+        // Set loading to false only after 3 minutes have passed
+        setTimeout(() => {
+          setLoading(false);
+        }, remainingTime);
+      });
   }, []);
 
   // Normalise a councillor entry regardless of source
