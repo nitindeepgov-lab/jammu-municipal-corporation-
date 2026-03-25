@@ -8,7 +8,7 @@
     "description": "Jammu Smart City Limited (JSCL) tender listings with ID, status tracking, and document uploads."
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

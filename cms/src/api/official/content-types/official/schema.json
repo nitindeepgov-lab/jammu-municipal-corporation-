@@ -8,7 +8,7 @@
     "description": "Municipal officers displayed in Who's Who section. Use the order field to control display priority."
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

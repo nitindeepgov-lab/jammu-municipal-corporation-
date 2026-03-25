@@ -8,7 +8,7 @@
     "description": "Official public and council notices published by JMC. Visible on the Notices page."
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

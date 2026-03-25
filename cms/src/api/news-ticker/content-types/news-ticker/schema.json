@@ -8,7 +8,7 @@
     "description": "Scrolling headline items on the JMC homepage top bar. Set order and active status to control display."
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
