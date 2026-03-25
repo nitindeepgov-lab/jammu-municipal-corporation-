@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getOfficials } from "../../services/strapiApi";
-
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
+import { STRAPI_URL } from "../../config/api";
+import { logError } from "../../utils/errorLogger";
 
 function getInitials(name) {
   return name
@@ -27,7 +27,10 @@ export default function WhosWho() {
   useEffect(() => {
     getOfficials()
       .then((res) => setOfficials(res.data.data || []))
-      .catch(() => setOfficials([]));
+      .catch((err) => {
+        logError("WhosWho", err);
+        setOfficials([]);
+      });
   }, []);
 
   return (
@@ -63,7 +66,7 @@ export default function WhosWho() {
       {/* Content */}
       <div className="h-[220px] sm:h-[260px] overflow-hidden relative">
         <div className="animate-slideUp">
-          {[...officials, ...officials].map((official, idx) => {
+          {officials.map((official, idx) => {
             const imgUrl = official.picture?.url
               ? `${STRAPI_URL}${official.picture.url}`
               : null;

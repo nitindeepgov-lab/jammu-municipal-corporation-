@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getCouncillors } from "../services/strapiApi";
+import { logError } from "../utils/errorLogger";
 import localData from "../assets/data.js";
 
 // Party colour mapping with more vibrant colors
@@ -107,7 +108,8 @@ export default function CouncillorDetails() {
           setSource("local");
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        logError("CouncillorDetails", err);
         setCouncillors(localData);
         setSource("local");
       })

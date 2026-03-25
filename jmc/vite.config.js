@@ -26,6 +26,12 @@ export default defineConfig(({ mode }) => {
         "/admin": {
           target: strapiTarget,
           changeOrigin: true,
+          ws: false, // Don't proxy WebSocket upgrades — prevents "Upgrade Required" from Strapi
+          // Only proxy actual HTTP requests to /admin, not HMR websockets
+          bypass(req) {
+            // Let Vite handle WebSocket upgrade requests itself
+            if (req.headers.upgrade === "websocket") return req.url;
+          },
         },
       },
     },

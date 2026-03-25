@@ -12,6 +12,9 @@
     "seed:example": "node ./scripts/seed.js",
     "seed:officials": "node ./scripts/seed-officials.js",
     "seed:councillors": "node ./scripts/seed-councillorDetails.js",
+    "check:db": "node ./scripts/check-db-health.js",
+    "cleanup:councillors": "node ./scripts/cleanup-councillors.js",
+    "keep-alive": "node ./scripts/keep-alive.js",
     "grant:councillors": "node ./scripts/grant-councillors-permissions.js",
     "grant:officials": "node ./scripts/grant-officials-permissions.js",
     "start": "strapi start",
@@ -20,6 +23,7 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
+    "@koa/router": "^15.4.0",
     "@strapi/plugin-cloud": "5.38.0",
     "@strapi/plugin-users-permissions": "5.38.0",
     "@strapi/strapi": "5.38.0",
