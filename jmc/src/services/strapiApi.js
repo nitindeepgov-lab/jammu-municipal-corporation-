@@ -76,6 +76,21 @@ export const getCouncillors = () =>
     "/councillor-details?populate=photo&sort=ward_no:asc&pagination[pageSize]=100&status=published",
   );
 
+/** Fetch councillors with backend pagination and optional ward filter */
+export const getCouncillorsPaginated = (
+  page = 1,
+  pageSize = 7,
+  wardNo = null,
+) => {
+  let url = `/councillor-details?populate=photo&sort=ward_no:asc&pagination[page]=${page}&pagination[pageSize]=${pageSize}&status=published`;
+
+  if (wardNo && wardNo !== "all") {
+    url += `&filters[ward_no][$eq]=${wardNo}`;
+  }
+
+  return api.get(url);
+};
+
 // ── Smart City Tenders ──────────────────────────────────────
 
 /** Fetch all published smart city tenders (newest first) */

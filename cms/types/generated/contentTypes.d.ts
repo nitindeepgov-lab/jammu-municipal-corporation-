@@ -440,7 +440,7 @@ export interface ApiBulletinBoardBulletinBoard
     singularName: 'bulletin-board';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -474,7 +474,7 @@ export interface ApiCouncillorDetailCouncillorDetail
     singularName: 'councillor-detail';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     address: Schema.Attribute.Text;
@@ -517,7 +517,7 @@ export interface ApiNewsTickerNewsTicker extends Struct.CollectionTypeSchema {
     singularName: 'news-ticker';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -550,7 +550,7 @@ export interface ApiNoticeNotice extends Struct.CollectionTypeSchema {
     singularName: 'notice';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -586,7 +586,7 @@ export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
     singularName: 'official';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -619,7 +619,7 @@ export interface ApiSmartCityTenderSmartCityTender
     singularName: 'smart-city-tender';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     category: Schema.Attribute.String & Schema.Attribute.Required;
@@ -663,7 +663,7 @@ export interface ApiTenderTender extends Struct.CollectionTypeSchema {
     singularName: 'tender';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;

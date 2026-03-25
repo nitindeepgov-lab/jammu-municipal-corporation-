@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
-import { getCouncillors } from "../services/strapiApi";
 import { logError } from "../utils/errorLogger";
 import localData from "../assets/data.js";
 
@@ -94,40 +93,64 @@ export default function CouncillorDetails() {
   const [selectedWard, setSelectedWard] = useState("all");
   const [source, setSource] = useState("cms"); // 'cms' | 'local'
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const pageSize = 7;
 
+  // Fetch data whenever page or ward changes
   useEffect(() => {
-    // Set minimum loading time to 3 minutes (180000 milliseconds)
-    const minLoadingTime = 180000; // 3 minutes
-    const startTime = Date.now();
+    setLoading(true);
 
-    getCouncillors()
-      .then((res) => {
-        const data = res.data.data || [];
-        if (data.length > 0) {
-          setCouncillors(data);
-          setSource("cms");
-        } else {
-          setCouncillors(localData);
-          setSource("local");
-        }
-      })
-      .catch((err) => {
-        logError("CouncillorDetails", err);
-        setCouncillors(localData);
-        setSource("local");
-      })
-      .finally(() => {
-        // Calculate remaining time until 3 minutes have passed
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
-        
-        // Set loading to false only after 3 minutes have passed
-        setTimeout(() => {
-          setLoading(false);
-        }, remainingTime);
-      });
-  }, []);
+    // Import the new paginated function
+    import("../services/strapiApi").then(({ getCouncillorsPaginated }) => {
+      getCouncillorsPaginated(currentPage, pageSize, selectedWard)
+        .then((res) => {
+          const data = res.data.data || [];
+          const meta = res.data.meta?.pagination || {};
+
+          if (data.length > 0 || currentPage === 1) {
+            setCouncillors(data);
+            setTotalPages(meta.pageCount || 1);
+            setTotalCount(meta.total || 0);
+            setSource("cms");
+          } else {
+            // Fallback to local data only on first page
+            if (currentPage === 1) {
+              const localFiltered =
+                selectedWard === "all"
+                  ? localData
+                  : localData.filter((c) => c.ward_no === selectedWard);
+
+              const start = 0;
+              const end = pageSize;
+              setCouncillors(localFiltered.slice(start, end));
+              setTotalPages(Math.ceil(localFiltered.length / pageSize));
+              setTotalCount(localFiltered.length);
+              setSource("local");
+            }
+          }
+        })
+        .catch((err) => {
+          logError("CouncillorDetails", err);
+
+          // Fallback to local data with client-side pagination
+          if (currentPage === 1) {
+            const localFiltered =
+              selectedWard === "all"
+                ? localData
+                : localData.filter((c) => c.ward_no === selectedWard);
+
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            setCouncillors(localFiltered.slice(start, end));
+            setTotalPages(Math.ceil(localFiltered.length / pageSize));
+            setTotalCount(localFiltered.length);
+            setSource("local");
+          }
+        })
+        .finally(() => setLoading(false));
+    });
+  }, [currentPage, selectedWard]);
 
   // Normalise a councillor entry regardless of source
   const normalise = (c) => {
@@ -157,15 +180,7 @@ export default function CouncillorDetails() {
     };
   };
 
-  const filtered = councillors
-    .map(normalise)
-    .filter((c) => selectedWard === "all" || c.ward_no === selectedWard);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const paginated = filtered.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
+  const paginated = councillors.map(normalise);
 
   return (
     <SubpageTemplate
@@ -269,7 +284,7 @@ export default function CouncillorDetails() {
         )}
 
         {/* Desktop Table View */}
-        {!loading && filtered.length > 0 && (
+        {!loading && paginated.length > 0 && (
           <div className="hidden md:block">
             <div className="overflow-hidden rounded-2xl border border-gray-100 shadow-sm bg-white">
               <table className="w-full border-collapse text-left">
@@ -407,7 +422,7 @@ export default function CouncillorDetails() {
         )}
 
         {/* Mobile Cards View */}
-        {!loading && filtered.length > 0 && (
+        {!loading && paginated.length > 0 && (
           <div className="md:hidden space-y-4">
             {paginated.map((c) => {
               const ps = partyStyle(c.party_name);
@@ -551,14 +566,19 @@ export default function CouncillorDetails() {
         )}
 
         {/* Empty state */}
-        {!loading && filtered.length === 0 && <EmptyState />}
+        {!loading && paginated.length === 0 && <EmptyState />}
 
         {/* Modern Pagination */}
-        {!loading && filtered.length > 0 && (
+        {!loading && paginated.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
               Showing page <span className="text-[#002B5E]">{currentPage}</span>{" "}
               of <span className="text-[#002B5E]">{totalPages}</span>
+              {totalCount > 0 && (
+                <span className="ml-2">
+                  ({totalCount} total councillor{totalCount !== 1 ? "s" : ""})
+                </span>
+              )}
             </p>
             <div className="flex items-center gap-2">
               <button
