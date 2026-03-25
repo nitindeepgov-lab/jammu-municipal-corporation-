@@ -5,24 +5,15 @@ import {
   getTenders,
   getBulletinItems,
 } from "../services/strapiApi";
-
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
+import { STRAPI_URL } from "../config/api";
+import { formatDate } from "../utils/dateFormatter";
+import { logError } from "../utils/errorLogger";
 
 const tabs = [
   { id: "public", label: "Public Notices" },
   { id: "tender", label: "Tenders" },
   { id: "council", label: "Council Updates" },
 ];
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default function Notices() {
   const [active, setActive] = useState("public");
@@ -75,9 +66,18 @@ export default function Notices() {
       });
 
     Promise.all([
-      getBulletinItems().catch(() => ({ data: { data: [] } })),
-      getTenders().catch(() => ({ data: { data: [] } })),
-      getNotices("council").catch(() => ({ data: { data: [] } })),
+      getBulletinItems().catch((err) => {
+        logError("Notices - getBulletinItems", err);
+        return { data: { data: [] } };
+      }),
+      getTenders().catch((err) => {
+        logError("Notices - getTenders", err);
+        return { data: { data: [] } };
+      }),
+      getNotices("council").catch((err) => {
+        logError("Notices - getNotices", err);
+        return { data: { data: [] } };
+      }),
     ])
       .then(([bulletinRes, tenderRes, councilRes]) => {
         setNotices({

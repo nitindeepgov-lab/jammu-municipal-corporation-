@@ -1,72 +1,73 @@
-import { useState, useEffect, useRef } from 'react'
-import { getNewsTickerItems } from '../../services/strapiApi'
+import { useState, useEffect, useRef } from "react";
+import { getNewsTickerItems } from "../../services/strapiApi";
+import { logError } from "../../utils/errorLogger";
 
 // Fallback items shown while loading or if the API is unavailable
-const FALLBACK_ITEMS = [
-  { text: 'Loading latest news...', href: '#' },
-]
+const FALLBACK_ITEMS = [{ text: "Loading latest news...", href: "#" }];
 
 export default function NewsTicker() {
-  const [newsItems, setNewsItems] = useState(FALLBACK_ITEMS)
-  const [current, setCurrent] = useState(0)
-  const [animKey, setAnimKey] = useState(0)
-  const timerRef = useRef(null)
+  const [newsItems, setNewsItems] = useState(FALLBACK_ITEMS);
+  const [current, setCurrent] = useState(0);
+  const [animKey, setAnimKey] = useState(0);
+  const timerRef = useRef(null);
 
   // Fetch from backend on mount
   useEffect(() => {
     getNewsTickerItems()
       .then((res) => {
         const items = (res.data?.data || []).map((item) => {
-          const a = item.attributes || item
+          const a = item.attributes || item;
           return {
             text: a.text,
-            href: a.link || '#',
+            href: a.link || "#",
             isExternal: a.is_external !== false, // default true
-          }
-        })
+          };
+        });
         if (items.length > 0) {
-          setNewsItems(items)
-          setCurrent(0)
+          setNewsItems(items);
+          setCurrent(0);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        logError("NewsTicker", err);
         // Keep fallback — news ticker stays functional
-      })
-  }, [])
+      });
+  }, []);
 
   const goTo = (idx) => {
-    setCurrent(idx)
-    setAnimKey(k => k + 1)
-  }
-  const next = () => goTo((current + 1) % newsItems.length)
-  const prev = () => goTo((current - 1 + newsItems.length) % newsItems.length)
+    setCurrent(idx);
+    setAnimKey((k) => k + 1);
+  };
+  const next = () => goTo((current + 1) % newsItems.length);
+  const prev = () => goTo((current - 1 + newsItems.length) % newsItems.length);
 
   useEffect(() => {
-    clearInterval(timerRef.current)
+    clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setCurrent(c => {
-        const n = (c + 1) % newsItems.length
-        return n
-      })
-      setAnimKey(k => k + 1)
-    }, 4500)
-    return () => clearInterval(timerRef.current)
-  }, [current, newsItems.length])
+      setCurrent((c) => {
+        const n = (c + 1) % newsItems.length;
+        return n;
+      });
+      setAnimKey((k) => k + 1);
+    }, 4500);
+    return () => clearInterval(timerRef.current);
+  }, [current, newsItems.length]);
 
-  const item = newsItems[current]
-  const linkProps = item.isExternal !== false
-    ? { target: '_blank', rel: 'noopener noreferrer' }
-    : {}
+  const item = newsItems[current];
+  const linkProps =
+    item.isExternal !== false
+      ? { target: "_blank", rel: "noopener noreferrer" }
+      : {};
 
   return (
     <div
       className="text-white relative"
       style={{
-        background: 'linear-gradient(90deg, #001a33 0%, #002244 40%, #00253d 100%)',
-        borderTop: '2px solid #FF6600',
+        background:
+          "linear-gradient(90deg, #001a33 0%, #002244 40%, #00253d 100%)",
+        borderTop: "2px solid #FF6600",
       }}
     >
-
       <style>{`
         @keyframes ticker-scroll {
           0%   { transform: translateX(100%); }
@@ -101,7 +102,7 @@ export default function NewsTicker() {
         <div
           key={animKey}
           className="news-progress-bar h-full rounded-r-full"
-          style={{ background: 'linear-gradient(90deg, #FF6600, #ffaa33)' }}
+          style={{ background: "linear-gradient(90deg, #FF6600, #ffaa33)" }}
         />
       </div>
 
@@ -110,14 +111,19 @@ export default function NewsTicker() {
         {/* Label row */}
         <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded"
-              style={{ background: 'linear-gradient(135deg, #FF6600, #e65c00)' }}>
+            <span
+              className="flex items-center gap-1.5 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded"
+              style={{
+                background: "linear-gradient(135deg, #FF6600, #e65c00)",
+              }}
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-white live-dot" />
               Latest News
             </span>
           </div>
           <span className="text-[10px] text-gray-500 font-mono tabular-nums">
-            {String(current + 1).padStart(2, '0')}/{String(newsItems.length).padStart(2, '0')}
+            {String(current + 1).padStart(2, "0")}/
+            {String(newsItems.length).padStart(2, "0")}
           </span>
         </div>
 
@@ -138,22 +144,58 @@ export default function NewsTicker() {
 
           {/* Compact controls */}
           <div className="flex items-center gap-1 flex-shrink-0">
-            <button onClick={prev} className="w-6 h-6 rounded flex items-center justify-center transition-all duration-200"
-              style={{ background: 'rgba(255,255,255,0.08)' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#FF6600'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-              aria-label="Previous">
-              <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7"/>
+            <button
+              onClick={prev}
+              className="w-6 h-6 rounded flex items-center justify-center transition-all duration-200"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#FF6600")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "rgba(255,255,255,0.08)")
+              }
+              aria-label="Previous"
+            >
+              <svg
+                width="10"
+                height="10"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
-            <button onClick={next} className="w-6 h-6 rounded flex items-center justify-center transition-all duration-200"
-              style={{ background: 'rgba(255,255,255,0.08)' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#FF6600'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-              aria-label="Next">
-              <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
+            <button
+              onClick={next}
+              className="w-6 h-6 rounded flex items-center justify-center transition-all duration-200"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#FF6600")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "rgba(255,255,255,0.08)")
+              }
+              aria-label="Next"
+            >
+              <svg
+                width="10"
+                height="10"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -161,22 +203,37 @@ export default function NewsTicker() {
       </div>
 
       {/* ── Desktop layout (≥ md) ── */}
-      <div className="hidden md:flex w-full items-stretch" style={{ minHeight: '44px' }}>
-
+      <div
+        className="hidden md:flex w-full items-stretch"
+        style={{ minHeight: "44px" }}
+      >
         {/* Label with icon + live dot */}
         <div
           className="flex items-center gap-2 px-5 flex-shrink-0 mr-0 font-bold text-[13px] uppercase tracking-wider text-white"
-          style={{ background: 'linear-gradient(135deg, #FF6600, #e65c00)' }}
+          style={{ background: "linear-gradient(135deg, #FF6600, #e65c00)" }}
         >
-          <svg className="w-3.5 h-3.5 opacity-90" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2"/>
+          <svg
+            className="w-3.5 h-3.5 opacity-90"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2"
+            />
           </svg>
           <span className="w-1.5 h-1.5 rounded-full bg-white live-dot" />
           Latest News
         </div>
 
         {/* Separator accent */}
-        <div className="w-[3px] flex-shrink-0" style={{ background: 'linear-gradient(180deg, #FF6600, #cc5200)' }} />
+        <div
+          className="w-[3px] flex-shrink-0"
+          style={{ background: "linear-gradient(180deg, #FF6600, #cc5200)" }}
+        />
 
         {/* News text marquee */}
         <div className="flex-1 py-3 overflow-hidden text-sm flex items-center pl-5">
@@ -186,7 +243,7 @@ export default function NewsTicker() {
               href={item.href}
               {...linkProps}
               className="ticker-text text-gray-200 hover:text-[#FF6600] transition-colors font-medium tracking-wide"
-              style={{ fontSize: '13px' }}
+              style={{ fontSize: "13px" }}
             >
               ●&ensp;{item.text}
             </a>
@@ -195,12 +252,13 @@ export default function NewsTicker() {
 
         {/* Counter + Controls */}
         <div className="flex items-center gap-3 px-4 flex-shrink-0 border-l border-white/5">
-
           {/* Counter badge */}
           <span className="text-[11px] font-mono tabular-nums text-gray-400 select-none">
-            <span className="text-[#FF6600] font-bold">{String(current + 1).padStart(2, '0')}</span>
+            <span className="text-[#FF6600] font-bold">
+              {String(current + 1).padStart(2, "0")}
+            </span>
             <span className="mx-0.5 text-gray-600">/</span>
-            {String(newsItems.length).padStart(2, '0')}
+            {String(newsItems.length).padStart(2, "0")}
           </span>
 
           {/* Nav buttons */}
@@ -208,31 +266,70 @@ export default function NewsTicker() {
             <button
               onClick={prev}
               className="w-7 h-7 flex items-center justify-center rounded transition-all duration-200"
-              style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(4px)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#FF6600'; e.currentTarget.style.transform = 'scale(1.1)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'scale(1)' }}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                backdropFilter: "blur(4px)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#FF6600";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
               aria-label="Previous news"
             >
-              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7"/>
+              <svg
+                width="12"
+                height="12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <button
               onClick={next}
               className="w-7 h-7 flex items-center justify-center rounded transition-all duration-200"
-              style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(4px)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#FF6600'; e.currentTarget.style.transform = 'scale(1.1)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'scale(1)' }}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                backdropFilter: "blur(4px)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#FF6600";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
               aria-label="Next news"
             >
-              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
+              <svg
+                width="12"
+                height="12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
         </div>
       </div>
-
     </div>
-  )
+  );
 }

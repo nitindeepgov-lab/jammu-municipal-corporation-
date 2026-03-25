@@ -1,14 +1,38 @@
 import axios from "axios";
-
-// Point to deployed Strapi; falls back to local for dev
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
+import { STRAPI_URL } from "../config/api.js";
+import { logError } from "../utils/errorLogger.js";
 
 const api = axios.create({
   baseURL: `${STRAPI_URL}/api`,
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000, // 10 second timeout
 });
+
+// Request interceptor for logging
+api.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => {
+    logError("API Request", error);
+    return Promise.reject(error);
+  },
+);
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const context = error.config?.url || "Unknown endpoint";
+    logError(`API Response [${context}]`, error, {
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return Promise.reject(error);
+  },
+);
 
 // ── Bulletin Board ──────────────────────────────────────────
 
