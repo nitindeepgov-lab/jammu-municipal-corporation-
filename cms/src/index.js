@@ -13,12 +13,12 @@ module.exports = {
 
     const contentTypes = [
       "api::bulletin-board.bulletin-board",
-      "api::councillor-detail.councillor-detail",
       "api::official.official",
       "api::news-ticker.news-ticker",
       "api::notice.notice",
       "api::tender.tender",
       "api::smart-city-tender.smart-city-tender",
+      "api::councillor-detail.councillor-detail",
     ];
 
     for (const ct of contentTypes) {

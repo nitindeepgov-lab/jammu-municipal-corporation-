@@ -8,7 +8,7 @@
     "description": "General JMC procurement and tender notices with associated documents."
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

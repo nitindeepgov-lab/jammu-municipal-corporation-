@@ -8,7 +8,7 @@
     "description": "Ward-wise details of ex-municipal councillors displayed on the website."
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

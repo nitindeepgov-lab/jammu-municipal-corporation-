@@ -8,7 +8,7 @@
     "description": "Press releases, circulars and notices displayed on the JMC homepage bulletin board section"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
