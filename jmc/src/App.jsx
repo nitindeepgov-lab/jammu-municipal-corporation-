@@ -32,6 +32,8 @@ import SmartCity from "./pages/SmartCity";
 import DevelopmentWorks from "./pages/DevelopmentWorks";
 import Feedback from "./pages/Feedback";
 import RTI from "./pages/RTI";
+import RTIDocumentViewer from "./pages/RTIDocumentViewer";
+import RTISection4Part2 from "./pages/RTISection4Part2";
 import SwachhMission from "./pages/SwachhMission";
 import EGov from "./pages/EGov";
 import News from "./pages/News";
@@ -61,6 +63,11 @@ export default function App() {
         <Route path="/development-works" element={<DevelopmentWorks />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/rti" element={<RTI />} />
+        <Route
+          path="/rti/disclosure-4-1-b-iv-vi"
+          element={<RTISection4Part2 />}
+        />
+        <Route path="/rti/document/:slug" element={<RTIDocumentViewer />} />
         <Route path="/swachh-mission" element={<SwachhMission />} />
         <Route path="/egov" element={<EGov />} />
         <Route path="/news/:id" element={<News />} />

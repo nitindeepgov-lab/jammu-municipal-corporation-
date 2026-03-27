@@ -228,12 +228,6 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
               >
                 <FileText className="w-4 h-4" />
               </button>
-              <button
-                className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10"
-                title="Share Page"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
