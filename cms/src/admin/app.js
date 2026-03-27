@@ -9,6 +9,14 @@ import favicon from './favicon.png';
    ────────────────────────────────────────────────────── */
 
 const injectAdminStyles = () => {
+  if (typeof document === 'undefined') return;
+
+  // Force light theme for the admin UI
+  try {
+    localStorage.setItem('strapi-theme', 'light');
+  } catch (_) {}
+  document.documentElement.setAttribute('data-theme', 'light');
+
   const style = document.createElement('style');
   style.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
@@ -66,6 +74,12 @@ const injectAdminStyles = () => {
     [class*="NpsSurvey"],
     a[href*="strapi.io"] { display: none !important; }
 
+    /* ═══════ HIDE THEME TOGGLE ═══════ */
+    [data-strapi-theme-toggle],
+    button[data-strapi-theme-toggle],
+    [class*="ThemeToggle"],
+    [aria-label="Change theme"] { display: none !important; }
+
     /* ═══════ HIDE DEFAULT HOMEPAGE when custom dashboard is active ═══════ */
     .dashboard-active #custom-jmc-dashboard ~ * {
       display: none !important;
@@ -83,15 +97,7 @@ const injectAdminStyles = () => {
       --jmc-text-dim: #64748b;
       --jmc-shadow: 0 10px 40px rgba(0,0,0,0.06);
     }
-    html[data-theme="dark"] {
-      --jmc-bg: #1e293b;
-      --jmc-bg-alt: #334155;
-      --jmc-border: #475569;
-      --jmc-text-h: #f1f5f9;
-      --jmc-text: #cbd5e1;
-      --jmc-text-dim: #94a3b8;
-      --jmc-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    }
+    html[data-theme="dark"] { color-scheme: light; }
 
     #custom-jmc-dashboard {
       padding: 32px 40px;
@@ -136,7 +142,6 @@ const injectAdminStyles = () => {
       font-weight: 600; font-size: 13px;
       display: flex; align-items: center; gap: 8px;
     }
-    html[data-theme="dark"] .custom-badge { color: #4ade80; }
     .custom-badge::before {
       content: ''; display: block;
       width: 7px; height: 7px;
@@ -193,9 +198,6 @@ const injectAdminStyles = () => {
       transform: translateY(-4px);
       box-shadow: 0 12px 30px rgba(0,0,0,0.1);
     }
-    html[data-theme="dark"] .jmc-widget-card:hover {
-      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-    }
 
     .jmc-widget-icon {
       width: 44px; height: 44px;
@@ -222,17 +224,6 @@ const injectAdminStyles = () => {
     .jmc-widget-card.gray .jmc-widget-icon { background: #f1f5f9; color: #475569; }
     .jmc-widget-card.gray h3 { color: #475569; }
 
-    /* ── Dark mode card colors ── */
-    html[data-theme="dark"] .jmc-widget-card.blue .jmc-widget-icon { background: rgba(99,102,241,0.15); color: #818cf8; }
-    html[data-theme="dark"] .jmc-widget-card.blue h3 { color: #a5b4fc; }
-    html[data-theme="dark"] .jmc-widget-card.orange .jmc-widget-icon { background: rgba(251,146,60,0.15); color: #fb923c; }
-    html[data-theme="dark"] .jmc-widget-card.orange h3 { color: #fdba74; }
-    html[data-theme="dark"] .jmc-widget-card.green .jmc-widget-icon { background: rgba(74,222,128,0.15); color: #4ade80; }
-    html[data-theme="dark"] .jmc-widget-card.green h3 { color: #86efac; }
-    html[data-theme="dark"] .jmc-widget-card.purple .jmc-widget-icon { background: rgba(192,132,252,0.15); color: #c084fc; }
-    html[data-theme="dark"] .jmc-widget-card.purple h3 { color: #d8b4fe; }
-    html[data-theme="dark"] .jmc-widget-card.gray .jmc-widget-icon { background: rgba(148,163,184,0.15); color: #94a3b8; }
-    html[data-theme="dark"] .jmc-widget-card.gray h3 { color: #cbd5e1; }
 
     @keyframes slideInDown {
       0% { opacity: 0; transform: translateY(-16px) scale(0.98); }
