@@ -11,10 +11,18 @@ function ScrollToTop() {
 
 function AdminRedirect() {
   useEffect(() => {
+    const isVercelFrontend =
+      window.location.hostname === "jammu-municipal-corporation.vercel.app";
+
     const strapiBaseUrl =
-      import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
+      import.meta.env.VITE_STRAPI_URL ||
+      (isVercelFrontend
+        ? "https://jammu-municipal-corporation.onrender.com"
+        : "http://localhost:1337");
+
     const adminUrl =
       import.meta.env.VITE_STRAPI_ADMIN_URL || `${strapiBaseUrl}/admin`;
+
     window.location.href = adminUrl;
   }, []);
   return null;
