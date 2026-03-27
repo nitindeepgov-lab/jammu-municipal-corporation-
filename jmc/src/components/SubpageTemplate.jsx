@@ -17,7 +17,6 @@ import {
   MessageSquare,
   CreditCard,
   ExternalLink,
-  ChevronRight,
 } from "lucide-react";
 
 const PAGE_NAV = [
@@ -73,15 +72,15 @@ function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="space-y-8">
+    <aside className="space-y-6 sm:space-y-8">
       {/* Minimalist Search */}
       <div className="relative">
         <input
           type="text"
           placeholder="Search..."
-          className="w-full bg-white border-b border-gray-200 py-2 pl-8 text-sm focus:outline-none focus:border-[#002B5E] transition-all"
+          className="w-full bg-white border-b border-gray-200 py-2 pl-7 sm:pl-8 text-[13px] sm:text-sm focus:outline-none focus:border-[#002B5E] transition-all"
         />
-        <Globe className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Globe className="absolute left-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
       </div>
 
       {/* Navigation - Minimalist & Professional */}
@@ -97,14 +96,14 @@ function Sidebar() {
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-semibold transition-all duration-200 ${
+                  className={`group flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-semibold transition-all duration-200 ${
                     active
                       ? "bg-gray-50 text-[#002B5E]"
                       : "text-gray-500 hover:text-[#002B5E] hover:bg-gray-50/50"
                   }`}
                 >
                   <Icon
-                    className={`w-4 h-4 transition-colors ${
+                    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
                       active
                         ? "text-[#FF6600]"
                         : "text-gray-300 group-hover:text-gray-400"
@@ -132,15 +131,15 @@ function Sidebar() {
             const isExternal = !!link.href;
 
             const linkContent = (
-              <div className="flex items-center gap-3 w-full">
-                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:text-[#FF6600] group-hover:bg-orange-50 transition-all">
+              <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:text-[#FF6600] group-hover:bg-orange-50 transition-all shrink-0">
                   <Icon className="w-3.5 h-3.5" />
                 </div>
-                <span className="flex-1 text-[13px] font-bold text-gray-600 group-hover:text-[#002B5E] transition-colors">
+                <span className="flex-1 min-w-0 text-[12px] sm:text-[13px] leading-tight font-bold text-gray-600 group-hover:text-[#002B5E] transition-colors">
                   {link.name}
                 </span>
                 {isExternal && (
-                  <ExternalLink className="w-3 h-3 text-gray-300" />
+                  <ExternalLink className="w-3 h-3 text-gray-300 shrink-0" />
                 )}
               </div>
             );
@@ -181,12 +180,12 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
         {/* Subtle Background Accent */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/[0.03] to-transparent"></div>
 
-        <div className="w-[92%] max-w-[900px] mx-auto px-2 sm:px-4 py-8 md:py-12 relative">
+        <div className="mx-auto w-[min(96%,1400px)] px-1.5 sm:px-4 py-7 sm:py-8 md:py-12 lg:py-14 relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-4">
               {/* Minimal Breadcrumb */}
               <nav aria-label="Breadcrumb">
-                <ol className="flex flex-wrap items-center gap-3 text-[11px] font-bold uppercase tracking-widest">
+                <ol className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.12em] sm:tracking-widest">
                   <li>
                     <Link
                       to="/"
@@ -214,20 +213,9 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
               </nav>
 
               {/* Refined Title */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] break-words">
                 {title}
               </h1>
-            </div>
-
-            {/* Subtle Action Buttons */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => window.print()}
-                className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10"
-                title="Print Page"
-              >
-                <FileText className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
@@ -235,10 +223,10 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
 
       {/* Main Content Area */}
       <div className="bg-white min-h-screen">
-        <div className="w-[92%] max-w-[900px] mx-auto px-2 sm:px-4 py-12 md:py-16">
-          <div className="flex flex-col lg:flex-row gap-16">
+        <div className="mx-auto w-[min(96%,1400px)] px-1.5 sm:px-4 py-8 sm:py-10 md:py-14 lg:py-16">
+          <div className="flex flex-col xl:flex-row gap-8 sm:gap-10 lg:gap-14 xl:gap-16">
             {/* Sidebar - Positioned Left for a more classic professional look */}
-            <div className="w-full lg:w-64 flex-shrink-0">
+            <div className="w-full xl:w-72 flex-shrink-0 xl:sticky xl:top-6 xl:self-start">
               <Sidebar />
             </div>
 
