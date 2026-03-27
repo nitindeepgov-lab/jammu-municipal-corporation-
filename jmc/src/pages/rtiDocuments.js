@@ -59,6 +59,12 @@ export const rtiDocuments = [
     desc: "Names, designations and other particulars of Public Information Officers",
     url: "https://jmc.jk.gov.in/forms/sec4xvi.pdf",
   },
+  {
+    slug: "rti-act-2005",
+    clause: "RTI ACT 2005",
+    desc: "The Right to Information Act, 2005 - Full document",
+    url: "/uploads/rti/rti-act-2005.pdf",
+  },
 ];
 
 export const rtiDocumentMap = rtiDocuments.reduce((acc, doc) => {

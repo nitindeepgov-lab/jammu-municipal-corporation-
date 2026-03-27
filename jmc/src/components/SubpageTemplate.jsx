@@ -181,9 +181,9 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
         {/* Subtle Background Accent */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/[0.03] to-transparent"></div>
 
-        <div className="max-w-[1200px] mx-auto px-4 py-12 md:py-20 relative">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div className="space-y-6">
+        <div className="w-[92%] max-w-[900px] mx-auto px-2 sm:px-4 py-8 md:py-12 relative">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-4">
               {/* Minimal Breadcrumb */}
               <nav aria-label="Breadcrumb">
                 <ol className="flex flex-wrap items-center gap-3 text-[11px] font-bold uppercase tracking-widest">
@@ -235,7 +235,7 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
 
       {/* Main Content Area */}
       <div className="bg-white min-h-screen">
-        <div className="max-w-[1200px] mx-auto px-4 py-12 md:py-16">
+        <div className="w-[92%] max-w-[900px] mx-auto px-2 sm:px-4 py-12 md:py-16">
           <div className="flex flex-col lg:flex-row gap-16">
             {/* Sidebar - Positioned Left for a more classic professional look */}
             <div className="w-full lg:w-64 flex-shrink-0">

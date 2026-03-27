@@ -101,7 +101,7 @@ const navLinks = [
         to: "/rti",
       },
       { name: "Details of APIO's/PIO/FAA of JMC.", to: "/rti" },
-      { name: "RTI ACT 2005", href: "https://rtionline.gov.in/" },
+      { name: "RTI ACT 2005", to: "/rti/document/rti-act-2005" },
     ],
   },
   { name: "Contact Us", to: "/contact" },
