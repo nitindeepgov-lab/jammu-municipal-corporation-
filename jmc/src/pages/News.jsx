@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getBulletinItemById } from "../services/strapiApi";
+import { PROD_STRAPI_URL } from "../config/api";
 
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1338";
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || PROD_STRAPI_URL;
 
 function Skeleton() {
   return (

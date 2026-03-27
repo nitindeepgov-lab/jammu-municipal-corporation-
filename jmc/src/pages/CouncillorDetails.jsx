@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { logError } from "../utils/errorLogger";
+import { PROD_STRAPI_URL } from "../config/api";
 import localData from "../assets/data.js";
 
 // Party colour mapping with more vibrant colors
@@ -165,7 +166,7 @@ export default function CouncillorDetails() {
         photoUrl: c.photo?.url
           ? c.photo.url.startsWith("http")
             ? c.photo.url
-            : `${import.meta.env.VITE_STRAPI_URL || "http://localhost:1338"}${c.photo.url}`
+            : `${import.meta.env.VITE_STRAPI_URL || PROD_STRAPI_URL}${c.photo.url}`
           : null,
       };
     }

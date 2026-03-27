@@ -2,21 +2,27 @@
  * API configuration for JMC application
  */
 
+export const PROD_STRAPI_URL =
+  "https://jammu-municipal-corporation.onrender.com";
+const LOCAL_STRAPI_URL = "http://localhost:1338";
+
 // Validate and get Strapi URL
 const getStrapiUrl = () => {
   const url = import.meta.env.VITE_STRAPI_URL;
 
-  if (!url) {
-    if (import.meta.env.DEV) {
-      console.warn("⚠️ VITE_STRAPI_URL not set, using localhost");
-      return "http://localhost:1338";
-    } else {
-      console.error("❌ VITE_STRAPI_URL is required in production");
-      return "";
-    }
+  if (url) {
+    return url.replace(/\/$/, "");
   }
 
-  return url;
+  if (import.meta.env.DEV) {
+    console.warn("⚠️ VITE_STRAPI_URL not set, using localhost");
+    return LOCAL_STRAPI_URL;
+  }
+
+  console.warn(
+    `⚠️ VITE_STRAPI_URL not set, using production fallback: ${PROD_STRAPI_URL}`
+  );
+  return PROD_STRAPI_URL;
 };
 
 export const STRAPI_URL = getStrapiUrl();

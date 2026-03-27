@@ -1,7 +1,8 @@
 import SubpageTemplate from "../components/SubpageTemplate";
+import { PROD_STRAPI_URL } from "../config/api";
 
 const STRAPI_BASE_URL = (
-  import.meta.env.VITE_STRAPI_URL || "http://localhost:1338"
+  import.meta.env.VITE_STRAPI_URL || PROD_STRAPI_URL
 ).replace(/\/$/, "");
 const CMS_RTI_BASE = `${STRAPI_BASE_URL}/uploads/rti`;
 

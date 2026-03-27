@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { PROD_STRAPI_URL } from "./config/api";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -11,14 +12,9 @@ function ScrollToTop() {
 
 function AdminRedirect() {
   useEffect(() => {
-    const isVercelFrontend =
-      window.location.hostname === "jammu-municipal-corporation.vercel.app";
-
     const strapiBaseUrl =
       import.meta.env.VITE_STRAPI_URL ||
-      (isVercelFrontend
-        ? "https://jammu-municipal-corporation.onrender.com"
-        : "http://localhost:1337");
+      (import.meta.env.DEV ? "http://localhost:1338" : PROD_STRAPI_URL);
 
     const adminUrl =
       import.meta.env.VITE_STRAPI_ADMIN_URL || `${strapiBaseUrl}/admin`;
