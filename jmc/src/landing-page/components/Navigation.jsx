@@ -98,7 +98,7 @@ const navLinks = [
     dropdown: [
       {
         name: "Disclosure of information Under Sec 4 of RTI Act.",
-        href: "https://jmc.jk.gov.in/RTI.aspx",
+        to: "/rti",
       },
       { name: "Details of APIO's/PIO/FAA of JMC.", to: "/rti" },
       { name: "RTI ACT 2005", href: "https://rtionline.gov.in/" },
