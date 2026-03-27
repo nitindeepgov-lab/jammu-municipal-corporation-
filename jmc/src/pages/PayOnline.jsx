@@ -1,57 +1,65 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { FaFileAlt } from 'react-icons/fa'
 import { RiMoneyRupeeCircleLine } from 'react-icons/ri'
 import SubpageTemplate from '../components/SubpageTemplate'
+import { STRAPI_URL } from '../config/api'
 
+/* ═══════════════════════════════════════════════════════
+   Payment Categories
+   ═══════════════════════════════════════════════════════ */
 const paymentOptions = [
-  // Removed Building Permission Fee and Sanitation Fee per request
   {
     id: 'tender',
     name: 'Tender Fee',
     desc: 'Pay tender document and processing charges',
-    href: 'https://jmc.jk.gov.in/TenderFee.aspx',
+    feeType: 'TENDER_FEE',
     icon: FaFileAlt,
-    color: 'bg-orange-50 text-orange-700 border-orange-200',
-    activeRing: 'border-orange-500 bg-orange-50',
+    accentFrom: '#f97316', accentTo: '#f59e0b',
     fields: [
-      { id: 'name', label: 'Name', type: 'text', placeholder: 'Enter name', required: true },
-      { id: 'parentage', label: 'Parentage', type: 'text', placeholder: 'Enter parentage (S/o, D/o, W/o)', required: true },
-      { id: 'mobile', label: 'Mobile No.', type: 'tel', placeholder: 'Enter mobile number', required: true },
-      { id: 'email', label: 'Email ID', type: 'email', placeholder: 'Enter email address' },
-      { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter address' },
-      { id: 'nitTenderNo', label: 'NIT/Tender No.', type: 'text', placeholder: 'Enter NIT/Tender No.', required: true },
-      { id: 'nitTenderDate', label: 'NIT/Tender Date', type: 'date', required: true },
-      { id: 'nitTenderDetails', label: 'NIT/Tender Details', type: 'textarea', placeholder: 'Enter NIT/Tender details' },
-      { id: 'amount', label: 'NIT/Tender Amount (₹)', type: 'number', placeholder: '0.0', required: true },
+      { id: 'name', label: 'Full Name', type: 'text', placeholder: 'Enter your full name', required: true, half: true },
+      { id: 'parentage', label: 'Parentage', type: 'text', placeholder: 'S/o, D/o, W/o', required: true, half: true },
+      { id: 'mobile', label: 'Mobile Number', type: 'tel', placeholder: '10-digit mobile number', required: true, half: true },
+      { id: 'email', label: 'Email', type: 'email', placeholder: 'your@email.com', half: true },
+      { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter your full address' },
+      { id: 'nitTenderNo', label: 'NIT / Tender No.', type: 'text', placeholder: 'e.g. NIT-2025/001', required: true, half: true },
+      { id: 'nitTenderDate', label: 'NIT / Tender Date', type: 'date', required: true, half: true },
+      { id: 'nitTenderDetails', label: 'Tender Details', type: 'textarea', placeholder: 'Brief description of the tender' },
+      { id: 'amount', label: 'Amount', type: 'number', placeholder: '₹ 0.00', required: true, half: true },
     ],
   },
   {
     id: 'other',
     name: 'Other Fee',
     desc: 'Pay miscellaneous JMC dues and charges',
-    href: 'https://jmc.jk.gov.in/OtherFee.aspx',
+    feeType: 'OTHER_FEE',
     icon: RiMoneyRupeeCircleLine,
-    color: 'bg-purple-50 text-purple-700 border-purple-200',
-    activeRing: 'border-purple-600 bg-purple-50',
+    accentFrom: '#8b5cf6', accentTo: '#6366f1',
     fields: [
-      { id: 'dept', label: 'Select Department', type: 'select', options: ['Select', 'Health Section', 'Veterinary Services Treatment Of Cattle Cell Section', 'Transport Section', 'Khilafwarzi Section', 'Revenue Section', 'Other Services Miscellaneous', 'Building Permission Section'], required: true },
-      { id: 'feeType', label: 'Select Type of Fee', type: 'text', placeholder: 'Enter type of fee', required: true },
-      { id: 'payDetails', label: 'Payment Details', type: 'text', placeholder: 'Enter payment details', required: true },
-      { id: 'location', label: 'Select Location', type: 'select', options: ['Select', 'Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'], required: true },
-      { id: 'name', label: 'Name', type: 'text', placeholder: 'Enter full name', required: true },
-      { id: 'mobile', label: 'Mobile Number', type: 'tel', placeholder: 'Enter 10-digit mobile number', required: true },
-      { id: 'email', label: 'Email ID', type: 'email', placeholder: 'Enter email address' },
-      { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter full address', required: true },
-      { id: 'amount', label: 'Amount (₹)', type: 'number', placeholder: 'Enter amount', required: true },
+      { id: 'dept', label: 'Department', type: 'select', options: ['Select Department', 'Health Section', 'Veterinary Services', 'Transport Section', 'Khilafwarzi Section', 'Revenue Section', 'Miscellaneous', 'Building Permission'], required: true, half: true },
+      { id: 'feeType', label: 'Type of Fee', type: 'text', placeholder: 'e.g. License Renewal', required: true, half: true },
+      { id: 'payDetails', label: 'Payment Details', type: 'text', placeholder: 'Brief description', required: true },
+      { id: 'location', label: 'Zone', type: 'select', options: ['Select Zone', 'Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'], required: true, half: true },
+      { id: 'name', label: 'Full Name', type: 'text', placeholder: 'Enter your full name', required: true, half: true },
+      { id: 'mobile', label: 'Mobile Number', type: 'tel', placeholder: '10-digit mobile number', required: true, half: true },
+      { id: 'email', label: 'Email', type: 'email', placeholder: 'your@email.com', half: true },
+      { id: 'address', label: 'Address', type: 'textarea', placeholder: 'Enter your full address', required: true },
+      { id: 'amount', label: 'Amount', type: 'number', placeholder: '₹ 0.00', required: true, half: true },
     ],
   },
 ]
 
-function FormField({ field, value, onChange }) {
-  const base = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#003366] focus:border-transparent transition bg-white'
+/* ═══════════════════════════════════════════════════════
+   Input Component — Clean, minimal
+   ═══════════════════════════════════════════════════════ */
+function Field({ field, value, onChange }) {
+  const cls =
+    'w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-[14px] text-gray-800 ' +
+    'placeholder:text-gray-400 outline-none transition-all ' +
+    'focus:border-[#003366] focus:ring-2 focus:ring-[#003366]/10'
+
   if (field.type === 'select') {
     return (
-      <select id={field.id} value={value || ''} onChange={onChange} required={field.required} className={base}>
+      <select id={field.id} value={value || ''} onChange={onChange} required={field.required} className={cls + ' appearance-none bg-no-repeat bg-[right_12px_center] bg-[length:16px] cursor-pointer'} style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")` }}>
         {field.options.map(opt => (
           <option key={opt} value={opt === field.options[0] ? '' : opt}>{opt}</option>
         ))}
@@ -61,304 +69,321 @@ function FormField({ field, value, onChange }) {
   if (field.type === 'textarea') {
     return (
       <textarea id={field.id} value={value || ''} onChange={onChange} placeholder={field.placeholder}
-        required={field.required} rows={3} className={base + ' resize-none'} />
-    )
-  }
-  if (field.type === 'fee-checkboxes') {
-    const feeValue = value || {}
-    const handleFee = (feeId, prop, val) => {
-      const updated = { ...feeValue, [feeId]: { ...(feeValue[feeId] || { checked: false, amount: '' }), [prop]: val } }
-      onChange({ target: { id: field.id, value: updated } })
-    }
-    const total = Object.values(feeValue).reduce((sum, item) => item.checked ? sum + (parseFloat(item.amount) || 0) : sum, 0)
-    return (
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
-        <div className="bg-gray-50 px-4 py-2 grid grid-cols-[1fr_auto] text-xs font-semibold text-gray-500 border-b border-gray-200">
-          <span>Fee Type</span><span className="w-28 text-right pr-1">Amount (₹)</span>
-        </div>
-        <div className="divide-y divide-gray-100">
-          {field.feeItems.map(item => {
-            const itemState = feeValue[item.id] || { checked: false, amount: '' }
-            return (
-              <div key={item.id} className="flex items-center gap-3 px-4 py-2.5">
-                <input type="checkbox" checked={itemState.checked}
-                  onChange={e => handleFee(item.id, 'checked', e.target.checked)}
-                  className="w-4 h-4 accent-[#003366] cursor-pointer flex-shrink-0" />
-                <span className={`flex-1 text-sm ${itemState.checked ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
-                  {item.label}
-                </span>
-                <input type="number" value={itemState.amount}
-                  onChange={e => handleFee(item.id, 'amount', e.target.value)}
-                  disabled={!itemState.checked}
-                  min="0" placeholder="0.00"
-                  className="w-28 border border-gray-300 rounded px-2 py-1.5 text-sm text-right disabled:bg-gray-100 disabled:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#003366] bg-white" />
-              </div>
-            )
-          })}
-        </div>
-        <div className="px-4 py-2.5 bg-[#003366]/5 flex items-center justify-between border-t border-gray-200">
-          <span className="text-sm font-bold text-[#003366]">Total Amount</span>
-          <span className="text-sm font-bold text-[#003366] w-28 text-right pr-1">₹ {total.toFixed(2)}</span>
-        </div>
-      </div>
+        required={field.required} rows={2} className={cls + ' resize-none'} />
     )
   }
   return (
     <input id={field.id} type={field.type} value={value || ''} onChange={onChange}
-      placeholder={field.placeholder} required={field.required} className={base} />
+      placeholder={field.placeholder} required={field.required}
+      className={cls}
+      {...(field.type === 'number' ? { min: 0, step: '0.01' } : {})} />
   )
 }
 
+/* ═══════════════════════════════════════════════════════
+   Status enum
+   ═══════════════════════════════════════════════════════ */
+const STATUS = { IDLE: 0, LOADING: 1, SUCCESS: 2, FAILED: 3 }
+
+/* ═══════════════════════════════════════════════════════
+   Main Component
+   ═══════════════════════════════════════════════════════ */
 export default function PayOnline() {
   const [selected, setSelected] = useState(null)
-  const [formData, setFormData] = useState({})
-  const [submitted, setSubmitted] = useState(false)
-  const formRef = useRef(null)
+  const [form, setForm] = useState({})
+  const [status, setStatus] = useState(STATUS.IDLE)
+  const [msg, setMsg] = useState('')
+  const panelRef = useRef(null)
 
-  const handleSelect = (option) => {
-    if (selected?.id === option.id) {
-      setSelected(null)
-      setFormData({})
-      setSubmitted(false)
+  /* helpers */
+  const reset = useCallback(() => { setSelected(null); setForm({}); setStatus(STATUS.IDLE); setMsg('') }, [])
+
+  const pick = (opt) => {
+    if (selected?.id === opt.id) { reset(); return }
+    setSelected(opt); setForm({}); setStatus(STATUS.IDLE); setMsg('')
+    setTimeout(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
+  }
+
+  const onChange = (e) => setForm(p => ({ ...p, [e.target.id]: e.target.value }))
+
+  /* ── BillDesk response handler ───────────────────────── */
+  const handleBillDeskResponse = useCallback((txn) => {
+    console.log('BillDesk SDK response:', txn)
+    if (txn && (txn.status === '0300' || txn.transaction_error_type === 'success')) {
+      setStatus(STATUS.SUCCESS)
+      setMsg(txn.transactionid || txn.orderid || '')
     } else {
-      setSelected(option)
-      setFormData({})
-      setSubmitted(false)
-      setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
+      setStatus(STATUS.FAILED)
+      setMsg(txn?.transaction_error_desc || 'Payment was not completed.')
+    }
+  }, [])
+
+  /* ── Submit → Backend → SDK ──────────────────────────── */
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setStatus(STATUS.LOADING)
+
+    try {
+      // ────────────────────────────────────────────────────────
+      // TEST INTEGRATION: Mocking backend response to show SDK UI
+      // ────────────────────────────────────────────────────────
+      // TODO: Uncomment this block when you get real credentials!
+      /*
+      const res = await fetch(`${STRAPI_URL}/api/billdesk/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: form.amount,
+          customerName: form.name || '',
+          customerEmail: form.email || '',
+          customerMobile: form.mobile || '',
+          feeType: selected.feeType,
+          additionalInfo: form,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error?.message || `Server error ${res.status}`)
+      }
+      const { data } = await res.json()
+      */
+      
+      // MOCK DATA: Just to trigger the Sandbox UI
+      await new Promise(r => setTimeout(r, 600)) // Fake network delay
+      const data = {
+        merchantId: 'BDSKUUAT',
+        bdOrderId: 'MOCK_ORDER_' + Date.now(),
+        authToken: 'MOCK_TEST_TOKEN',
+      }
+      // ────────────────────────────────────────────────────────
+
+      // 2) Launch BillDesk Web SDK
+      if (!window.loadBillDeskSdk) {
+        throw new Error('BillDesk SDK not loaded. Check your internet connection.')
+      }
+
+      window.loadBillDeskSdk({
+        responseHandler: handleBillDeskResponse,
+        merchantLogo: '/logo.jpeg',
+        flowConfig: {
+          merchantId: data.merchantId,
+          bdOrderId: data.bdOrderId,
+          authToken: data.authToken,
+          childWindow: false,
+          retryCount: 3,
+          prefs: { payment_categories: ['card', 'nb', 'upi', 'wallets', 'qr'] },
+        },
+        flowType: 'payments',
+      })
+    } catch (err) {
+      console.error('Payment init failed:', err)
+      setStatus(STATUS.FAILED)
+      setMsg(err.message || 'Could not start payment. Please try again.')
     }
   }
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }))
-  }
+  /* derived */
+  const step = status === STATUS.IDLE ? (selected ? 1 : 0) : 2
+  const amount = form.amount ? parseFloat(form.amount) : 0
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => window.open(selected.href, '_blank', 'noopener,noreferrer'), 600)
-  }
-
+  /* ═══════════════════════════════════════════════════════
+     Render
+     ═══════════════════════════════════════════════════════ */
   return (
     <SubpageTemplate
       title="Online Payment"
       breadcrumb={[{ name: 'Citizen Services', to: '/services' }, { name: 'Online Payment', to: null }]}
     >
-      <div className="space-y-8">
+      <div className="space-y-6 max-w-4xl mx-auto">
 
-        {/* Hero header */}
-        <div className="rounded-xl bg-[#003366] px-6 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-1">Jammu Municipal Corporation</p>
-            <h2 className="text-white font-bold text-xl mb-1.5">Online Payment Portal</h2>
-            <p className="text-blue-200 text-sm">Select a fee category, fill in the details, and proceed to payment securely.</p>
-          </div>
-          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 flex-shrink-0 self-start sm:self-auto">
-            <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
-            </svg>
-            <span className="text-white text-xs font-semibold">Secure &amp; Official</span>
+        {/* ── Hero ─────────────────────────────────────── */}
+        <div className="relative rounded-2xl overflow-hidden bg-[#003366]">
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='1'%3E%3Cpath d='M20 18V0H0v20h18V20zM20 20v18h18V20z'/%3E%3C/g%3E%3C/svg%3E")` }} />
+          <div className="relative px-6 py-6 sm:px-8 sm:py-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-blue-300/80 text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5">Jammu Municipal Corporation</p>
+              <h2 className="text-white font-bold text-xl sm:text-2xl leading-tight">Online Payment Portal</h2>
+              <p className="text-blue-200/60 text-sm mt-1">Secure payments powered by BillDesk</p>
+            </div>
+            <div className="flex items-center gap-2.5 bg-white/[0.08] border border-white/[0.1] rounded-xl px-4 py-2.5 shrink-0 self-start">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-white/90 text-xs font-semibold">SSL Secured</span>
+            </div>
           </div>
         </div>
 
-        {/* Progress stepper */}
-        <div className="bg-white border border-gray-100 rounded-xl shadow-sm px-5 py-4">
-          <div className="flex items-center justify-between">
-            {[
-              { label: 'Select Category', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10M4 18h7" /></svg> },
-              { label: 'Fill Details', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> },
-              { label: 'Proceed to Pay', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
-            ].map(({ label, icon }, i, arr) => {
-              const isComplete = (i === 0 && selected) || (i === 1 && submitted)
-              const isActive = (i === 0 && !selected) || (i === 1 && selected && !submitted) || (i === 2 && submitted)
+        {/* ── Stepper ──────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 px-6 py-4 shadow-sm">
+          <div className="flex items-center">
+            {['Select Category', 'Fill Details', 'Payment'].map((label, i, arr) => {
+              const done = i < step, active = i === step
               return (
                 <div key={label} className="flex items-center flex-1">
-                  <div className="flex flex-col items-center gap-1.5 flex-1">
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                      isComplete ? 'bg-green-500 border-green-500 text-white' :
-                      isActive ? 'bg-[#003366] border-[#003366] text-white' :
-                      'bg-white border-gray-200 text-gray-400'
+                  <div className="flex flex-col items-center flex-1 gap-1.5">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                      done ? 'bg-green-500 text-white' : active ? 'bg-[#003366] text-white' : 'bg-gray-100 text-gray-400'
                     }`}>
-                      {isComplete
-                        ? <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-                        : icon}
+                      {done ? '✓' : i + 1}
                     </div>
-                    <span className={`text-[10px] font-semibold hidden sm:block text-center transition-colors ${
-                      isComplete ? 'text-green-600' : isActive ? 'text-[#003366]' : 'text-gray-400'
-                    }`}>{label}</span>
+                    <span className={`text-[10px] font-semibold hidden sm:block ${done ? 'text-green-600' : active ? 'text-[#003366]' : 'text-gray-400'}`}>{label}</span>
                   </div>
-                  {i < arr.length - 1 && (
-                    <div className={`h-0.5 flex-1 mx-2 mb-5 sm:mb-0 rounded-full transition-all duration-500 ${
-                      (i === 0 && selected) || (i === 1 && submitted) ? 'bg-green-400' : 'bg-gray-200'
-                    }`} />
-                  )}
+                  {i < arr.length - 1 && <div className={`h-0.5 flex-1 mx-2 rounded-full mb-4 sm:mb-0 transition-colors duration-500 ${done ? 'bg-green-400' : 'bg-gray-100'}`} />}
                 </div>
               )
             })}
           </div>
         </div>
 
-        {/* Payment category cards */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-[#003366] font-bold text-base">Choose Payment Category</h3>
-              <p className="text-gray-400 text-xs mt-0.5">Select the type of fee you want to pay</p>
-            </div>
-            {selected && (
-              <button
-                onClick={() => { setSelected(null); setFormData({}); setSubmitted(false) }}
-                className="text-xs text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1 border border-gray-200 hover:border-red-200 rounded-lg px-3 py-1.5"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                Clear selection
-              </button>
-            )}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {paymentOptions.map((option) => {
-              const Icon = option.icon
-              const isActive = selected?.id === option.id
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => handleSelect(option)}
-                  className={`group relative flex items-center gap-4 bg-white rounded-xl p-4 transition-all duration-200 text-left w-full overflow-hidden
-                    ${isActive ? 'shadow-lg ring-2 ring-[#003366]' : 'shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200'}`}
-                >
-                  <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 ${isActive ? 'bg-[#FF6600]' : 'bg-transparent group-hover:bg-gray-200'}`} />
-                  <div className={`w-12 h-12 flex items-center justify-center rounded-xl border ml-2 flex-shrink-0 transition-transform duration-200 ${option.color} ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}>
-                    <Icon size={22} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-bold text-sm leading-tight transition-colors ${isActive ? 'text-[#FF6600]' : 'text-[#003366] group-hover:text-[#FF6600]'}`}>
-                      {option.name}
-                    </p>
-                    <p className="text-gray-400 text-xs mt-0.5 leading-snug">{option.desc}</p>
-                  </div>
-                  <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-orange-50' : 'bg-gray-50 group-hover:bg-orange-50'}`}>
-                    <svg className={`w-3.5 h-3.5 transition-all ${isActive ? 'rotate-90 text-[#FF6600]' : 'text-gray-400 group-hover:text-[#FF6600]'}`}
-                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+        {/* ── Category Selection ───────────────────────── */}
+        {status === STATUS.IDLE && (
+          <>
+            <div className="flex items-center justify-between">
+              <h3 className="text-gray-900 font-semibold text-base">Choose Payment Category</h3>
+              {selected && (
+                <button onClick={reset} className="text-xs text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+                  <span>×</span> Clear
                 </button>
-              )
-            })}
-          </div>
-        </div>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {paymentOptions.map(opt => {
+                const Icon = opt.icon
+                const active = selected?.id === opt.id
+                return (
+                  <button key={opt.id} onClick={() => pick(opt)}
+                    className={`group relative flex items-center gap-4 rounded-xl p-4 text-left w-full transition-all duration-200 ${
+                      active ? 'bg-white shadow-lg ring-2 ring-[#003366]' : 'bg-white border border-gray-100 hover:shadow-md hover:border-gray-200'
+                    }`}
+                  >
+                    <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200`}
+                      style={{ background: active ? `linear-gradient(135deg,${opt.accentFrom},${opt.accentTo})` : '#f3f4f6', color: active ? '#fff' : opt.accentFrom }}>
+                      <Icon size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-semibold text-sm ${active ? 'text-[#003366]' : 'text-gray-900'}`}>{opt.name}</p>
+                      <p className="text-gray-400 text-xs mt-0.5">{opt.desc}</p>
+                    </div>
+                    <svg className={`w-4 h-4 shrink-0 transition-all ${active ? 'text-[#003366] rotate-90' : 'text-gray-300 group-hover:text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        )}
 
-        {/* Inline Form */}
-        {selected && (
-          <div ref={formRef} className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-            {/* Form header */}
-            <div className="bg-gradient-to-r from-[#003366] to-[#004f99] px-6 py-5 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`w-11 h-11 flex items-center justify-center rounded-xl border-2 border-white/20 ${selected.color}`}>
-                  <selected.icon size={22} />
+        {/* ── Form Panel ───────────────────────────────── */}
+        {selected && status === STATUS.IDLE && (
+          <div ref={panelRef} className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+            {/* header */}
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between"
+              style={{ background: `linear-gradient(135deg, ${selected.accentFrom}08, ${selected.accentTo}05)` }}>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white"
+                  style={{ background: `linear-gradient(135deg,${selected.accentFrom},${selected.accentTo})` }}>
+                  <selected.icon size={18} />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-base">{selected.name}</p>
-                  <p className="text-blue-300 text-xs mt-0.5">Fill in the details — fields marked * are required</p>
+                  <p className="font-semibold text-sm text-gray-900">{selected.name}</p>
+                  <p className="text-gray-400 text-[11px]">Fields marked * are required</p>
                 </div>
               </div>
-              <button
-                onClick={() => { setSelected(null); setFormData({}); setSubmitted(false) }}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-blue-200 hover:text-white transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              <button onClick={reset} className="text-gray-400 hover:text-gray-600 transition p-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
-            {submitted ? (
-              <div className="bg-white p-12 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5 ring-4 ring-green-50">
-                  <svg className="w-9 h-9 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+            {/* form body */}
+            <form onSubmit={handleSubmit}>
+              <div className="px-6 py-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+                  {selected.fields.map(f => (
+                    <div key={f.id} className={f.type === 'textarea' || !f.half ? 'sm:col-span-2' : ''}>
+                      <label htmlFor={f.id} className="block text-xs font-medium text-gray-500 mb-1.5">
+                        {f.label}{f.required && <span className="text-red-400 ml-0.5">*</span>}
+                      </label>
+                      <Field field={f} value={form[f.id]} onChange={onChange} />
+                    </div>
+                  ))}
                 </div>
-                <p className="text-[#003366] font-bold text-lg mb-2">Redirecting to Payment Portal…</p>
-                <p className="text-gray-500 text-sm max-w-sm mx-auto leading-relaxed">
-                  You will be taken to the official JMC payment gateway to complete your transaction securely.
-                </p>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="bg-white">
-                <div className="p-6 sm:p-7">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-5">
-                    {selected.fields.map((field) => (
-                      <div key={field.id} className={field.type === 'textarea' || field.type === 'fee-checkboxes' ? 'sm:col-span-2' : ''}>
-                        <label htmlFor={field.id} className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                          {field.label}
-                          {field.required && <span className="text-red-500 ml-0.5 normal-case font-normal"> *</span>}
-                        </label>
-                        <FormField field={field} value={formData[field.id]} onChange={handleChange} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="bg-gray-50 border-t border-gray-100 px-6 sm:px-7 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
-                    </svg>
-                    Secure redirect to official JMC payment portal
-                  </div>
-                  <div className="flex gap-3 w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={() => { setSelected(null); setFormData({}) }}
-                      className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-100 hover:border-gray-300 transition-all"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 sm:flex-none px-7 py-2.5 rounded-xl bg-[#003366] text-white text-sm font-bold hover:bg-[#FF6600] transition-colors flex items-center justify-center gap-2 shadow-md shadow-blue-900/20"
-                    >
-                      Proceed to Pay
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </button>
-                  </div>
+              {/* footer */}
+              <div className="px-6 py-4 bg-gray-50/70 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <svg className="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" /></svg>
+                  Secure via <strong className="text-gray-600 ml-0.5">BillDesk</strong>
                 </div>
-              </form>
-            )}
+                <div className="flex gap-2.5 w-full sm:w-auto">
+                  <button type="button" onClick={reset}
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">
+                    Cancel
+                  </button>
+                  <button type="submit"
+                    className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg bg-[#003366] text-white text-sm font-semibold hover:bg-[#004080] transition flex items-center justify-center gap-2 shadow-sm">
+                    {amount > 0 ? `Pay ₹${amount.toFixed(2)}` : 'Proceed to Pay'}
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         )}
 
-        {/* Bottom info strip */}
+        {/* ── Loading ──────────────────────────────────── */}
+        {status === STATUS.LOADING && (
+          <div ref={panelRef} className="bg-white rounded-2xl border border-gray-100 shadow-lg p-12 text-center">
+            <div className="relative w-14 h-14 mx-auto mb-5">
+              <div className="absolute inset-0 rounded-full border-[3px] border-gray-100" />
+              <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#003366] animate-spin" />
+            </div>
+            <p className="text-gray-900 font-semibold text-lg">Initializing Payment…</p>
+            <p className="text-gray-400 text-sm mt-1.5 max-w-xs mx-auto">Connecting to BillDesk. Please do not close this window.</p>
+          </div>
+        )}
+
+        {/* ── Success ──────────────────────────────────── */}
+        {status === STATUS.SUCCESS && (
+          <div ref={panelRef} className="bg-white rounded-2xl border border-green-100 shadow-lg p-12 text-center">
+            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <p className="text-gray-900 font-semibold text-lg">Payment Successful</p>
+            {msg && <p className="text-green-600 text-xs font-mono bg-green-50 inline-block px-3 py-1 rounded mt-2">{msg}</p>}
+            <p className="text-gray-400 text-sm mt-3">Your payment has been processed. A receipt has been sent to your email.</p>
+            <button onClick={reset} className="mt-6 px-6 py-2.5 rounded-lg bg-[#003366] text-white text-sm font-semibold hover:bg-[#004080] transition">Make Another Payment</button>
+          </div>
+        )}
+
+        {/* ── Failed ───────────────────────────────────── */}
+        {status === STATUS.FAILED && (
+          <div ref={panelRef} className="bg-white rounded-2xl border border-red-100 shadow-lg p-12 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <p className="text-gray-900 font-semibold text-lg">Payment Not Completed</p>
+            <p className="text-gray-500 text-sm mt-1.5 max-w-md mx-auto">{msg || 'The payment could not be processed. You have not been charged.'}</p>
+            <div className="flex gap-3 justify-center mt-6">
+              <button onClick={() => { setStatus(STATUS.IDLE); setMsg('') }}
+                className="px-6 py-2.5 rounded-lg bg-[#003366] text-white text-sm font-semibold hover:bg-[#004080] transition">Retry</button>
+              <button onClick={reset}
+                className="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">Start Over</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Info Strip ───────────────────────────────── */}
         <div className="grid sm:grid-cols-3 gap-3">
           {[
-            {
-              icon: <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>,
-              bg: 'bg-blue-50 border-blue-100',
-              title: 'Secure Payments',
-              desc: 'All transactions are SSL encrypted and processed via the official JMC payment gateway.',
-            },
-            {
-              icon: <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>,
-              bg: 'bg-green-50 border-green-100',
-              title: 'Instant Receipt',
-              desc: 'Download your payment receipt instantly after a successful transaction.',
-            },
-            {
-              icon: <svg className="w-5 h-5 text-[#FF6600]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>,
-              bg: 'bg-orange-50 border-orange-100',
-              title: 'Helpline: 1800-180-7207',
-              desc: 'Toll Free · Monday–Friday · 10 AM to 5 PM',
-            },
-          ].map(({ icon, bg, title, desc }) => (
-            <div key={title} className={`border rounded-xl p-4 flex gap-3 items-start ${bg}`}>
-              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
-                {icon}
-              </div>
+            { icon: '🛡️', title: 'Secure Payments', desc: 'SSL encrypted via BillDesk', bg: 'bg-blue-50/60 border-blue-100' },
+            { icon: '🧾', title: 'Instant Receipt', desc: 'Download receipt after payment', bg: 'bg-green-50/60 border-green-100' },
+            { icon: '📞', title: '1800-180-7207', desc: 'Toll-free helpline', bg: 'bg-orange-50/60 border-orange-100' },
+          ].map(({ icon, title, desc, bg }) => (
+            <div key={title} className={`border rounded-xl p-4 flex items-center gap-3 ${bg}`}>
+              <span className="text-xl">{icon}</span>
               <div>
-                <p className="font-bold text-xs text-gray-800 mb-0.5">{title}</p>
-                <p className="text-gray-500 text-[11px] leading-relaxed">{desc}</p>
+                <p className="font-semibold text-xs text-gray-800">{title}</p>
+                <p className="text-gray-500 text-[10px]">{desc}</p>
               </div>
             </div>
           ))}
