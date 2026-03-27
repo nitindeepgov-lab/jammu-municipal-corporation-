@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@koa/router": "^15.4.0",
-    "@strapi/plugin-cloud": "5.38.0",
     "@strapi/plugin-users-permissions": "5.38.0",
     "@strapi/strapi": "5.38.0",
     "fs-extra": "^10.0.0",
