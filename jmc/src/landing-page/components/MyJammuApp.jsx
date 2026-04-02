@@ -158,7 +158,7 @@ export default function MyJammuApp() {
                 </svg>
                 <div className="text-left leading-tight">
                   <div className="text-[9px] text-white/60 uppercase tracking-wider font-medium">Get it on</div>
-                  <div href="" className="text-sm font-bold">Google Play</div>
+                  <div className="text-sm font-bold">Google Play</div>
                 </div>
               </a>
               <a
