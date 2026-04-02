@@ -146,6 +146,20 @@ module.exports = () => ({
     };
 
     try {
+      // Insert pending transaction into DB
+      await strapi.db.query("api::transaction.transaction").create({
+        data: {
+          orderId,
+          amount: parseFloat(amount),
+          customerName,
+          customerMobile,
+          customerEmail,
+          feeType,
+          additionalInfo,
+          status: "PENDING",
+        },
+      });
+
       // Create JWS token
       const jwsToken = await createJwsToken(
         orderPayload,
@@ -183,11 +197,24 @@ module.exports = () => ({
         throw new Error("Order creation rejected by BillDesk");
       }
 
+      const bdOrderId = orderResponse.bdorderid || orderResponse.orderid;
+      const authToken = orderResponse.links?.[1]?.headers?.authorization || "";
+
+      // Update DB with bdOrderId
+      await strapi.db.query("api::transaction.transaction").update({
+        where: { orderId },
+        data: {
+          bdOrderId,
+          authToken,
+          rawResponse: orderResponse,
+        },
+      });
+
       // Return SDK config for frontend
       return {
         merchantId: config.merchantId,
-        bdOrderId: orderResponse.bdorderid || orderResponse.orderid,
-        authToken: orderResponse.links?.[1]?.headers?.authorization || "",
+        bdOrderId,
+        authToken,
         orderId: orderId,
         amount: orderPayload.amount,
         sdkBaseUrl: config.sdkBaseUrl,
@@ -213,18 +240,29 @@ module.exports = () => ({
         config.secretKey
       );
 
+      const statusMessage = txnData.auth_status === "0300"
+        ? "SUCCESS"
+        : txnData.auth_status === "0002"
+        ? "PENDING"
+        : "FAILED";
+
+      // Update DB
+      await strapi.db.query("api::transaction.transaction").update({
+        where: { orderId: txnData.orderid },
+        data: {
+          status: statusMessage,
+          transactionId: txnData.transactionid,
+          rawResponse: txnData,
+        },
+      });
+
       return {
         verified: true,
         orderId: txnData.orderid,
         transactionId: txnData.transactionid,
         amount: txnData.amount,
         status: txnData.auth_status,
-        statusMessage:
-          txnData.auth_status === "0300"
-            ? "SUCCESS"
-            : txnData.auth_status === "0002"
-            ? "PENDING"
-            : "FAILED",
+        statusMessage,
         raw: txnData,
       };
     } catch (error) {

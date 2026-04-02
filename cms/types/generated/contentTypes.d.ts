@@ -688,6 +688,50 @@ export interface ApiTenderTender extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
+  collectionName: 'transactions';
+  info: {
+    description: 'BillDesk Transactions';
+    displayName: 'Transaction';
+    pluralName: 'transactions';
+    singularName: 'transaction';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    additionalInfo: Schema.Attribute.JSON;
+    amount: Schema.Attribute.Decimal;
+    bdOrderId: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerEmail: Schema.Attribute.String;
+    customerMobile: Schema.Attribute.String;
+    customerName: Schema.Attribute.String;
+    feeType: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction.transaction'
+    > &
+      Schema.Attribute.Private;
+    orderId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    publishedAt: Schema.Attribute.DateTime;
+    rawResponse: Schema.Attribute.JSON;
+    status: Schema.Attribute.Enumeration<
+      ['PENDING', 'SUCCESS', 'FAILED', 'INITIATED']
+    > &
+      Schema.Attribute.DefaultTo<'PENDING'>;
+    transactionId: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1206,6 +1250,7 @@ declare module '@strapi/strapi' {
       'api::official.official': ApiOfficialOfficial;
       'api::smart-city-tender.smart-city-tender': ApiSmartCityTenderSmartCityTender;
       'api::tender.tender': ApiTenderTender;
+      'api::transaction.transaction': ApiTransactionTransaction;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

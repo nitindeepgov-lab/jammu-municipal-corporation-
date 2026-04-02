@@ -124,11 +124,6 @@ export default function PayOnline() {
     setStatus(STATUS.LOADING)
 
     try {
-      // ────────────────────────────────────────────────────────
-      // TEST INTEGRATION: Mocking backend response to show SDK UI
-      // ────────────────────────────────────────────────────────
-      // TODO: Uncomment this block when you get real credentials!
-      /*
       const res = await fetch(`${STRAPI_URL}/api/billdesk/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -147,16 +142,6 @@ export default function PayOnline() {
         throw new Error(err.error?.message || `Server error ${res.status}`)
       }
       const { data } = await res.json()
-      */
-      
-      // MOCK DATA: Just to trigger the Sandbox UI
-      await new Promise(r => setTimeout(r, 600)) // Fake network delay
-      const data = {
-        merchantId: 'BDSKUUAT',
-        bdOrderId: 'MOCK_ORDER_' + Date.now(),
-        authToken: 'MOCK_TEST_TOKEN',
-      }
-      // ────────────────────────────────────────────────────────
 
       // 2) Launch BillDesk Web SDK
       if (!window.loadBillDeskSdk) {

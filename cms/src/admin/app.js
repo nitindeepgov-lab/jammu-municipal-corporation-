@@ -1286,6 +1286,19 @@ const injectDashboardWidgets = () => {
           </a>
         </div>
 
+        <!-- Finance Section -->
+        <div class="jmc-section-header">
+          <h2>💸 Finance & Payments</h2>
+          <span>Gateway Logs</span>
+        </div>
+        <div class="jmc-dash-grid jmc-content-widgets">
+          <a href="/admin/content-manager/collection-types/api::transaction.transaction" class="jmc-widget-card emerald">
+            <div class="jmc-widget-icon">₹</div>
+            <h3>Transactions</h3>
+            <p>Monitor BillDesk payment flow and logs.</p>
+          </a>
+        </div>
+
         <!-- System & Tools Section -->
         <div class="jmc-section-header">
           <h2>\u2699\ufe0f System & Tools</h2>
@@ -1418,8 +1431,12 @@ const injectDashboardWidgets = () => {
                     <div class="wo-text"><h4>Councillors</h4><p>Ward members</p></div>
                   </a>
                   <a href="/admin/content-manager/collection-types/api::health.health" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83c\udfe5</div>
+                    <div class="wo-icon">🏥</div>
                     <div class="wo-text"><h4>Health</h4><p>Health department</p></div>
+                  </a>
+                  <a href="/admin/content-manager/collection-types/api::transaction.transaction" class="jmc-widget-option">
+                    <div class="wo-icon">₹</div>
+                    <div class="wo-text"><h4>Transactions</h4><p>Payment logs</p></div>
                   </a>
                   <a href="/admin/upload" class="jmc-widget-option">
                     <div class="wo-icon">\ud83d\uddbc</div>

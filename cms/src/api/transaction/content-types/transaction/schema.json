@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transactions",
+  "info": {
+    "singularName": "transaction",
+    "pluralName": "transactions",
+    "displayName": "Transaction",
+    "description": "BillDesk Transactions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "orderId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "bdOrderId": {
+      "type": "string"
+    },
+    "transactionId": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "decimal"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["PENDING", "SUCCESS", "FAILED", "INITIATED"],
+      "default": "PENDING"
+    },
+    "customerName": {
+      "type": "string"
+    },
+    "customerMobile": {
+      "type": "string"
+    },
+    "customerEmail": {
+      "type": "string"
+    },
+    "feeType": {
+      "type": "string"
+    },
+    "additionalInfo": {
+      "type": "json"
+    },
+    "rawResponse": {
+      "type": "json"
+    }
+  }
+}
