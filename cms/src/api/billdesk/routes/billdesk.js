@@ -11,7 +11,7 @@ module.exports = {
   routes: [
     {
       method: "POST",
-      path: "/billdesk/create-order",
+      path: "/api/billdesk/create-order",
       handler: "billdesk.createOrder",
       config: {
         auth: false, // Public endpoint — frontend calls this
@@ -20,7 +20,7 @@ module.exports = {
     },
     {
       method: "POST",
-      path: "/billdesk/verify",
+      path: "/api/billdesk/verify",
       handler: "billdesk.verifyTransaction",
       config: {
         auth: false, // Public — BillDesk callback + frontend verification
