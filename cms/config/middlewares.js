@@ -22,6 +22,8 @@ module.exports = [
         "https://jammu-municipal-corporation.vercel.app", //todo_change_it_to_actual_url
         "http://localhost:3000",
         "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
       ],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
       headers: ["Content-Type", "Authorization"],
