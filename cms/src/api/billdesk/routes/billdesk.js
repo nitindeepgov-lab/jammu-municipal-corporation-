@@ -36,5 +36,41 @@ module.exports = {
         description: "Receive BillDesk webhook events",
       },
     },
+    {
+      method: "POST",
+      path: "/billdesk/transaction-status",
+      handler: "billdesk.transactionStatus",
+      config: {
+        auth: false, // Public — manual verification by transaction/order ID
+        description: "Retrieve BillDesk transaction status",
+      },
+    },
+    {
+      method: "POST",
+      path: "/billdesk/reload-transactions",
+      handler: "billdesk.reloadTransactions",
+      config: {
+        auth: false, // Public — intended for CMS admin use
+        description: "Reload pending BillDesk transactions",
+      },
+    },
+    {
+      method: "POST",
+      path: "/billdesk/mark-failed",
+      handler: "billdesk.markFailed",
+      config: {
+        auth: false, // Public — intended for CMS admin use
+        description: "Manually mark a transaction as failed",
+      },
+    },
+    {
+      method: "POST",
+      path: "/billdesk/mark-status",
+      handler: "billdesk.markStatus",
+      config: {
+        auth: false, // Public — intended for CMS admin use
+        description: "Manually update a transaction status",
+      },
+    },
   ],
 };

@@ -5,9 +5,85 @@
  *   POST /api/billdesk/create-order   → creates a BillDesk order and returns SDK config
  *   POST /api/billdesk/verify         → verifies a BillDesk transaction response
  *   POST /api/billdesk/webhook        → receives BillDesk webhook notifications
+ *   POST /api/billdesk/transaction-status → retrieves transaction status by ID
+ *   POST /api/billdesk/reload-transactions → reloads pending transactions
+ *   POST /api/billdesk/mark-failed    → manually mark a transaction as failed
+ *   POST /api/billdesk/mark-status    → manually update transaction status
  */
 
 "use strict";
+
+const ALLOWED_MANUAL_STATUS = new Set([
+  "PENDING",
+  "SUCCESS",
+  "FAILED",
+  "INITIATED",
+]);
+
+const normalizeManualStatus = (status) => {
+  if (!status) return null;
+  const normalized = String(status).trim().toUpperCase();
+  return ALLOWED_MANUAL_STATUS.has(normalized) ? normalized : null;
+};
+
+const updateTransactionStatus = async ({
+  orderId,
+  transactionId,
+  status,
+  reason,
+}) => {
+  if (!orderId && !transactionId) {
+    throw new Error("orderId or transactionId is required");
+  }
+
+  const normalizedStatus = normalizeManualStatus(status);
+  if (!normalizedStatus) {
+    throw new Error("Invalid status. Use PENDING, SUCCESS, FAILED, INITIATED");
+  }
+
+  const transactionQuery = strapi.db.query("api::transaction.transaction");
+  const where = orderId ? { orderId } : { transactionId };
+  const existing = await transactionQuery.findOne({ where });
+
+  if (!existing) {
+    return { notFound: true };
+  }
+
+  const rawResponse =
+    existing.rawResponse && typeof existing.rawResponse === "object"
+      ? existing.rawResponse
+      : {};
+
+  const manualOverride = {
+    status: normalizedStatus,
+    reason: reason || "Manual override",
+    updatedAt: new Date().toISOString(),
+  };
+
+  const updateData = {
+    status: normalizedStatus,
+    rawResponse: { ...rawResponse, manualOverride },
+  };
+
+  if (transactionId && !existing.transactionId) {
+    updateData.transactionId = transactionId;
+  }
+
+  await transactionQuery.update({
+    where: { id: existing.id },
+    data: updateData,
+  });
+
+  return {
+    notFound: false,
+    data: {
+      id: existing.id,
+      orderId: existing.orderId,
+      transactionId: transactionId || existing.transactionId || "",
+      status: normalizedStatus,
+    },
+  };
+};
 
 module.exports = {
   /**
@@ -130,6 +206,228 @@ module.exports = {
     } catch (error) {
       console.error("Webhook error:", error.message);
       ctx.internalServerError("Failed to process webhook");
+    }
+  },
+
+  /**
+   * POST /api/billdesk/transaction-status
+   *
+   * Body: { orderId? , transactionId?, refundDetails? }
+   * Returns: { status, authStatus, orderId, transactionId, amount, message }
+   */
+  async transactionStatus(ctx) {
+    try {
+      const { orderId, transactionId, refundDetails } = ctx.request.body || {};
+
+      if (!orderId && !transactionId) {
+        return ctx.badRequest("orderId or transactionId is required");
+      }
+
+      const billDeskService = strapi.service("api::billdesk.billdesk");
+      const result = await billDeskService.retrieveTransaction({
+        orderId,
+        transactionId,
+        refundDetails: refundDetails === true || refundDetails === "true",
+      });
+
+      const statusMessage =
+        result.auth_status === "0300"
+          ? "SUCCESS"
+          : result.auth_status === "0002"
+          ? "PENDING"
+          : "FAILED";
+
+      const responseData = {
+        status: statusMessage,
+        authStatus: result.auth_status,
+        orderId: result.orderid || orderId || "",
+        transactionId: result.transactionid || transactionId || "",
+        amount: result.amount,
+        message: result.status || result.transaction_error_desc || "",
+        raw: result,
+      };
+
+      const transactionQuery = strapi.db.query(
+        "api::transaction.transaction"
+      );
+
+      const where = result.orderid
+        ? { orderId: result.orderid }
+        : result.transactionid
+        ? { transactionId: result.transactionid }
+        : orderId
+        ? { orderId }
+        : transactionId
+        ? { transactionId }
+        : null;
+
+      if (where) {
+        const existing = await transactionQuery.findOne({ where });
+        if (existing) {
+          await transactionQuery.update({
+            where,
+            data: {
+              status: statusMessage,
+              transactionId: responseData.transactionId || existing.transactionId,
+              rawResponse: result,
+            },
+          });
+        }
+      }
+
+      ctx.send({
+        success: true,
+        data: responseData,
+      });
+    } catch (error) {
+      console.error("Transaction status error:", error.message);
+      ctx.internalServerError("Failed to retrieve transaction status");
+    }
+  },
+
+  /**
+   * POST /api/billdesk/reload-transactions
+   *
+   * Body: { limit? }
+   * Returns: { total, updated, failed, skipped }
+   */
+  async reloadTransactions(ctx) {
+    try {
+      const { limit } = ctx.request.body || {};
+      const limitValue = Math.max(1, Math.min(parseInt(limit, 10) || 50, 500));
+
+      const transactionQuery = strapi.db.query(
+        "api::transaction.transaction"
+      );
+
+      const pendingTransactions = await transactionQuery.findMany({
+        where: {
+          status: {
+            $in: ["PENDING", "INITIATED"],
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        limit: limitValue,
+      });
+
+      const billDeskService = strapi.service("api::billdesk.billdesk");
+
+      const summary = {
+        total: pendingTransactions.length,
+        updated: 0,
+        failed: 0,
+        skipped: 0,
+      };
+
+      for (const txn of pendingTransactions) {
+        const lookupOrderId = txn.orderId || "";
+        const lookupTxnId = txn.transactionId || "";
+
+        if (!lookupOrderId && !lookupTxnId) {
+          summary.skipped += 1;
+          continue;
+        }
+
+        try {
+          const result = await billDeskService.retrieveTransaction({
+            orderId: lookupOrderId || undefined,
+            transactionId: lookupTxnId || undefined,
+          });
+
+          const statusMessage =
+            result.auth_status === "0300"
+              ? "SUCCESS"
+              : result.auth_status === "0002"
+              ? "PENDING"
+              : "FAILED";
+
+          await transactionQuery.update({
+            where: { id: txn.id },
+            data: {
+              status: statusMessage,
+              transactionId: result.transactionid || txn.transactionId,
+              rawResponse: result,
+            },
+          });
+
+          summary.updated += 1;
+        } catch (error) {
+          summary.failed += 1;
+          console.error(
+            "Reload transaction failed:",
+            txn.orderId || txn.transactionId,
+            error.message
+          );
+        }
+      }
+
+      ctx.send({
+        success: true,
+        data: summary,
+      });
+    } catch (error) {
+      console.error("Reload transactions error:", error.message);
+      ctx.internalServerError("Failed to reload transactions");
+    }
+  },
+
+  /**
+   * POST /api/billdesk/mark-failed
+   *
+   * Body: { orderId?, transactionId?, reason? }
+   * Returns: { id, orderId, transactionId, status }
+   */
+  async markFailed(ctx) {
+    try {
+      const { orderId, transactionId, reason } = ctx.request.body || {};
+      const result = await updateTransactionStatus({
+        orderId,
+        transactionId,
+        status: "FAILED",
+        reason,
+      });
+
+      if (result.notFound) {
+        return ctx.notFound("Transaction not found");
+      }
+
+      ctx.send({ success: true, data: result.data });
+    } catch (error) {
+      if (error.message.includes("required") || error.message.includes("Invalid status")) {
+        return ctx.badRequest(error.message);
+      }
+      console.error("Mark failed error:", error.message);
+      ctx.internalServerError("Failed to mark transaction as failed");
+    }
+  },
+
+  /**
+   * POST /api/billdesk/mark-status
+   *
+   * Body: { orderId?, transactionId?, status, reason? }
+   * Returns: { id, orderId, transactionId, status }
+   */
+  async markStatus(ctx) {
+    try {
+      const { orderId, transactionId, status, reason } = ctx.request.body || {};
+      const result = await updateTransactionStatus({
+        orderId,
+        transactionId,
+        status,
+        reason,
+      });
+
+      if (result.notFound) {
+        return ctx.notFound("Transaction not found");
+      }
+
+      ctx.send({ success: true, data: result.data });
+    } catch (error) {
+      if (error.message.includes("required") || error.message.includes("Invalid status")) {
+        return ctx.badRequest(error.message);
+      }
+      console.error("Mark status error:", error.message);
+      ctx.internalServerError("Failed to update transaction status");
     }
   },
 };

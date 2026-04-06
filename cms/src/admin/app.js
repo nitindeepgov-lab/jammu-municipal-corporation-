@@ -1110,6 +1110,37 @@ const injectAdminStyles = () => {
       color: var(--jmc-text-dim);
     }
 
+    /* ── Modal Actions ── */
+    .jmc-action-field {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 12px;
+    }
+    .jmc-action-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--jmc-text-dim);
+    }
+    .jmc-action-input {
+      border: 1px solid var(--jmc-border);
+      border-radius: 8px; padding: 8px 10px;
+      font-size: 13px; color: var(--jmc-text-primary);
+      background: #fff; outline: none;
+    }
+    .jmc-action-input:focus {
+      border-color: var(--jmc-blue);
+      box-shadow: 0 0 0 2px rgba(0,51,102,0.12);
+    }
+    .jmc-action-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .jmc-action-result {
+      margin-top: 12px; padding: 12px;
+      border-radius: 10px; background: var(--jmc-bg);
+      border: 1px solid var(--jmc-border-light);
+      font-size: 12px; color: var(--jmc-text-secondary);
+      white-space: pre-wrap; min-height: 24px;
+    }
+
     /* ── Activity Feed ── */
     .jmc-activity-panel {
       margin-top: 28px; padding: 20px 24px;
@@ -1297,6 +1328,21 @@ const injectDashboardWidgets = () => {
             <h3>Transactions</h3>
             <p>Monitor BillDesk payment flow and logs.</p>
           </a>
+          <button type="button" id="jmc-verify-payment" class="jmc-widget-card blue">
+            <div class="jmc-widget-icon">V</div>
+            <h3>Verify Payment</h3>
+            <p>Check status by transaction or order ID.</p>
+          </button>
+          <button type="button" id="jmc-reload-transactions" class="jmc-widget-card gray">
+            <div class="jmc-widget-icon">R</div>
+            <h3>Reload Transactions</h3>
+            <p>Refresh pending payment statuses.</p>
+          </button>
+          <button type="button" id="jmc-update-status" class="jmc-widget-card red">
+            <div class="jmc-widget-icon">S</div>
+            <h3>Update Status</h3>
+            <p>Set to SUCCESS, FAILED, PENDING, INITIATED.</p>
+          </button>
         </div>
 
         <!-- System & Tools Section -->
@@ -1458,6 +1504,307 @@ const injectDashboardWidgets = () => {
           document.addEventListener('keydown', function escHandler(e) {
             if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); }
           });
+        });
+      }
+
+      const verifyBtn = document.getElementById('jmc-verify-payment');
+      if (verifyBtn) {
+        verifyBtn.addEventListener('click', () => {
+          if (document.getElementById('jmc-verify-modal-overlay')) return;
+
+          const overlay = document.createElement('div');
+          overlay.className = 'jmc-widget-modal-overlay';
+          overlay.id = 'jmc-verify-modal-overlay';
+          overlay.innerHTML = `
+            <div class="jmc-widget-modal">
+              <div class="jmc-widget-modal-header">
+                <h2>Verify Payment</h2>
+                <button id="jmc-verify-close">X</button>
+              </div>
+              <div class="jmc-widget-modal-body">
+                <p style="margin:0 0 16px;font-size:12.5px;color:var(--jmc-text-dim);">Check status by Transaction ID or Order ID.</p>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-verify-transaction">Transaction ID</label>
+                  <input id="jmc-verify-transaction" class="jmc-action-input" type="text" placeholder="BillDesk transaction ID" />
+                </div>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-verify-order">Order ID (optional)</label>
+                  <input id="jmc-verify-order" class="jmc-action-input" type="text" placeholder="Merchant order ID" />
+                </div>
+                <div class="jmc-action-row">
+                  <button id="jmc-verify-submit" class="jmc-qa-btn primary" type="button">Check Status</button>
+                  <button id="jmc-verify-reset" class="jmc-qa-btn outline" type="button">Clear</button>
+                </div>
+                <div id="jmc-verify-result" class="jmc-action-result">Awaiting input.</div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+
+          const close = () => overlay.remove();
+          const closeBtn = document.getElementById('jmc-verify-close');
+          if (closeBtn) closeBtn.addEventListener('click', close);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+          document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+          });
+
+          const txnInput = document.getElementById('jmc-verify-transaction');
+          const orderInput = document.getElementById('jmc-verify-order');
+          const submitBtn = document.getElementById('jmc-verify-submit');
+          const resetBtn = document.getElementById('jmc-verify-reset');
+          const resultEl = document.getElementById('jmc-verify-result');
+
+          const setResult = (text) => { if (resultEl) resultEl.textContent = text; };
+
+          if (submitBtn) {
+            submitBtn.addEventListener('click', async () => {
+              const transactionId = txnInput?.value?.trim() || '';
+              const orderId = orderInput?.value?.trim() || '';
+
+              if (!transactionId && !orderId) {
+                setResult('Transaction ID or Order ID is required.');
+                return;
+              }
+
+              submitBtn.disabled = true;
+              setResult('Checking status...');
+
+              try {
+                const res = await fetch('/api/billdesk/transaction-status', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ transactionId, orderId }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                  throw new Error(data.error?.message || 'Unable to retrieve status.');
+                }
+
+                const result = data.data || {};
+                const lines = [
+                  `Status: ${result.status || 'UNKNOWN'}`,
+                  `Auth Status: ${result.authStatus || '-'}`,
+                  `Transaction ID: ${result.transactionId || '-'}`,
+                  `Order ID: ${result.orderId || '-'}`,
+                  `Amount: ${result.amount || '-'}`,
+                  `Message: ${result.message || '-'}`,
+                ];
+                setResult(lines.join('\n'));
+              } catch (error) {
+                setResult(error.message || 'Unable to retrieve status.');
+              } finally {
+                submitBtn.disabled = false;
+              }
+            });
+          }
+
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              if (txnInput) txnInput.value = '';
+              if (orderInput) orderInput.value = '';
+              setResult('Awaiting input.');
+            });
+          }
+        });
+      }
+
+      const reloadBtn = document.getElementById('jmc-reload-transactions');
+      if (reloadBtn) {
+        reloadBtn.addEventListener('click', () => {
+          if (document.getElementById('jmc-reload-modal-overlay')) return;
+
+          const overlay = document.createElement('div');
+          overlay.className = 'jmc-widget-modal-overlay';
+          overlay.id = 'jmc-reload-modal-overlay';
+          overlay.innerHTML = `
+            <div class="jmc-widget-modal">
+              <div class="jmc-widget-modal-header">
+                <h2>Reload Transactions</h2>
+                <button id="jmc-reload-close">X</button>
+              </div>
+              <div class="jmc-widget-modal-body">
+                <p style="margin:0 0 16px;font-size:12.5px;color:var(--jmc-text-dim);">Refresh pending and initiated transactions from BillDesk.</p>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-reload-limit">Limit</label>
+                  <input id="jmc-reload-limit" class="jmc-action-input" type="number" min="1" max="500" value="50" />
+                </div>
+                <div class="jmc-action-row">
+                  <button id="jmc-reload-submit" class="jmc-qa-btn primary" type="button">Run Reload</button>
+                </div>
+                <div id="jmc-reload-result" class="jmc-action-result">Ready to reload.</div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+
+          const close = () => overlay.remove();
+          const closeBtn = document.getElementById('jmc-reload-close');
+          if (closeBtn) closeBtn.addEventListener('click', close);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+          document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+          });
+
+          const limitInput = document.getElementById('jmc-reload-limit');
+          const submitBtn = document.getElementById('jmc-reload-submit');
+          const resultEl = document.getElementById('jmc-reload-result');
+
+          const setResult = (text) => { if (resultEl) resultEl.textContent = text; };
+
+          if (submitBtn) {
+            submitBtn.addEventListener('click', async () => {
+              const limitValue = limitInput?.value ? parseInt(limitInput.value, 10) : 50;
+              submitBtn.disabled = true;
+              setResult('Reloading pending transactions...');
+
+              try {
+                const res = await fetch('/api/billdesk/reload-transactions', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ limit: limitValue || 50 }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                  throw new Error(data.error?.message || 'Unable to reload transactions.');
+                }
+
+                const summary = data.data || {};
+                const lines = [
+                  `Total: ${summary.total ?? 0}`,
+                  `Updated: ${summary.updated ?? 0}`,
+                  `Failed: ${summary.failed ?? 0}`,
+                  `Skipped: ${summary.skipped ?? 0}`,
+                ];
+                setResult(lines.join('\n'));
+              } catch (error) {
+                setResult(error.message || 'Unable to reload transactions.');
+              } finally {
+                submitBtn.disabled = false;
+              }
+            });
+          }
+        });
+      }
+
+      const updateStatusBtn = document.getElementById('jmc-update-status');
+      if (updateStatusBtn) {
+        updateStatusBtn.addEventListener('click', () => {
+          if (document.getElementById('jmc-update-status-overlay')) return;
+
+          const overlay = document.createElement('div');
+          overlay.className = 'jmc-widget-modal-overlay';
+          overlay.id = 'jmc-update-status-overlay';
+          overlay.innerHTML = `
+            <div class="jmc-widget-modal">
+              <div class="jmc-widget-modal-header">
+                <h2>Update Transaction Status</h2>
+                <button id="jmc-update-status-close">X</button>
+              </div>
+              <div class="jmc-widget-modal-body">
+                <p style="margin:0 0 16px;font-size:12.5px;color:var(--jmc-text-dim);">Use Transaction ID or Order ID from the receipt.</p>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-update-status-transaction">Transaction ID</label>
+                  <input id="jmc-update-status-transaction" class="jmc-action-input" type="text" placeholder="BillDesk transaction ID" />
+                </div>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-update-status-order">Order ID (optional)</label>
+                  <input id="jmc-update-status-order" class="jmc-action-input" type="text" placeholder="Merchant order ID" />
+                </div>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-update-status-value">Status</label>
+                  <select id="jmc-update-status-value" class="jmc-action-input">
+                    <option value="PENDING">PENDING</option>
+                    <option value="SUCCESS">SUCCESS</option>
+                    <option value="FAILED">FAILED</option>
+                    <option value="INITIATED">INITIATED</option>
+                  </select>
+                </div>
+                <div class="jmc-action-field">
+                  <label class="jmc-action-label" for="jmc-update-status-reason">Reason (optional)</label>
+                  <input id="jmc-update-status-reason" class="jmc-action-input" type="text" placeholder="Manual override reason" />
+                </div>
+                <div class="jmc-action-row">
+                  <button id="jmc-update-status-submit" class="jmc-qa-btn primary" type="button">Update Status</button>
+                  <button id="jmc-update-status-reset" class="jmc-qa-btn outline" type="button">Clear</button>
+                </div>
+                <div id="jmc-update-status-result" class="jmc-action-result">Awaiting input.</div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+
+          const close = () => overlay.remove();
+          const closeBtn = document.getElementById('jmc-update-status-close');
+          if (closeBtn) closeBtn.addEventListener('click', close);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+          document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+          });
+
+          const txnInput = document.getElementById('jmc-update-status-transaction');
+          const orderInput = document.getElementById('jmc-update-status-order');
+          const statusInput = document.getElementById('jmc-update-status-value');
+          const reasonInput = document.getElementById('jmc-update-status-reason');
+          const submitBtn = document.getElementById('jmc-update-status-submit');
+          const resetBtn = document.getElementById('jmc-update-status-reset');
+          const resultEl = document.getElementById('jmc-update-status-result');
+
+          const setResult = (text) => { if (resultEl) resultEl.textContent = text; };
+
+          if (submitBtn) {
+            submitBtn.addEventListener('click', async () => {
+              const transactionId = txnInput?.value?.trim() || '';
+              const orderId = orderInput?.value?.trim() || '';
+              const status = statusInput?.value || '';
+              const reason = reasonInput?.value?.trim() || '';
+
+              if (!transactionId && !orderId) {
+                setResult('Transaction ID or Order ID is required.');
+                return;
+              }
+
+              submitBtn.disabled = true;
+              setResult('Updating status...');
+
+              try {
+                const res = await fetch('/api/billdesk/mark-status', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ transactionId, orderId, status, reason }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                  throw new Error(data.error?.message || 'Unable to update status.');
+                }
+
+                const result = data.data || {};
+                const lines = [
+                  `Status: ${result.status || '-'}`,
+                  `Transaction ID: ${result.transactionId || '-'}`,
+                  `Order ID: ${result.orderId || '-'}`,
+                ];
+                setResult(lines.join('\n'));
+              } catch (error) {
+                setResult(error.message || 'Unable to update status.');
+              } finally {
+                submitBtn.disabled = false;
+              }
+            });
+          }
+
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              if (txnInput) txnInput.value = '';
+              if (orderInput) orderInput.value = '';
+              if (statusInput) statusInput.value = 'PENDING';
+              if (reasonInput) reasonInput.value = '';
+              setResult('Awaiting input.');
+            });
+          }
         });
       }
 
