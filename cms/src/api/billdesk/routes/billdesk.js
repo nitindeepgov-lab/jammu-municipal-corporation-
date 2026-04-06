@@ -27,5 +27,14 @@ module.exports = {
         description: "Verify a BillDesk transaction response",
       },
     },
+    {
+      method: "POST",
+      path: "/billdesk/webhook",
+      handler: "billdesk.webhook",
+      config: {
+        auth: false, // Public — BillDesk webhook notifications
+        description: "Receive BillDesk webhook events",
+      },
+    },
   ],
 };

@@ -4,6 +4,7 @@
  * Exposes two endpoints:
  *   POST /api/billdesk/create-order   → creates a BillDesk order and returns SDK config
  *   POST /api/billdesk/verify         → verifies a BillDesk transaction response
+ *   POST /api/billdesk/webhook        → receives BillDesk webhook notifications
  */
 
 "use strict";
@@ -92,6 +93,43 @@ module.exports = {
     } catch (error) {
       console.error("Verify transaction error:", error.message);
       ctx.internalServerError("Failed to verify transaction");
+    }
+  },
+
+  /**
+   * POST /api/billdesk/webhook
+   *
+   * Body: application/jose (raw JWS token) or JSON with { transactionResponse | jws | payload }
+   * Returns: { received, success, data }
+   */
+  async webhook(ctx) {
+    try {
+      const body = ctx.request.body;
+      const token =
+        typeof body === "string"
+          ? body
+          : body?.transactionResponse ||
+            body?.jws ||
+            body?.payload ||
+            body?.event ||
+            body?.data ||
+            body?.response;
+
+      if (!token) {
+        return ctx.badRequest("Webhook payload is required");
+      }
+
+      const billDeskService = strapi.service("api::billdesk.billdesk");
+      const result = await billDeskService.verifyTransaction(token);
+
+      ctx.send({
+        received: true,
+        success: result.verified,
+        data: result,
+      });
+    } catch (error) {
+      console.error("Webhook error:", error.message);
+      ctx.internalServerError("Failed to process webhook");
     }
   },
 };

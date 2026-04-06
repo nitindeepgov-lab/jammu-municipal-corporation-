@@ -39,7 +39,7 @@ export default function About() {
               </div>
             </section>
 
-            {/* Vision & Mission */}}
+            {/* Vision & Mission */}
             <section id="vision" className="bg-white rounded shadow-sm p-6">
               <h2 className="text-xl font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">Vision &amp; Mission</h2>
               <div className="grid md:grid-cols-2 gap-6 mt-4">
