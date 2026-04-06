@@ -32,7 +32,14 @@ module.exports = [
   },
   "strapi::poweredBy",
   "strapi::query",
-  "strapi::body",
+  {
+    name: "strapi::body",
+    config: {
+      text: true,
+      textLimit: "1mb",
+      includeUnparsed: true,
+    },
+  },
   "strapi::session",
   "strapi::favicon",
   "strapi::public",
