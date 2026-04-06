@@ -36,6 +36,11 @@ function getConfig() {
       ? `${baseUrl}/pgsi/v1_2/orders/create`
       : `${baseUrl}/u2/payments/ve1_2/orders/create`;
 
+  const transactionStatusUrl =
+    env === "PRODUCTION"
+      ? `${baseUrl}/pgsi/v1_2/transactions/get`
+      : `${baseUrl}/u2/payments/ve1_2/transactions/get`;
+
   const sdkBaseUrl =
     env === "PRODUCTION"
       ? "https://pay.billdesk.com"
@@ -47,7 +52,16 @@ function getConfig() {
     );
   }
 
-  return { merchantId, clientId, secretKey, env, baseUrl, createOrderUrl, sdkBaseUrl };
+  return {
+    merchantId,
+    clientId,
+    secretKey,
+    env,
+    baseUrl,
+    createOrderUrl,
+    transactionStatusUrl,
+    sdkBaseUrl,
+  };
 }
 
 /**
@@ -270,6 +284,63 @@ module.exports = () => ({
         verified: false,
         error: error.message,
       };
+    }
+  },
+
+  /**
+   * Retrieve transaction details by orderId or transactionId
+   *
+   * @param {Object} params
+   * @param {string} [params.orderId] - Merchant order ID
+   * @param {string} [params.transactionId] - BillDesk transaction ID
+   * @param {boolean} [params.refundDetails] - Include refund details
+   * @returns {Object} Transaction response from BillDesk
+   */
+  async retrieveTransaction({ orderId, transactionId, refundDetails = false }) {
+    const config = getConfig();
+
+    if (!orderId && !transactionId) {
+      throw new Error("orderId or transactionId is required");
+    }
+
+    const payload = {
+      mercid: config.merchantId,
+      ...(orderId ? { orderid: orderId } : {}),
+      ...(transactionId ? { transactionid: transactionId } : {}),
+      ...(refundDetails ? { refund_details: "true" } : {}),
+    };
+
+    try {
+      const jwsToken = await createJwsToken(
+        payload,
+        config.secretKey,
+        config.clientId
+      );
+
+      const response = await fetch(config.transactionStatusUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/jose",
+          Accept: "application/jose",
+          "BD-Traceid": uuidv4(),
+          "BD-Timestamp": new Date().toISOString(),
+        },
+        body: jwsToken,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("BillDesk transaction status error:", response.status, errorText);
+        throw new Error(`BillDesk API returned ${response.status}`);
+      }
+
+      const responseJws = await response.text();
+      const txnResponse = await verifyJwsToken(responseJws, config.secretKey);
+
+      return txnResponse;
+    } catch (error) {
+      console.error("BillDesk retrieveTransaction error:", error);
+      throw error;
     }
   },
 });

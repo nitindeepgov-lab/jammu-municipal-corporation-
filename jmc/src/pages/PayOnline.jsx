@@ -93,10 +93,17 @@ export default function PayOnline() {
   const [form, setForm] = useState({})
   const [status, setStatus] = useState(STATUS.IDLE)
   const [msg, setMsg] = useState('')
+  const [receipt, setReceipt] = useState(null)
   const panelRef = useRef(null)
 
   /* helpers */
-  const reset = useCallback(() => { setSelected(null); setForm({}); setStatus(STATUS.IDLE); setMsg('') }, [])
+  const reset = useCallback(() => {
+    setSelected(null)
+    setForm({})
+    setStatus(STATUS.IDLE)
+    setMsg('')
+    setReceipt(null)
+  }, [])
 
   const pick = (opt) => {
     if (selected?.id === opt.id) { reset(); return }
@@ -109,13 +116,22 @@ export default function PayOnline() {
   /* ── BillDesk response handler ───────────────────────── */
   const handleBillDeskResponse = useCallback((txn) => {
     console.log('BillDesk SDK response:', txn)
-    if (txn && (txn.status === '0300' || txn.transaction_error_type === 'success')) {
-      setStatus(STATUS.SUCCESS)
-      setMsg(txn.transactionid || txn.orderid || '')
-    } else {
-      setStatus(STATUS.FAILED)
-      setMsg(txn?.transaction_error_desc || 'Payment was not completed.')
-    }
+    const isSuccess = txn && (txn.status === '0300' || txn.transaction_error_type === 'success')
+    const statusMessage = isSuccess
+      ? 'Payment successful'
+      : (txn?.transaction_error_desc || 'Payment was not completed.')
+
+    setStatus(isSuccess ? STATUS.SUCCESS : STATUS.FAILED)
+    setMsg(isSuccess ? (txn.transactionid || txn.orderid || '') : statusMessage)
+
+    setReceipt(prev => ({
+      ...(prev || {}),
+      status: isSuccess ? 'SUCCESS' : 'FAILED',
+      statusMessage,
+      transactionId: txn?.transactionid || prev?.transactionId || '',
+      gatewayStatus: txn?.status || txn?.transaction_error_type || '',
+      completedAt: new Date().toISOString(),
+    }))
   }, [])
 
   /* ── Submit → Backend → SDK ──────────────────────────── */
@@ -142,6 +158,21 @@ export default function PayOnline() {
         throw new Error(err.error?.message || `Server error ${res.status}`)
       }
       const { data } = await res.json()
+
+      setReceipt({
+        receiptId: data.orderId,
+        orderId: data.orderId,
+        bdOrderId: data.bdOrderId,
+        amount: data.amount,
+        customerName: form.name || '',
+        customerEmail: form.email || '',
+        customerMobile: form.mobile || '',
+        feeType: selected.feeType,
+        status: 'INITIATED',
+        statusMessage: 'Payment initiated',
+        transactionId: '',
+        createdAt: new Date().toISOString(),
+      })
 
       // 2) Launch BillDesk Web SDK
       if (!window.loadBillDeskSdk) {
@@ -335,7 +366,7 @@ export default function PayOnline() {
             </div>
             <p className="text-gray-900 font-semibold text-lg">Payment Successful</p>
             {msg && <p className="text-green-600 text-xs font-mono bg-green-50 inline-block px-3 py-1 rounded mt-2">{msg}</p>}
-            <p className="text-gray-400 text-sm mt-3">Your payment has been processed. A receipt has been sent to your email.</p>
+            <p className="text-gray-400 text-sm mt-3">Your payment has been processed. Receipt details are shown below.</p>
             <button onClick={reset} className="mt-6 px-6 py-2.5 rounded-lg bg-[#003366] text-white text-sm font-semibold hover:bg-[#004080] transition">Make Another Payment</button>
           </div>
         )}
@@ -348,12 +379,81 @@ export default function PayOnline() {
             </div>
             <p className="text-gray-900 font-semibold text-lg">Payment Not Completed</p>
             <p className="text-gray-500 text-sm mt-1.5 max-w-md mx-auto">{msg || 'The payment could not be processed. You have not been charged.'}</p>
+            <p className="text-gray-400 text-xs mt-2">Receipt details are still generated for verification.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setStatus(STATUS.IDLE); setMsg('') }}
                 className="px-6 py-2.5 rounded-lg bg-[#003366] text-white text-sm font-semibold hover:bg-[#004080] transition">Retry</button>
               <button onClick={reset}
                 className="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">Start Over</button>
             </div>
+          </div>
+        )}
+
+        {/* ── Receipt (Success or Failed) ─────────────── */}
+        {receipt && (status === STATUS.SUCCESS || status === STATUS.FAILED) && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p className="text-gray-900 font-semibold text-base">Payment Receipt</p>
+                <p className="text-gray-400 text-xs">Use Receipt ID or Transaction ID for verification.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-50 transition"
+              >
+                Print Receipt
+              </button>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4 mt-5 text-xs">
+              <div>
+                <p className="text-gray-400">Receipt ID</p>
+                <p className="text-gray-900 font-mono">{receipt.receiptId || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Transaction ID</p>
+                <p className="text-gray-900 font-mono">{receipt.transactionId || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Order ID</p>
+                <p className="text-gray-900 font-mono">{receipt.orderId || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Status</p>
+                <p className={`font-semibold ${receipt.status === 'SUCCESS' ? 'text-green-600' : receipt.status === 'FAILED' ? 'text-red-500' : 'text-gray-600'}`}>
+                  {receipt.status}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-400">Amount</p>
+                <p className="text-gray-900">₹ {receipt.amount || '0.00'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Fee Type</p>
+                <p className="text-gray-900">{receipt.feeType || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Customer Name</p>
+                <p className="text-gray-900">{receipt.customerName || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Mobile</p>
+                <p className="text-gray-900">{receipt.customerMobile || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Email</p>
+                <p className="text-gray-900">{receipt.customerEmail || '-'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Message</p>
+                <p className="text-gray-900">{receipt.statusMessage || '-'}</p>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-gray-500 mt-4">
+              These receipt details can be shared via email/SMS once notification services are enabled. Admins can verify status in the CMS using the Receipt or Transaction ID.
+            </p>
           </div>
         )}
 
