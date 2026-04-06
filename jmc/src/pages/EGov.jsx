@@ -4,7 +4,7 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 const egovServices = [
   {
     name: "Online Property Tax Payment",
-    href: "https://jmc.jk.gov.in/online-payment.html",
+    href: "/pay-online",
     desc: "Pay property tax dues online quickly and securely.",
   },
   {

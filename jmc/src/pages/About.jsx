@@ -7,7 +7,9 @@ export default function About() {
 
             {/* About section */}
             <section className="bg-white rounded shadow-sm p-6">
-              <h2 className="text-xl font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-6 inline-block">About JMC</h2>
+              <h2 className="text-xl font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-6 inline-block">
+                About JMC
+              </h2>
               <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start">
                 <div className="space-y-4">
                   <p className="text-gray-700 text-sm leading-relaxed">
@@ -26,18 +28,18 @@ export default function About() {
                     schemes including Smart Cities Mission and Swachh Bharat Mission.
                   </p>
                 </div>
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#FF6600]/10 via-transparent to-[#003366]/10 rounded-lg blur" aria-hidden />
+
+                <div>
                   <img
-                    src="/logo.jpeg"
+                    src="/banner/images.jpeg"
                     alt="Jammu Municipal Corporation building"
-                    className="relative w-full h-full max-h-[320px] object-cover rounded-lg shadow-md"
+                    className="w-full max-h-[320px] object-contain rounded-lg shadow-md bg-white"
                   />
                 </div>
               </div>
             </section>
 
-            {/* Vision & Mission */}
+            {/* Vision & Mission */}}
             <section id="vision" className="bg-white rounded shadow-sm p-6">
               <h2 className="text-xl font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">Vision &amp; Mission</h2>
               <div className="grid md:grid-cols-2 gap-6 mt-4">

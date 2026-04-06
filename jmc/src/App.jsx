@@ -49,6 +49,14 @@ import QuickLinksPage from "./pages/QuickLinksPage";
 import SmartCityTenders from "./pages/SmartCityTenders";
 import Sitemap from "./pages/Sitemap";
 import CouncillorDetails from "./pages/CouncillorDetails";
+import {
+  PrivacyPolicyPage,
+  DisclaimerPage,
+  HyperlinkPolicyPage,
+  AccessibilityPage,
+  CopyrightPolicyPage,
+  TermsConditionsPage,
+} from "./pages/PolicyPages";
 
 export default function App() {
   return (
@@ -83,6 +91,12 @@ export default function App() {
         <Route path="/smart-city-tenders" element={<SmartCityTenders />} />
         <Route path="/sitemap" element={<Sitemap />} />
         <Route path="/councillor-details" element={<CouncillorDetails />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/disclaimer" element={<DisclaimerPage />} />
+        <Route path="/hyperlink-policy" element={<HyperlinkPolicyPage />} />
+        <Route path="/accessibility" element={<AccessibilityPage />} />
+        <Route path="/copyright-policy" element={<CopyrightPolicyPage />} />
+        <Route path="/terms-conditions" element={<TermsConditionsPage />} />
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>
