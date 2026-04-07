@@ -28,6 +28,7 @@ import LandingPage from "./landing-page";
 import About from "./pages/About";
 import Officials from "./pages/Officials";
 import Commissioner from "./pages/Commissioner";
+import GoverningBodies from "./pages/GoverningBodies";
 import Notices from "./pages/Notices";
 import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
@@ -68,6 +69,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/officials" element={<Officials />} />
         <Route path="/commissioner" element={<Commissioner />} />
+        <Route path="/governing-bodies" element={<GoverningBodies />} />
         <Route path="/notices" element={<Notices />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/contact" element={<Contact />} />

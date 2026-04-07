@@ -17,28 +17,34 @@ const navLinks = [
   },
   {
     name: "Governing Bodies",
-    to: "/officials",
+    to: "/governing-bodies",
     hasDropdown: true,
     dropdown: [
-      { name: "Hon'ble Mayor", href: "https://jmc.jk.gov.in/mayor.aspx" },
+      { name: "Hon'ble Mayor", to: "/governing-bodies?Mayor" },
       {
         name: "Hon'ble Deputy Mayor",
-        href: "https://jmc.jk.gov.in/deputymayor.aspx",
+        to: "/governing-bodies?Deputy-Mayor",
       },
       {
         name: "Hon'ble Chairman Public Health and Sanitation Committee",
-        href: "https://jmc.jk.gov.in/governingbodies.aspx",
+        to: "/governing-bodies?Chairman-PHSC",
       },
       {
         name: "Hon'ble Chairman Swachh Bharat Committee",
-        href: "https://jmc.jk.gov.in/governingbodies.aspx",
+        to: "/governing-bodies?Chairman-SBC",
       },
       {
         name: "Hon'ble Chairman Social Justice Committee",
-        href: "https://jmc.jk.gov.in/governingbodies.aspx",
+        to: "/governing-bodies?Chairman-SJC",
       },
-      { name: "Commissioner Secretary to Govt. (HUDD)", to: "/officials" },
-      { name: "Municipal Commissioner, JMC", to: "/commissioner" },
+      {
+        name: "Commissioner Secretary to Govt. (HUDD)",
+        to: "/governing-bodies?Principal-Secretary",
+      },
+      {
+        name: "Municipal Commissioner, JMC",
+        to: "/governing-bodies?Commissioner",
+      },
     ],
   },
   {
