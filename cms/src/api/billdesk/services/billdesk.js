@@ -15,10 +15,37 @@ const { CompactSign, compactVerify, CompactEncrypt, compactDecrypt } = require("
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 
+/**
+ * @typedef {Object} BillDeskConfig
+ * @property {string} merchantId
+ * @property {string} clientId
+ * @property {string | undefined} signingKeyId
+ * @property {string | undefined} encryptionKeyId
+ * @property {"JWS" | "SYMMETRIC"} joseMode
+ * @property {Uint8Array} signingKeyBytes
+ * @property {Uint8Array | null} encryptionKeyBytes
+ * @property {string} env
+ * @property {string} baseUrl
+ * @property {string} createOrderUrl
+ * @property {string} transactionStatusUrl
+ * @property {string} sdkBaseUrl
+ */
+
+/**
+ * @param {unknown} error
+ * @returns {string}
+ */
+function getErrorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 // ── Helpers ─────────────────────────────────────────────
 
 /**
  * Get BillDesk config from environment
+ */
+/**
+ * @returns {BillDeskConfig}
  */
 function getConfig() {
   const merchantId = process.env.BILLDESK_MERCHANT_ID;
@@ -29,10 +56,14 @@ function getConfig() {
     process.env.BILLDESK_ENCRYPTION_KEY || process.env.BILLDESK_SECRET_KEY;
   const signingKeyId = process.env.BILLDESK_SIGNING_KEY_ID;
   const encryptionKeyId = process.env.BILLDESK_ENCRYPTION_KEY_ID;
-  const joseMode = (process.env.BILLDESK_JOSE_MODE ||
+  const rawJoseMode = (process.env.BILLDESK_JOSE_MODE ||
     (process.env.BILLDESK_ENCRYPTION_KEY ? "SYMMETRIC" : "JWS"))
     .toUpperCase();
-  const keyFormat = (process.env.BILLDESK_KEY_FORMAT || "RAW").toUpperCase();
+  /** @type {"JWS" | "SYMMETRIC"} */
+  const joseMode = rawJoseMode === "SYMMETRIC" ? "SYMMETRIC" : "JWS";
+  const rawKeyFormat = (process.env.BILLDESK_KEY_FORMAT || "RAW").toUpperCase();
+  /** @type {"RAW" | "BASE64"} */
+  const keyFormat = rawKeyFormat === "BASE64" ? "BASE64" : "RAW";
   const env = (process.env.BILLDESK_ENV || "UAT").toUpperCase();
 
   const baseUrl =
@@ -90,6 +121,9 @@ function getConfig() {
 
 /**
  * Convert key to bytes based on format
+ * @param {string} key
+ * @param {"RAW" | "BASE64"} keyFormat
+ * @returns {Uint8Array}
  */
 function getKeyBytes(key, keyFormat) {
   if (keyFormat === "BASE64") {
@@ -101,11 +135,18 @@ function getKeyBytes(key, keyFormat) {
 
 /**
  * Create a JOSE request token
+ * @param {Record<string, unknown>} payload
+ * @param {BillDeskConfig} config
+ * @returns {Promise<string>}
  */
 async function createJoseToken(payload, config) {
   const encoder = new TextEncoder();
 
   if (config.joseMode === "SYMMETRIC") {
+    if (!config.encryptionKeyBytes) {
+      throw new Error("Encryption key missing for JOSE request");
+    }
+    const encryptionKey = config.encryptionKeyBytes;
     const jwe = await new CompactEncrypt(
       encoder.encode(JSON.stringify(payload))
     )
@@ -115,7 +156,7 @@ async function createJoseToken(payload, config) {
         ...(config.encryptionKeyId ? { kid: config.encryptionKeyId } : {}),
         clientid: config.clientId,
       })
-      .encrypt(config.encryptionKeyBytes);
+      .encrypt(encryptionKey);
 
     const jws = await new CompactSign(encoder.encode(jwe))
       .setProtectedHeader({
@@ -138,6 +179,9 @@ async function createJoseToken(payload, config) {
 
 /**
  * Verify and decrypt a JOSE response from BillDesk
+ * @param {string} token
+ * @param {BillDeskConfig} config
+ * @returns {Promise<Record<string, any>>}
  */
 async function verifyJoseToken(token, config) {
   try {
@@ -158,7 +202,7 @@ async function verifyJoseToken(token, config) {
 
     return JSON.parse(payloadText);
   } catch (err) {
-    console.error("JOSE verification failed:", err.message);
+    console.error("JOSE verification failed:", getErrorMessage(err));
     throw new Error("Invalid BillDesk response signature");
   }
 }
@@ -170,13 +214,13 @@ module.exports = () => ({
    * Create a BillDesk order and return SDK config for frontend
    *
    * @param {Object} params
-   * @param {number} params.amount - Amount in INR (e.g. 100.50)
+  * @param {string | number} params.amount - Amount in INR (e.g. 100.50)
    * @param {string} params.customerName - Customer name
    * @param {string} params.customerEmail - Customer email
    * @param {string} params.customerMobile - Customer mobile (10 digits)
    * @param {string} params.feeType - Fee category (tender/other)
    * @param {Object} params.additionalInfo - Any extra metadata
-   * @returns {Object} SDK config for frontend
+  * @returns {Promise<Object>} SDK config for frontend
    */
   async createOrder({
     amount,
@@ -191,11 +235,13 @@ module.exports = () => ({
     // Generate unique order ID
     const orderId = `JMC${Date.now()}${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 
+    const parsedAmount = Number(amount);
+
     // BillDesk Create Order payload
     const orderPayload = {
       mercid: config.merchantId,
       orderid: orderId,
-      amount: parseFloat(amount).toFixed(2),
+      amount: parsedAmount.toFixed(2),
       order_date: new Date().toISOString(),
       currency: "356", // INR
       ru: `${process.env.BILLDESK_RETURN_URL || "https://jammu-municipal-corporation.vercel.app/payment-status"}`,
@@ -218,7 +264,7 @@ module.exports = () => ({
       await strapi.db.query("api::transaction.transaction").create({
         data: {
           orderId,
-          amount: parseFloat(amount),
+          amount: parsedAmount,
           customerName,
           customerMobile,
           customerEmail,
@@ -284,7 +330,7 @@ module.exports = () => ({
         sdkBaseUrl: config.sdkBaseUrl,
       };
     } catch (error) {
-      console.error("BillDesk createOrder error:", error);
+      console.error("BillDesk createOrder error:", getErrorMessage(error));
       throw error;
     }
   },
@@ -293,7 +339,7 @@ module.exports = () => ({
    * Verify a transaction response from BillDesk
    *
   * @param {string} transactionResponse - JOSE token from BillDesk callback
-   * @returns {Object} Verified transaction details
+  * @returns {Promise<Object>} Verified transaction details
    */
   async verifyTransaction(transactionResponse) {
     const config = getConfig();
@@ -329,7 +375,7 @@ module.exports = () => ({
     } catch (error) {
       return {
         verified: false,
-        error: error.message,
+        error: getErrorMessage(error),
       };
     }
   },
@@ -341,7 +387,7 @@ module.exports = () => ({
    * @param {string} [params.orderId] - Merchant order ID
    * @param {string} [params.transactionId] - BillDesk transaction ID
    * @param {boolean} [params.refundDetails] - Include refund details
-   * @returns {Object} Transaction response from BillDesk
+  * @returns {Promise<Object>} Transaction response from BillDesk
    */
   async retrieveTransaction({ orderId, transactionId, refundDetails = false }) {
     const config = getConfig();
@@ -382,7 +428,7 @@ module.exports = () => ({
 
       return txnResponse;
     } catch (error) {
-      console.error("BillDesk retrieveTransaction error:", error);
+      console.error("BillDesk retrieveTransaction error:", getErrorMessage(error));
       throw error;
     }
   },
