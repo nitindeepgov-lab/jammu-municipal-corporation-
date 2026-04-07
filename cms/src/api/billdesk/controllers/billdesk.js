@@ -13,6 +13,13 @@
 
 "use strict";
 
+/**
+ * @param {unknown} error
+ * @returns {string}
+ */
+const getErrorMessage = (error) =>
+  error instanceof Error ? error.message : String(error);
+
 const ALLOWED_MANUAL_STATUS = new Set([
   "PENDING",
   "SUCCESS",
@@ -20,12 +27,24 @@ const ALLOWED_MANUAL_STATUS = new Set([
   "INITIATED",
 ]);
 
+/**
+ * @param {string | null | undefined} status
+ * @returns {string | null}
+ */
 const normalizeManualStatus = (status) => {
   if (!status) return null;
   const normalized = String(status).trim().toUpperCase();
   return ALLOWED_MANUAL_STATUS.has(normalized) ? normalized : null;
 };
 
+/**
+ * @param {Object} params
+ * @param {string=} params.orderId
+ * @param {string=} params.transactionId
+ * @param {string=} params.status
+ * @param {string=} params.reason
+ * @returns {Promise<{ notFound: boolean, data?: { id: string | number, orderId: string, transactionId: string, status: string } }>} 
+ */
 const updateTransactionStatus = async ({
   orderId,
   transactionId,
@@ -60,10 +79,10 @@ const updateTransactionStatus = async ({
     updatedAt: new Date().toISOString(),
   };
 
-  const updateData = {
+  const updateData = /** @type {{ status: string, rawResponse: object, transactionId?: string }} */ ({
     status: normalizedStatus,
     rawResponse: { ...rawResponse, manualOverride },
-  };
+  });
 
   if (transactionId && !existing.transactionId) {
     updateData.transactionId = transactionId;
@@ -92,6 +111,7 @@ module.exports = {
    * Body: { amount, customerName, customerEmail, customerMobile, feeType, additionalInfo }
    * Returns: { merchantId, bdOrderId, authToken, orderId, amount, sdkBaseUrl }
    */
+  /** @param {any} ctx */
   async createOrder(ctx) {
     try {
       const {
@@ -130,10 +150,11 @@ module.exports = {
         data: orderConfig,
       });
     } catch (error) {
-      console.error("Create order error:", error.message);
+      const message = getErrorMessage(error);
+      console.error("Create order error:", message);
 
       // Check if it's a credentials-missing error
-      if (error.message.includes("credentials missing")) {
+      if (message.includes("credentials missing")) {
         return ctx.serviceUnavailable(
           "Payment gateway is not configured. Please contact the administrator."
         );
@@ -151,6 +172,7 @@ module.exports = {
    * Body: { transactionResponse } — JWS token from BillDesk
    * Returns: { verified, orderId, transactionId, amount, status, statusMessage }
    */
+  /** @param {any} ctx */
   async verifyTransaction(ctx) {
     try {
       const { transactionResponse } = ctx.request.body;
@@ -167,7 +189,7 @@ module.exports = {
         data: result,
       });
     } catch (error) {
-      console.error("Verify transaction error:", error.message);
+      console.error("Verify transaction error:", getErrorMessage(error));
       ctx.internalServerError("Failed to verify transaction");
     }
   },
@@ -178,6 +200,7 @@ module.exports = {
    * Body: application/jose (raw JWS token) or JSON with { transactionResponse | jws | payload }
    * Returns: { received, success, data }
    */
+  /** @param {any} ctx */
   async webhook(ctx) {
     try {
       const body = ctx.request.body;
@@ -204,7 +227,7 @@ module.exports = {
         data: result,
       });
     } catch (error) {
-      console.error("Webhook error:", error.message);
+      console.error("Webhook error:", getErrorMessage(error));
       ctx.internalServerError("Failed to process webhook");
     }
   },
@@ -215,6 +238,7 @@ module.exports = {
    * Body: { orderId? , transactionId?, refundDetails? }
    * Returns: { status, authStatus, orderId, transactionId, amount, message }
    */
+  /** @param {any} ctx */
   async transactionStatus(ctx) {
     try {
       const { orderId, transactionId, refundDetails } = ctx.request.body || {};
@@ -280,7 +304,7 @@ module.exports = {
         data: responseData,
       });
     } catch (error) {
-      console.error("Transaction status error:", error.message);
+      console.error("Transaction status error:", getErrorMessage(error));
       ctx.internalServerError("Failed to retrieve transaction status");
     }
   },
@@ -291,6 +315,7 @@ module.exports = {
    * Body: { limit? }
    * Returns: { total, updated, failed, skipped }
    */
+  /** @param {any} ctx */
   async reloadTransactions(ctx) {
     try {
       const { limit } = ctx.request.body || {};
@@ -356,7 +381,7 @@ module.exports = {
           console.error(
             "Reload transaction failed:",
             txn.orderId || txn.transactionId,
-            error.message
+            getErrorMessage(error)
           );
         }
       }
@@ -366,7 +391,7 @@ module.exports = {
         data: summary,
       });
     } catch (error) {
-      console.error("Reload transactions error:", error.message);
+      console.error("Reload transactions error:", getErrorMessage(error));
       ctx.internalServerError("Failed to reload transactions");
     }
   },
@@ -377,6 +402,7 @@ module.exports = {
    * Body: { orderId?, transactionId?, reason? }
    * Returns: { id, orderId, transactionId, status }
    */
+  /** @param {any} ctx */
   async markFailed(ctx) {
     try {
       const { orderId, transactionId, reason } = ctx.request.body || {};
@@ -393,10 +419,11 @@ module.exports = {
 
       ctx.send({ success: true, data: result.data });
     } catch (error) {
-      if (error.message.includes("required") || error.message.includes("Invalid status")) {
-        return ctx.badRequest(error.message);
+      const message = getErrorMessage(error);
+      if (message.includes("required") || message.includes("Invalid status")) {
+        return ctx.badRequest(message);
       }
-      console.error("Mark failed error:", error.message);
+      console.error("Mark failed error:", message);
       ctx.internalServerError("Failed to mark transaction as failed");
     }
   },
@@ -407,6 +434,7 @@ module.exports = {
    * Body: { orderId?, transactionId?, status, reason? }
    * Returns: { id, orderId, transactionId, status }
    */
+  /** @param {any} ctx */
   async markStatus(ctx) {
     try {
       const { orderId, transactionId, status, reason } = ctx.request.body || {};
@@ -423,10 +451,11 @@ module.exports = {
 
       ctx.send({ success: true, data: result.data });
     } catch (error) {
-      if (error.message.includes("required") || error.message.includes("Invalid status")) {
-        return ctx.badRequest(error.message);
+      const message = getErrorMessage(error);
+      if (message.includes("required") || message.includes("Invalid status")) {
+        return ctx.badRequest(message);
       }
-      console.error("Mark status error:", error.message);
+      console.error("Mark status error:", message);
       ctx.internalServerError("Failed to update transaction status");
     }
   },
