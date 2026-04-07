@@ -1,8 +1,8 @@
 /**
  * BillDesk Service
  *
- * Handles JWS-HMAC token generation and Create Order API calls.
- * Uses JOSE library for JWS (JSON Web Signature) with HMAC-SHA256.
+ * Handles Symmetric JOSE (JWE + JWS) and Create Order API calls.
+ * Uses JOSE library for encryption (JWE) and signing (JWS) with HMAC-SHA256.
  *
  * Docs reference:
  * - BillDesk Web SDK Specs One Time Payments (HMAC) v1.5
@@ -11,7 +11,7 @@
 
 "use strict";
 
-const { CompactSign, compactVerify } = require("jose");
+const { CompactSign, compactVerify, CompactEncrypt, compactDecrypt } = require("jose");
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 
@@ -23,7 +23,16 @@ const crypto = require("crypto");
 function getConfig() {
   const merchantId = process.env.BILLDESK_MERCHANT_ID;
   const clientId = process.env.BILLDESK_CLIENT_ID;
-  const secretKey = process.env.BILLDESK_SECRET_KEY;
+  const signingKey =
+    process.env.BILLDESK_SIGNING_KEY || process.env.BILLDESK_SECRET_KEY;
+  const encryptionKey =
+    process.env.BILLDESK_ENCRYPTION_KEY || process.env.BILLDESK_SECRET_KEY;
+  const signingKeyId = process.env.BILLDESK_SIGNING_KEY_ID;
+  const encryptionKeyId = process.env.BILLDESK_ENCRYPTION_KEY_ID;
+  const joseMode = (process.env.BILLDESK_JOSE_MODE ||
+    (process.env.BILLDESK_ENCRYPTION_KEY ? "SYMMETRIC" : "JWS"))
+    .toUpperCase();
+  const keyFormat = (process.env.BILLDESK_KEY_FORMAT || "RAW").toUpperCase();
   const env = (process.env.BILLDESK_ENV || "UAT").toUpperCase();
 
   const baseUrl =
@@ -46,16 +55,31 @@ function getConfig() {
       ? "https://pay.billdesk.com"
       : "https://uat1.billdesk.com/merchant-uat";
 
-  if (!merchantId || !clientId || !secretKey) {
+  if (!merchantId || !clientId || !signingKey) {
     throw new Error(
-      "BillDesk credentials missing. Set BILLDESK_MERCHANT_ID, BILLDESK_CLIENT_ID, and BILLDESK_SECRET_KEY in .env"
+      "BillDesk credentials missing. Set BILLDESK_MERCHANT_ID, BILLDESK_CLIENT_ID, and BILLDESK_SIGNING_KEY (or BILLDESK_SECRET_KEY) in .env"
     );
   }
+
+  if (joseMode === "SYMMETRIC" && !encryptionKey) {
+    throw new Error(
+      "BillDesk encryption key missing. Set BILLDESK_ENCRYPTION_KEY (or BILLDESK_SECRET_KEY) in .env"
+    );
+  }
+
+  const signingKeyBytes = getKeyBytes(signingKey, keyFormat);
+  const encryptionKeyBytes = encryptionKey
+    ? getKeyBytes(encryptionKey, keyFormat)
+    : null;
 
   return {
     merchantId,
     clientId,
-    secretKey,
+    signingKeyId,
+    encryptionKeyId,
+    joseMode,
+    signingKeyBytes,
+    encryptionKeyBytes,
     env,
     baseUrl,
     createOrderUrl,
@@ -65,46 +89,76 @@ function getConfig() {
 }
 
 /**
- * Create a JWS token from payload using HMAC-SHA256
+ * Convert key to bytes based on format
  */
-async function createJwsToken(payload, secretKey, clientId) {
+function getKeyBytes(key, keyFormat) {
+  if (keyFormat === "BASE64") {
+    return Uint8Array.from(Buffer.from(key, "base64"));
+  }
   const encoder = new TextEncoder();
-  const keyBytes = encoder.encode(secretKey);
-
-  // Import key for HMAC
-  const key = await crypto.subtle
-    ? crypto.webcrypto.subtle.importKey(
-        "raw",
-        keyBytes,
-        { name: "HMAC", hash: "SHA-256" },
-        false,
-        ["sign"]
-      )
-    : keyBytes;
-
-  const jws = await new CompactSign(encoder.encode(JSON.stringify(payload)))
-    .setProtectedHeader({
-      alg: "HS256",
-      clientid: clientId,
-    })
-    .sign(keyBytes);
-
-  return jws;
+  return encoder.encode(key);
 }
 
 /**
- * Verify a JWS token response from BillDesk
+ * Create a JOSE request token
  */
-async function verifyJwsToken(token, secretKey) {
+async function createJoseToken(payload, config) {
   const encoder = new TextEncoder();
-  const keyBytes = encoder.encode(secretKey);
 
+  if (config.joseMode === "SYMMETRIC") {
+    const jwe = await new CompactEncrypt(
+      encoder.encode(JSON.stringify(payload))
+    )
+      .setProtectedHeader({
+        alg: "dir",
+        enc: "A256GCM",
+        ...(config.encryptionKeyId ? { kid: config.encryptionKeyId } : {}),
+        clientid: config.clientId,
+      })
+      .encrypt(config.encryptionKeyBytes);
+
+    const jws = await new CompactSign(encoder.encode(jwe))
+      .setProtectedHeader({
+        alg: "HS256",
+        ...(config.signingKeyId ? { kid: config.signingKeyId } : {}),
+        clientid: config.clientId,
+      })
+      .sign(config.signingKeyBytes);
+
+    return jws;
+  }
+
+  return new CompactSign(encoder.encode(JSON.stringify(payload)))
+    .setProtectedHeader({
+      alg: "HS256",
+      clientid: config.clientId,
+    })
+    .sign(config.signingKeyBytes);
+}
+
+/**
+ * Verify and decrypt a JOSE response from BillDesk
+ */
+async function verifyJoseToken(token, config) {
   try {
-    const { payload } = await compactVerify(token, keyBytes);
+    const { payload } = await compactVerify(token, config.signingKeyBytes);
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(payload));
+    const payloadText = decoder.decode(payload).trim();
+
+    if (payloadText.split(".").length === 5) {
+      if (!config.encryptionKeyBytes) {
+        throw new Error("Encryption key missing for JOSE response");
+      }
+      const { plaintext } = await compactDecrypt(
+        payloadText,
+        config.encryptionKeyBytes
+      );
+      return JSON.parse(decoder.decode(plaintext));
+    }
+
+    return JSON.parse(payloadText);
   } catch (err) {
-    console.error("JWS verification failed:", err.message);
+    console.error("JOSE verification failed:", err.message);
     throw new Error("Invalid BillDesk response signature");
   }
 }
@@ -175,11 +229,7 @@ module.exports = () => ({
       });
 
       // Create JWS token
-      const jwsToken = await createJwsToken(
-        orderPayload,
-        config.secretKey,
-        config.clientId
-      );
+      const joseToken = await createJoseToken(orderPayload, config);
 
       // Call BillDesk Create Order API
       const response = await fetch(config.createOrderUrl, {
@@ -190,7 +240,7 @@ module.exports = () => ({
           "BD-Traceid": uuidv4(),
           "BD-Timestamp": new Date().toISOString(),
         },
-        body: jwsToken,
+        body: joseToken,
       });
 
       if (!response.ok) {
@@ -201,7 +251,7 @@ module.exports = () => ({
 
       // Response is a JWS token, verify and decode
       const responseJws = await response.text();
-      const orderResponse = await verifyJwsToken(responseJws, config.secretKey);
+      const orderResponse = await verifyJoseToken(responseJws, config);
 
       if (
         orderResponse.status !== "ACTIVE" &&
@@ -242,17 +292,14 @@ module.exports = () => ({
   /**
    * Verify a transaction response from BillDesk
    *
-   * @param {string} transactionResponse - JWS token from BillDesk callback
+  * @param {string} transactionResponse - JOSE token from BillDesk callback
    * @returns {Object} Verified transaction details
    */
   async verifyTransaction(transactionResponse) {
     const config = getConfig();
 
     try {
-      const txnData = await verifyJwsToken(
-        transactionResponse,
-        config.secretKey
-      );
+      const txnData = await verifyJoseToken(transactionResponse, config);
 
       const statusMessage = txnData.auth_status === "0300"
         ? "SUCCESS"
@@ -311,11 +358,7 @@ module.exports = () => ({
     };
 
     try {
-      const jwsToken = await createJwsToken(
-        payload,
-        config.secretKey,
-        config.clientId
-      );
+      const joseToken = await createJoseToken(payload, config);
 
       const response = await fetch(config.transactionStatusUrl, {
         method: "POST",
@@ -325,7 +368,7 @@ module.exports = () => ({
           "BD-Traceid": uuidv4(),
           "BD-Timestamp": new Date().toISOString(),
         },
-        body: jwsToken,
+        body: joseToken,
       });
 
       if (!response.ok) {
@@ -335,7 +378,7 @@ module.exports = () => ({
       }
 
       const responseJws = await response.text();
-      const txnResponse = await verifyJwsToken(responseJws, config.secretKey);
+      const txnResponse = await verifyJoseToken(responseJws, config);
 
       return txnResponse;
     } catch (error) {
