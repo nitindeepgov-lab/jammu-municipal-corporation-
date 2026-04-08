@@ -3,6 +3,11 @@ import NewsTicker from './NewsTicker'
 
 const slides = [
   {
+    image: '/banner/jmc.jpeg',
+    title: 'Infrastructure Development',
+    subtitle: 'Building roads, parks, and amenities for a better Jammu',
+  },
+  {
     image: '/banner/banner5.png',
     title: 'Jammu Municipal Corporation',
     subtitle: 'Committed to serving the residents of Jammu City',
@@ -17,12 +22,7 @@ const slides = [
     title: 'Infrastructure Development',
     subtitle: 'Building roads, parks, and amenities for a better Jammu',
   },
-   {
-    image: '/banner/jmc.jpeg',
-    title: 'Infrastructure Development',
-    subtitle: 'Building roads, parks, and amenities for a better Jammu',
-  },
-   {
+  {
     image: '/banner/banner8.jpeg',
     title: 'Infrastructure Development',
     subtitle: 'Building roads, parks, and amenities for a better Jammu',
