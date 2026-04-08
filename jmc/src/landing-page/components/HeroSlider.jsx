@@ -8,11 +8,6 @@ const slides = [
     subtitle: 'Committed to serving the residents of Jammu City',
   },
   {
-    image: '/banner/banner2.jpg',
-    title: 'Smart Urban Services',
-    subtitle: 'Online payments, digital services, and more for citizens',
-  },
-  {
     image: '/banner/banner9.jpg',
     title: 'Cleaner, Greener Jammu',
     subtitle: "JMC's commitment to sanitation and environment",
@@ -23,7 +18,7 @@ const slides = [
     subtitle: 'Building roads, parks, and amenities for a better Jammu',
   },
    {
-    image: '/banner/banner5.jpg',
+    image: '/banner/jmc.jpeg',
     title: 'Infrastructure Development',
     subtitle: 'Building roads, parks, and amenities for a better Jammu',
   },
