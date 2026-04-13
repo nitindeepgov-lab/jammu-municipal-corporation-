@@ -80,6 +80,60 @@ function getBillDeskTraceId() {
   return `${Date.now()}${crypto.randomBytes(16).toString("hex")}`.slice(0, 35);
 }
 
+/**
+ * BillDesk additional_info values should be simple strings.
+ * Keep only safe characters and short lengths to avoid schema rejections.
+ * @param {unknown} value
+ * @returns {string}
+ */
+function sanitizeAdditionalInfoValue(value) {
+  if (value === null || value === undefined) return "NA";
+  const normalized = String(value)
+    .replace(/\s+/g, " ")
+    .replace(/[^a-zA-Z0-9 ._\/-]/g, "")
+    .trim();
+
+  if (!normalized) return "NA";
+  return normalized.slice(0, 100);
+}
+
+/**
+ * Build BillDesk additional_info object with 7 slots.
+ * Avoid passing PII in additional_info as per BillDesk guidance.
+ * @param {string} feeType
+ * @param {Object} additionalInfo
+ * @returns {{
+ *  additional_info1: string,
+ *  additional_info2: string,
+ *  additional_info3: string,
+ *  additional_info4: string,
+ *  additional_info5: string,
+ *  additional_info6: string,
+ *  additional_info7: string,
+ * }}
+ */
+function getBillDeskAdditionalInfo(feeType, additionalInfo = {}) {
+  const info =
+    additionalInfo && typeof additionalInfo === "object"
+      ? /** @type {Record<string, unknown>} */ (additionalInfo)
+      : {};
+
+  // Use non-PII business/context references in additional info.
+  const reference1 =
+    info["nitTenderNo"] || info["payDetails"] || info["feeType"] || "NA";
+  const reference2 = info["dept"] || info["location"] || "NA";
+
+  return {
+    additional_info1: sanitizeAdditionalInfoValue(feeType || "JMC_FEE"),
+    additional_info2: sanitizeAdditionalInfoValue(reference1),
+    additional_info3: sanitizeAdditionalInfoValue(reference2),
+    additional_info4: "NA",
+    additional_info5: "NA",
+    additional_info6: "NA",
+    additional_info7: "NA",
+  };
+}
+
 // ── Helpers ─────────────────────────────────────────────
 
 /**
@@ -286,12 +340,7 @@ module.exports = () => ({
       order_date: getBillDeskTimestamp(),
       currency: "356", // INR
       ru: `${process.env.BILLDESK_RETURN_URL || "https://jammu-municipal-corporation.vercel.app/payment-status"}`,
-      additional_info: {
-        additional_info1: feeType || "JMC_FEE",
-        additional_info2: customerName || "",
-        additional_info3: customerMobile || "",
-        additional_info4: JSON.stringify(additionalInfo).substring(0, 240),
-      },
+      additional_info: getBillDeskAdditionalInfo(feeType, additionalInfo),
       itemcode: "DIRECT",
       device: {
         init_channel: "internet",
