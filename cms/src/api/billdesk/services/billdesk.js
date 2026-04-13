@@ -81,6 +81,40 @@ function getBillDeskTraceId() {
 }
 
 /**
+ * Call BillDesk create-order and return raw response details.
+ * @param {string} url
+ * @param {string} joseToken
+ */
+async function callBillDeskCreateOrder(url, joseToken) {
+  const traceId = getBillDeskTraceId();
+  const timestamp = getBillDeskEpochTimestamp();
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/jose",
+      Accept: "application/jose",
+      "BD-Traceid": traceId,
+      "BD-Timestamp": timestamp,
+    },
+    body: joseToken,
+  });
+
+  const responseBuffer = Buffer.from(await response.arrayBuffer());
+  const rawBody = responseBuffer.toString("utf8");
+
+  return {
+    ok: response.ok,
+    status: response.status,
+    headers: Object.fromEntries(response.headers.entries()),
+    body: rawBody,
+    bodyBytes: responseBuffer.length,
+    traceId,
+    timestamp,
+  };
+}
+
+/**
  * BillDesk additional_info values should be simple strings.
  * Keep only safe characters and short lengths to avoid schema rejections.
  * @param {unknown} value
@@ -389,41 +423,62 @@ module.exports = () => ({
       // Create JWS token
       const joseToken = await createJoseToken(orderPayload, config);
 
-      const traceId = getBillDeskTraceId();
-      const timestamp = getBillDeskEpochTimestamp();
+      /** @type {{ok: boolean, status: number, headers: Record<string, string>, body: string, bodyBytes: number, traceId: string, timestamp: string}} */
+      let billdeskResponse;
 
-      // Call BillDesk Create Order API
-      const response = await fetch(config.createOrderUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/jose",
-          Accept: "application/jose",
-          "BD-Traceid": traceId,
-          "BD-Timestamp": timestamp,
-        },
-        body: joseToken,
-      });
+      // BillDesk sometimes returns an empty body with 200; retry once with a new trace id.
+      for (let attempt = 1; attempt <= 2; attempt += 1) {
+        const result = await callBillDeskCreateOrder(config.createOrderUrl, joseToken);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("BillDesk API error:", response.status, errorText, {
-          traceId,
-          timestamp,
+        if (!result.ok) {
+          console.error("BillDesk API error:", result.status, result.body, {
+            traceId: result.traceId,
+            timestamp: result.timestamp,
+            headers: result.headers,
+          });
+          throw new Error(`BillDesk API returned ${result.status}`);
+        }
+
+        const trimmedBody = result.body.trim();
+
+        console.log("BillDesk createOrder response format:", {
+          attempt,
+          status: result.status,
+          contentType: result.headers["content-type"] || null,
+          bodyBytes: result.bodyBytes,
+          segments: trimmedBody ? trimmedBody.split(".").length : 0,
+          startsWith: trimmedBody.slice(0, 40),
+          traceId: result.traceId,
+          timestamp: result.timestamp,
         });
-        throw new Error(`BillDesk API returned ${response.status}`);
+
+        if (trimmedBody) {
+          billdeskResponse = result;
+          break;
+        }
+
+        if (attempt < 2) {
+          console.warn("BillDesk createOrder returned empty body. Retrying.", {
+            traceId: result.traceId,
+            timestamp: result.timestamp,
+            headers: result.headers,
+          });
+          continue;
+        }
+
+        console.error("BillDesk createOrder returned empty body after retries", {
+          traceId: result.traceId,
+          timestamp: result.timestamp,
+          headers: result.headers,
+        });
+        throw new Error("BillDesk returned empty response body");
       }
 
-      // Response is a JWS token, verify and decode
-      const responseJws = await response.text();
+      if (!billdeskResponse) {
+        throw new Error("BillDesk order response missing");
+      }
 
-      console.log("BillDesk createOrder response format:", {
-        status: response.status,
-        contentType: response.headers.get("content-type"),
-        segments: responseJws.trim().split(".").length,
-        startsWith: responseJws.trim().slice(0, 40),
-      });
-
-      const orderResponse = await verifyJoseToken(responseJws, config);
+      const orderResponse = await verifyJoseToken(billdeskResponse.body, config);
 
       if (
         orderResponse.status !== "ACTIVE" &&
