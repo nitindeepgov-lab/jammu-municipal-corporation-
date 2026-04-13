@@ -86,17 +86,52 @@ function getBillDeskTraceId() {
  * @param {string} joseToken
  */
 async function callBillDeskCreateOrder(url, joseToken) {
+  let cookieHeader = null;
+  return callBillDeskCreateOrderWithCookie(url, joseToken, cookieHeader);
+}
+
+/**
+ * Extract a Cookie header value from Set-Cookie string(s).
+ * @param {string | undefined} setCookie
+ */
+function getCookieHeaderFromSetCookie(setCookie) {
+  if (!setCookie) return "";
+
+  const cookieParts = String(setCookie)
+    .split(/,(?=[^;,]+=)/)
+    .map((entry) => entry.trim().split(";")[0])
+    .filter(Boolean);
+
+  return cookieParts.join("; ");
+}
+
+/**
+ * Call BillDesk create-order with optional cookie.
+ * @param {string} url
+ * @param {string} joseToken
+ * @param {string | null} cookieHeader
+ */
+async function callBillDeskCreateOrderWithCookie(url, joseToken, cookieHeader) {
   const traceId = getBillDeskTraceId();
   const timestamp = getBillDeskEpochTimestamp();
 
+  /** @type {Record<string, string>} */
+  const requestHeaders = {
+    "Content-Type": "application/jose",
+    Accept: "application/jose",
+    "BD-Traceid": traceId,
+    "BD-Timestamp": timestamp,
+    Connection: "close",
+    "User-Agent": "Mozilla/5.0",
+  };
+
+  if (cookieHeader) {
+    requestHeaders.Cookie = cookieHeader;
+  }
+
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/jose",
-      Accept: "application/jose",
-      "BD-Traceid": traceId,
-      "BD-Timestamp": timestamp,
-    },
+    headers: requestHeaders,
     body: joseToken,
   });
 
@@ -111,6 +146,8 @@ async function callBillDeskCreateOrder(url, joseToken) {
     bodyBytes: responseBuffer.length,
     traceId,
     timestamp,
+    requestCookie: cookieHeader || "",
+    nextCookie: getCookieHeaderFromSetCookie(response.headers.get("set-cookie") || undefined),
   };
 }
 
@@ -423,12 +460,17 @@ module.exports = () => ({
       // Create JWS token
       const joseToken = await createJoseToken(orderPayload, config);
 
-      /** @type {{ok: boolean, status: number, headers: Record<string, string>, body: string, bodyBytes: number, traceId: string, timestamp: string}} */
+      /** @type {{ok: boolean, status: number, headers: Record<string, string>, body: string, bodyBytes: number, traceId: string, timestamp: string, requestCookie: string, nextCookie: string}} */
       let billdeskResponse;
+      let retryCookie = "";
 
       // BillDesk sometimes returns an empty body with 200; retry once with a new trace id.
       for (let attempt = 1; attempt <= 2; attempt += 1) {
-        const result = await callBillDeskCreateOrder(config.createOrderUrl, joseToken);
+        const result = await callBillDeskCreateOrderWithCookie(
+          config.createOrderUrl,
+          joseToken,
+          retryCookie || null
+        );
 
         if (!result.ok) {
           console.error("BillDesk API error:", result.status, result.body, {
@@ -450,6 +492,8 @@ module.exports = () => ({
           startsWith: trimmedBody.slice(0, 40),
           traceId: result.traceId,
           timestamp: result.timestamp,
+          requestCookiePresent: Boolean(result.requestCookie),
+          nextCookiePresent: Boolean(result.nextCookie),
         });
 
         if (trimmedBody) {
@@ -458,10 +502,13 @@ module.exports = () => ({
         }
 
         if (attempt < 2) {
+          retryCookie = result.nextCookie;
           console.warn("BillDesk createOrder returned empty body. Retrying.", {
             traceId: result.traceId,
             timestamp: result.timestamp,
             headers: result.headers,
+            requestCookiePresent: Boolean(result.requestCookie),
+            nextCookiePresent: Boolean(result.nextCookie),
           });
           continue;
         }
