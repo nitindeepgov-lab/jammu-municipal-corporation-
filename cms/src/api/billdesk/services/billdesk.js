@@ -39,6 +39,26 @@ function getErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
+/**
+ * BillDesk expects an ISO timestamp with explicit timezone offset and no milliseconds.
+ * Example: 2026-04-13T14:35:22+05:30
+ * @param {Date=} date
+ * @returns {string}
+ */
+function getBillDeskTimestamp(date = new Date()) {
+  const istOffsetMinutes = 330;
+  const shifted = new Date(date.getTime() + istOffsetMinutes * 60 * 1000);
+
+  const year = shifted.getUTCFullYear();
+  const month = String(shifted.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(shifted.getUTCDate()).padStart(2, "0");
+  const hours = String(shifted.getUTCHours()).padStart(2, "0");
+  const minutes = String(shifted.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(shifted.getUTCSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+05:30`;
+}
+
 // ── Helpers ─────────────────────────────────────────────
 
 /**
@@ -242,7 +262,7 @@ module.exports = () => ({
       mercid: config.merchantId,
       orderid: orderId,
       amount: parsedAmount.toFixed(2),
-      order_date: new Date().toISOString(),
+      order_date: getBillDeskTimestamp(),
       currency: "356", // INR
       ru: `${process.env.BILLDESK_RETURN_URL || "https://jammu-municipal-corporation.vercel.app/payment-status"}`,
       additional_info: {
@@ -284,7 +304,7 @@ module.exports = () => ({
           "Content-Type": "application/jose",
           Accept: "application/jose",
           "BD-Traceid": uuidv4(),
-          "BD-Timestamp": new Date().toISOString(),
+          "BD-Timestamp": getBillDeskTimestamp(),
         },
         body: joseToken,
       });
@@ -412,7 +432,7 @@ module.exports = () => ({
           "Content-Type": "application/jose",
           Accept: "application/jose",
           "BD-Traceid": uuidv4(),
-          "BD-Timestamp": new Date().toISOString(),
+          "BD-Timestamp": getBillDeskTimestamp(),
         },
         body: joseToken,
       });
