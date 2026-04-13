@@ -273,17 +273,37 @@ async function createJoseToken(payload, config) {
 async function verifyJoseToken(token, config) {
   try {
     const decoder = new TextDecoder();
+    const responseToken = token.trim();
+
+    // Some BillDesk responses can be plain JSON payloads.
+    if (responseToken.startsWith("{")) {
+      return JSON.parse(responseToken);
+    }
+
+    // Some gateways return a JSON-quoted token string.
+    if (responseToken.startsWith('"')) {
+      const parsed = JSON.parse(responseToken);
+      if (typeof parsed === "string") {
+        return verifyJoseToken(parsed, config);
+      }
+      if (parsed && typeof parsed === "object") {
+        return parsed;
+      }
+    }
 
     // Some BillDesk responses are direct JWE (5 segments) without outer JWS.
-    if (token.split(".").length === 5) {
+    if (responseToken.split(".").length === 5) {
       if (!config.encryptionKeyBytes) {
         throw new Error("Encryption key missing for JOSE response");
       }
-      const { plaintext } = await compactDecrypt(token, config.encryptionKeyBytes);
+      const { plaintext } = await compactDecrypt(
+        responseToken,
+        config.encryptionKeyBytes
+      );
       return JSON.parse(decoder.decode(plaintext));
     }
 
-    const { payload } = await compactVerify(token, config.signingKeyBytes);
+    const { payload } = await compactVerify(responseToken, config.signingKeyBytes);
     const payloadText = decoder.decode(payload).trim();
 
     if (payloadText.split(".").length === 5) {
@@ -395,6 +415,14 @@ module.exports = () => ({
 
       // Response is a JWS token, verify and decode
       const responseJws = await response.text();
+
+      console.log("BillDesk createOrder response format:", {
+        status: response.status,
+        contentType: response.headers.get("content-type"),
+        segments: responseJws.trim().split(".").length,
+        startsWith: responseJws.trim().slice(0, 40),
+      });
+
       const orderResponse = await verifyJoseToken(responseJws, config);
 
       if (
