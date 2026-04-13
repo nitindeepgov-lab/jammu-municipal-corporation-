@@ -12,7 +12,6 @@
 "use strict";
 
 const { CompactSign, compactVerify, CompactEncrypt, compactDecrypt } = require("jose");
-const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 
 /**
@@ -57,6 +56,28 @@ function getBillDeskTimestamp(date = new Date()) {
   const seconds = String(shifted.getUTCSeconds()).padStart(2, "0");
 
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+05:30`;
+}
+
+/**
+ * BillDesk expects BD-Timestamp as epoch timestamp of the server.
+ * Default to seconds; set BILLDESK_TIMESTAMP_UNIT=MILLISECONDS if required by gateway config.
+ * @param {Date=} date
+ * @returns {string}
+ */
+function getBillDeskEpochTimestamp(date = new Date()) {
+  const unit = (process.env.BILLDESK_TIMESTAMP_UNIT || "SECONDS").toUpperCase();
+  const epochMs = date.getTime();
+  return unit === "MILLISECONDS"
+    ? String(epochMs)
+    : String(Math.floor(epochMs / 1000));
+}
+
+/**
+ * BillDesk Traceid should be alphanumeric and max length 35.
+ * @returns {string}
+ */
+function getBillDeskTraceId() {
+  return `${Date.now()}${crypto.randomBytes(16).toString("hex")}`.slice(0, 35);
 }
 
 // ── Helpers ─────────────────────────────────────────────
@@ -297,21 +318,27 @@ module.exports = () => ({
       // Create JWS token
       const joseToken = await createJoseToken(orderPayload, config);
 
+      const traceId = getBillDeskTraceId();
+      const timestamp = getBillDeskEpochTimestamp();
+
       // Call BillDesk Create Order API
       const response = await fetch(config.createOrderUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/jose",
           Accept: "application/jose",
-          "BD-Traceid": uuidv4(),
-          "BD-Timestamp": getBillDeskTimestamp(),
+          "BD-Traceid": traceId,
+          "BD-Timestamp": timestamp,
         },
         body: joseToken,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("BillDesk API error:", response.status, errorText);
+        console.error("BillDesk API error:", response.status, errorText, {
+          traceId,
+          timestamp,
+        });
         throw new Error(`BillDesk API returned ${response.status}`);
       }
 
@@ -426,20 +453,26 @@ module.exports = () => ({
     try {
       const joseToken = await createJoseToken(payload, config);
 
+      const traceId = getBillDeskTraceId();
+      const timestamp = getBillDeskEpochTimestamp();
+
       const response = await fetch(config.transactionStatusUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/jose",
           Accept: "application/jose",
-          "BD-Traceid": uuidv4(),
-          "BD-Timestamp": getBillDeskTimestamp(),
+          "BD-Traceid": traceId,
+          "BD-Timestamp": timestamp,
         },
         body: joseToken,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("BillDesk transaction status error:", response.status, errorText);
+        console.error("BillDesk transaction status error:", response.status, errorText, {
+          traceId,
+          timestamp,
+        });
         throw new Error(`BillDesk API returned ${response.status}`);
       }
 
