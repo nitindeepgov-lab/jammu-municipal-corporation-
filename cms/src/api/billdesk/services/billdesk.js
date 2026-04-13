@@ -98,19 +98,11 @@ function sanitizeAdditionalInfoValue(value) {
 }
 
 /**
- * Build BillDesk additional_info object with 7 slots.
+ * Build BillDesk additional_info array with 7 slots.
  * Avoid passing PII in additional_info as per BillDesk guidance.
  * @param {string} feeType
  * @param {Object} additionalInfo
- * @returns {{
- *  additional_info1: string,
- *  additional_info2: string,
- *  additional_info3: string,
- *  additional_info4: string,
- *  additional_info5: string,
- *  additional_info6: string,
- *  additional_info7: string,
- * }}
+ * @returns {string[]}
  */
 function getBillDeskAdditionalInfo(feeType, additionalInfo = {}) {
   const info =
@@ -123,15 +115,15 @@ function getBillDeskAdditionalInfo(feeType, additionalInfo = {}) {
     info["nitTenderNo"] || info["payDetails"] || info["feeType"] || "NA";
   const reference2 = info["dept"] || info["location"] || "NA";
 
-  return {
-    additional_info1: sanitizeAdditionalInfoValue(feeType || "JMC_FEE"),
-    additional_info2: sanitizeAdditionalInfoValue(reference1),
-    additional_info3: sanitizeAdditionalInfoValue(reference2),
-    additional_info4: "NA",
-    additional_info5: "NA",
-    additional_info6: "NA",
-    additional_info7: "NA",
-  };
+  return [
+    sanitizeAdditionalInfoValue(feeType || "JMC_FEE"),
+    sanitizeAdditionalInfoValue(reference1),
+    sanitizeAdditionalInfoValue(reference2),
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+  ];
 }
 
 // ── Helpers ─────────────────────────────────────────────
