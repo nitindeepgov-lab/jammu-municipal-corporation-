@@ -272,8 +272,18 @@ async function createJoseToken(payload, config) {
  */
 async function verifyJoseToken(token, config) {
   try {
-    const { payload } = await compactVerify(token, config.signingKeyBytes);
     const decoder = new TextDecoder();
+
+    // Some BillDesk responses are direct JWE (5 segments) without outer JWS.
+    if (token.split(".").length === 5) {
+      if (!config.encryptionKeyBytes) {
+        throw new Error("Encryption key missing for JOSE response");
+      }
+      const { plaintext } = await compactDecrypt(token, config.encryptionKeyBytes);
+      return JSON.parse(decoder.decode(plaintext));
+    }
+
+    const { payload } = await compactVerify(token, config.signingKeyBytes);
     const payloadText = decoder.decode(payload).trim();
 
     if (payloadText.split(".").length === 5) {
