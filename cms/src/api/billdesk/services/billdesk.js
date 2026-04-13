@@ -141,6 +141,7 @@ async function callBillDeskCreateOrderWithCookie(url, joseToken, cookieHeader) {
   return {
     ok: response.ok,
     status: response.status,
+    statusText: response.statusText,
     headers: Object.fromEntries(response.headers.entries()),
     body: rawBody,
     bodyBytes: responseBuffer.length,
@@ -148,7 +149,86 @@ async function callBillDeskCreateOrderWithCookie(url, joseToken, cookieHeader) {
     timestamp,
     requestCookie: cookieHeader || "",
     nextCookie: getCookieHeaderFromSetCookie(response.headers.get("set-cookie") || undefined),
+    redirected: response.redirected,
+    responseUrl: response.url,
   };
+}
+
+/**
+ * Summarize a create-order HTTP response for logs.
+ * @param {{status: number, statusText?: string, headers: Record<string, string>, body: string, bodyBytes: number, traceId: string, timestamp: string, requestCookie?: string, nextCookie?: string, redirected?: boolean, responseUrl?: string}} result
+ */
+function summarizeCreateOrderHttpResult(result) {
+  const trimmedBody = (result.body || "").trim();
+  return {
+    status: result.status,
+    statusText: result.statusText || null,
+    contentType: result.headers["content-type"] || null,
+    contentLength: result.headers["content-length"] || null,
+    bodyBytes: result.bodyBytes,
+    segments: trimmedBody ? trimmedBody.split(".").length : 0,
+    startsWith: trimmedBody.slice(0, 40),
+    traceId: result.traceId,
+    timestamp: result.timestamp,
+    requestCookiePresent: Boolean(result.requestCookie),
+    nextCookiePresent: Boolean(result.nextCookie),
+    redirected: Boolean(result.redirected),
+    responseUrl: result.responseUrl || null,
+  };
+}
+
+/**
+ * Resolve egress IP for runtime diagnostics.
+ */
+async function getRuntimeEgressIp() {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json", {
+      method: "GET",
+    });
+    const bodyText = await response.text();
+    if (!response.ok) {
+      return {
+        ok: false,
+        status: response.status,
+        body: bodyText.slice(0, 120),
+      };
+    }
+
+    const parsed = JSON.parse(bodyText);
+    return {
+      ok: true,
+      ip: typeof parsed?.ip === "string" ? parsed.ip : null,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: getErrorMessage(error),
+    };
+  }
+}
+
+/**
+ * Run invalid-token probe to compare edge behavior from current runtime.
+ * @param {string} createOrderUrl
+ */
+async function runInvalidTokenProbe(createOrderUrl) {
+  try {
+    const result = await callBillDeskCreateOrderWithCookie(
+      createOrderUrl,
+      "invalid.token.payload",
+      null
+    );
+    return {
+      ok: true,
+      ...summarizeCreateOrderHttpResult(result),
+      bodyPreview: (result.body || "").slice(0, 200),
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: getErrorMessage(error),
+    };
+  }
 }
 
 /**
@@ -460,8 +540,23 @@ module.exports = () => ({
       // Create JWS token
       const joseToken = await createJoseToken(orderPayload, config);
 
-      /** @type {{ok: boolean, status: number, headers: Record<string, string>, body: string, bodyBytes: number, traceId: string, timestamp: string, requestCookie: string, nextCookie: string}} */
-      let billdeskResponse;
+      const runDiagnostics =
+        String(process.env.BILLDESK_DIAGNOSTIC_PROBE || "").toLowerCase() ===
+        "true";
+
+      if (runDiagnostics) {
+        const egress = await getRuntimeEgressIp();
+        const invalidTokenProbe = await runInvalidTokenProbe(
+          config.createOrderUrl
+        );
+        console.warn("BillDesk runtime diagnostics:", {
+          egress,
+          invalidTokenProbe,
+        });
+      }
+
+      /** @type {{ok: boolean, status: number, statusText?: string, headers: Record<string, string>, body: string, bodyBytes: number, traceId: string, timestamp: string, requestCookie: string, nextCookie: string, redirected?: boolean, responseUrl?: string} | null} */
+      let billdeskResponse = null;
       let retryCookie = "";
 
       // BillDesk sometimes returns an empty body with 200; retry once with a new trace id.
@@ -485,15 +580,7 @@ module.exports = () => ({
 
         console.log("BillDesk createOrder response format:", {
           attempt,
-          status: result.status,
-          contentType: result.headers["content-type"] || null,
-          bodyBytes: result.bodyBytes,
-          segments: trimmedBody ? trimmedBody.split(".").length : 0,
-          startsWith: trimmedBody.slice(0, 40),
-          traceId: result.traceId,
-          timestamp: result.timestamp,
-          requestCookiePresent: Boolean(result.requestCookie),
-          nextCookiePresent: Boolean(result.nextCookie),
+          ...summarizeCreateOrderHttpResult(result),
         });
 
         if (trimmedBody) {
