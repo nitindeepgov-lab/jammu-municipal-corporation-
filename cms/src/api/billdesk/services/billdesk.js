@@ -59,25 +59,31 @@ function getBillDeskTimestamp(date = new Date()) {
 }
 
 /**
- * BillDesk expects BD-Timestamp as epoch timestamp of the server.
- * Default to seconds; set BILLDESK_TIMESTAMP_UNIT=MILLISECONDS if required by gateway config.
+ * BillDesk expects BD-Timestamp in YYYYMMDDHHmmss format (14 digits).
+ * Example: 20210113180403 = 2021-01-13 18:04:03
+ * Reference: https://docs.billdesk.io/reference/post-payments-v1_2-transactions-get
  * @param {Date=} date
  * @returns {string}
  */
-function getBillDeskEpochTimestamp(date = new Date()) {
-  const unit = (process.env.BILLDESK_TIMESTAMP_UNIT || "SECONDS").toUpperCase();
-  const epochMs = date.getTime();
-  return unit === "MILLISECONDS"
-    ? String(epochMs)
-    : String(Math.floor(epochMs / 1000));
+function getBillDeskHeaderTimestamp(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  
+  return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
 /**
  * BillDesk Traceid should be alphanumeric and max length 35.
+ * Used for request idempotency - identical TraceIDs within 24h will fail.
  * @returns {string}
  */
 function getBillDeskTraceId() {
-  return `${Date.now()}${crypto.randomBytes(16).toString("hex")}`.slice(0, 35);
+  // Generate 32-char hex string (UUID-like) for better uniqueness
+  return crypto.randomBytes(16).toString("hex").toUpperCase();
 }
 
 /**
@@ -113,7 +119,7 @@ function getCookieHeaderFromSetCookie(setCookie) {
  */
 async function callBillDeskCreateOrderWithCookie(url, joseToken, cookieHeader) {
   const traceId = getBillDeskTraceId();
-  const timestamp = getBillDeskEpochTimestamp();
+  const timestamp = getBillDeskHeaderTimestamp();
 
   /** @type {Record<string, string>} */
   const requestHeaders = {
@@ -722,7 +728,7 @@ module.exports = () => ({
       const joseToken = await createJoseToken(payload, config);
 
       const traceId = getBillDeskTraceId();
-      const timestamp = getBillDeskEpochTimestamp();
+      const timestamp = getBillDeskHeaderTimestamp();
 
       const response = await fetch(config.transactionStatusUrl, {
         method: "POST",
