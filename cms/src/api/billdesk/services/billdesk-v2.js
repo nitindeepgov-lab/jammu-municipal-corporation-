@@ -26,22 +26,22 @@ const crypto = require("crypto");
 function getConfig() {
   const merchantId = process.env.BILLDESK_MERCHANT_ID;
   const clientId = process.env.BILLDESK_CLIENT_ID;
-  const signingKey = process.env.BILLDESK_SIGNING_KEY;
-  const encryptionKey = process.env.BILLDESK_ENCRYPTION_KEY;
+  const signingKey = process.env.BILLDESK_SIGNING_PASSWORD;
+  const encryptionKey = process.env.BILLDESK_ENCRYPTION_PASSWORD;
   const env = (process.env.BILLDESK_ENV || "UAT").toUpperCase();
 
   // Validate required credentials
   if (!merchantId || !clientId || !signingKey || !encryptionKey) {
     throw new Error(
-      "BillDesk credentials missing. Required: BILLDESK_MERCHANT_ID, BILLDESK_CLIENT_ID, BILLDESK_SIGNING_KEY, BILLDESK_ENCRYPTION_KEY"
+      "BillDesk credentials missing. Required: BILLDESK_MERCHANT_ID, BILLDESK_CLIENT_ID, BILLDESK_SIGNING_PASSWORD, BILLDESK_ENCRYPTION_PASSWORD"
     );
   }
 
   // Environment-specific URLs
   const isProduction = env === "PRODUCTION";
-  const baseUrl = isProduction
+  const baseUrl = process.env.BILLDESK_BASE_URL || (isProduction
     ? "https://api.billdesk.com"
-    : "https://uat1.billdesk.com";
+    : "https://uat1.billdesk.com");
 
   const createOrderUrl = isProduction
     ? `${baseUrl}/pgsi/v1_2/orders/create`
