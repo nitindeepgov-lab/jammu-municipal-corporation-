@@ -72,5 +72,14 @@ module.exports = {
         description: "Manually update a transaction status",
       },
     },
+    {
+      method: "GET",
+      path: "/billdesk/diagnostic",
+      handler: "billdesk.diagnostic",
+      config: {
+        auth: false,
+        description: "Diagnostic endpoint to check timestamp format and configuration",
+      },
+    },
   ],
 };

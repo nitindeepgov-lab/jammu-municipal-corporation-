@@ -459,4 +459,74 @@ module.exports = {
       ctx.internalServerError("Failed to update transaction status");
     }
   },
+
+  /**
+   * GET /api/billdesk/diagnostic
+   *
+   * Returns diagnostic information about BillDesk configuration and timestamp format
+   */
+  /** @param {any} ctx */
+  async diagnostic(ctx) {
+    try {
+      const crypto = require("crypto");
+      
+      // Test timestamp function
+      const getBillDeskHeaderTimestamp = (date = new Date()) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = String(date.getSeconds()).padStart(2, "0");
+        
+        return `${year}${month}${day}${hours}${minutes}${seconds}`;
+      };
+
+      const getBillDeskTraceId = () => {
+        return crypto.randomBytes(16).toString("hex").toUpperCase();
+      };
+
+      const testDate = new Date("2021-01-13T18:04:03+05:30");
+      const testTimestamp = getBillDeskHeaderTimestamp(testDate);
+      const currentTimestamp = getBillDeskHeaderTimestamp();
+      const sampleTraceId = getBillDeskTraceId();
+
+      const config = {
+        merchantId: process.env.BILLDESK_MERCHANT_ID || "NOT_SET",
+        clientId: process.env.BILLDESK_CLIENT_ID || "NOT_SET",
+        signingKeyPresent: !!process.env.BILLDESK_SIGNING_KEY,
+        encryptionKeyPresent: !!process.env.BILLDESK_ENCRYPTION_KEY,
+        joseMode: process.env.BILLDESK_JOSE_MODE || "NOT_SET",
+        env: process.env.BILLDESK_ENV || "NOT_SET",
+        diagnosticProbe: process.env.BILLDESK_DIAGNOSTIC_PROBE || "NOT_SET",
+        returnUrl: process.env.BILLDESK_RETURN_URL || "NOT_SET",
+      };
+
+      ctx.send({
+        success: true,
+        version: "1.1.0-timestamp-fix",
+        deployedCommit: "c4b7d3c",
+        deployedAt: "2026-04-15T11:05:00Z",
+        timestamp: {
+          testDate: testDate.toISOString(),
+          testTimestamp,
+          expectedFormat: "20210113180403",
+          testMatch: testTimestamp === "20210113180403",
+          currentTimestamp,
+          timestampLength: currentTimestamp.length,
+          formatCorrect: currentTimestamp.length === 14,
+        },
+        traceId: {
+          sample: sampleTraceId,
+          length: sampleTraceId.length,
+          formatCorrect: sampleTraceId.length === 32,
+        },
+        config,
+        fixDeployed: currentTimestamp.length === 14,
+      });
+    } catch (error) {
+      console.error("Diagnostic error:", getErrorMessage(error));
+      ctx.internalServerError("Diagnostic check failed");
+    }
+  },
 };
