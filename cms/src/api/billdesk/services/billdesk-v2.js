@@ -91,22 +91,37 @@ function getConfig() {
  */
 async function createJoseToken(payload, config) {
   const encoder = new TextEncoder();
+  const keyId = process.env.BILLDESK_KEY_ID;
 
   // Step 1: Encrypt payload with JWE
+  const jweHeader = {
+    alg: "dir",              // Direct key agreement
+    enc: "A256GCM",          // AES-256-GCM encryption
+    clientid: config.clientId,
+  };
+  
+  // Add kid if available
+  if (keyId) {
+    jweHeader.kid = keyId;
+  }
+
   const jwe = await new CompactEncrypt(encoder.encode(JSON.stringify(payload)))
-    .setProtectedHeader({
-      alg: "dir",              // Direct key agreement
-      enc: "A256GCM",          // AES-256-GCM encryption
-      clientid: config.clientId,
-    })
+    .setProtectedHeader(jweHeader)
     .encrypt(config.encryptionKeyBytes);
 
   // Step 2: Sign JWE with JWS
+  const jwsHeader = {
+    alg: "HS256",            // HMAC-SHA256 signing
+    clientid: config.clientId,
+  };
+  
+  // Add kid if available
+  if (keyId) {
+    jwsHeader.kid = keyId;
+  }
+
   const jws = await new CompactSign(encoder.encode(jwe))
-    .setProtectedHeader({
-      alg: "HS256",            // HMAC-SHA256 signing
-      clientid: config.clientId,
-    })
+    .setProtectedHeader(jwsHeader)
     .sign(config.signingKeyBytes);
 
   return jws;
@@ -368,6 +383,7 @@ module.exports = () => ({
           status: response.status,
           traceId: response.traceId,
           timestamp: response.timestamp,
+          body: response.body.substring(0, 500), // Log first 500 chars of error
         });
         throw new Error(`BillDesk API returned ${response.status}`);
       }
