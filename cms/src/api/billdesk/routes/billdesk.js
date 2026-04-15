@@ -45,5 +45,14 @@ module.exports = {
         description: "Retrieve BillDesk transaction status",
       },
     },
+    {
+      method: "GET",
+      path: "/billdesk/config-check",
+      handler: "diagnostic.configCheck",
+      config: {
+        auth: false,
+        description: "Check BillDesk configuration status",
+      },
+    },
   ],
 };
