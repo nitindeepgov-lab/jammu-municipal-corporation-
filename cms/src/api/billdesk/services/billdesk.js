@@ -397,8 +397,7 @@ async function createJoseToken(payload, config) {
       .setProtectedHeader({
         alg: "dir",
         enc: "A256GCM",
-        // Temporarily removed kid to test if it's causing issues
-        // ...(config.encryptionKeyId ? { kid: config.encryptionKeyId } : {}),
+        ...(config.encryptionKeyId ? { kid: config.encryptionKeyId } : {}),
         clientid: config.clientId,
       })
       .encrypt(encryptionKey);
@@ -406,8 +405,7 @@ async function createJoseToken(payload, config) {
     const jws = await new CompactSign(encoder.encode(jwe))
       .setProtectedHeader({
         alg: "HS256",
-        // Temporarily removed kid to test if it's causing issues
-        // ...(config.signingKeyId ? { kid: config.signingKeyId } : {}),
+        ...(config.signingKeyId ? { kid: config.signingKeyId } : {}),
         clientid: config.clientId,
       })
       .sign(config.signingKeyBytes);
