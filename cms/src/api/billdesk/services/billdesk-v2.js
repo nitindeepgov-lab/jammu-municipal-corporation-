@@ -14,6 +14,7 @@
 
 const { CompactSign, compactVerify, CompactEncrypt, compactDecrypt } = require("jose");
 const crypto = require("crypto");
+const net = require("net");
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURATION
@@ -254,6 +255,50 @@ function sanitizeValue(value) {
   return normalized || "NA";
 }
 
+function normalizeIp(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  let candidate = value.trim();
+  if (!candidate) {
+    return null;
+  }
+
+  if (candidate.includes(",")) {
+    candidate = candidate.split(",")[0].trim();
+  }
+
+  candidate = candidate.replace(/^"|"$/g, "");
+
+  if (candidate.startsWith("[")) {
+    const endIndex = candidate.indexOf("]");
+    if (endIndex > 0) {
+      candidate = candidate.slice(1, endIndex);
+    }
+  }
+
+  if (candidate.startsWith("::ffff:")) {
+    candidate = candidate.slice(7);
+  }
+
+  if (/^\d{1,3}(?:\.\d{1,3}){3}:\d+$/.test(candidate)) {
+    candidate = candidate.split(":")[0];
+  }
+
+  return net.isIP(candidate) ? candidate : null;
+}
+
+function resolveDeviceIp(deviceIp) {
+  const normalizedDeviceIp = normalizeIp(deviceIp);
+  if (normalizedDeviceIp) {
+    return normalizedDeviceIp;
+  }
+
+  const fallbackIp = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
+  return fallbackIp || "127.0.0.1";
+}
+
 /**
  * Build additional_info array (7 elements required)
  * @param {string} feeType - Fee type
@@ -325,6 +370,7 @@ module.exports = () => ({
    * @param {string} params.customerEmail - Customer email
    * @param {string} params.customerMobile - Customer mobile (10 digits)
    * @param {string} params.feeType - Fee type/category
+   * @param {string} [params.deviceIp] - Requesting client IP address
    * @param {Object} params.additionalInfo - Additional metadata
    * @returns {Promise<Object>} SDK configuration
    */
@@ -334,6 +380,7 @@ module.exports = () => ({
     customerEmail,
     customerMobile,
     feeType,
+    deviceIp,
     additionalInfo = {},
   }) {
     const config = getConfig();
@@ -352,7 +399,7 @@ module.exports = () => ({
       itemcode: "DIRECT",
       device: {
         init_channel: "internet",
-        ip: "0.0.0.0",
+        ip: resolveDeviceIp(deviceIp),
         user_agent: "Mozilla/5.0",
       },
     };

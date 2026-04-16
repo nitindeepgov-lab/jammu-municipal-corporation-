@@ -8,8 +8,79 @@
 
 "use strict";
 
+const net = require("net");
+
 const getErrorMessage = (error) =>
   error instanceof Error ? error.message : String(error);
+
+function normalizeIp(rawIp) {
+  if (typeof rawIp !== "string") {
+    return null;
+  }
+
+  let candidate = rawIp.trim();
+  if (!candidate) {
+    return null;
+  }
+
+  if (candidate.includes(",")) {
+    candidate = candidate.split(",")[0].trim();
+  }
+
+  if (candidate.toLowerCase().startsWith("for=")) {
+    candidate = candidate.slice(4).trim();
+  }
+
+  candidate = candidate.replace(/^"|"$/g, "");
+
+  if (candidate.startsWith("[")) {
+    const endIndex = candidate.indexOf("]");
+    if (endIndex > 0) {
+      candidate = candidate.slice(1, endIndex);
+    }
+  }
+
+  if (candidate.startsWith("::ffff:")) {
+    candidate = candidate.slice(7);
+  }
+
+  if (/^\d{1,3}(?:\.\d{1,3}){3}:\d+$/.test(candidate)) {
+    candidate = candidate.split(":")[0];
+  }
+
+  return net.isIP(candidate) ? candidate : null;
+}
+
+function getDeviceIp(ctx) {
+  const headers = ctx.request.headers || {};
+  const forwarded = headers.forwarded;
+  const forwardedMatch =
+    typeof forwarded === "string"
+      ? forwarded.match(/for=(?:"?\[?)([^;\]\s",]+)/i)
+      : null;
+
+  const candidates = [
+    headers["x-forwarded-for"],
+    headers["x-real-ip"],
+    headers["cf-connecting-ip"],
+    headers["true-client-ip"],
+    headers["x-client-ip"],
+    forwardedMatch ? forwardedMatch[1] : null,
+    ctx.request.ip,
+    ctx.ip,
+    ctx.req?.socket?.remoteAddress,
+  ];
+
+  for (const candidate of candidates) {
+    const ip = normalizeIp(candidate);
+    if (ip) {
+      return ip;
+    }
+  }
+
+  const fallbackIp = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
+  return fallbackIp || "127.0.0.1";
+}
 
 module.exports = {
   /**
@@ -65,6 +136,8 @@ module.exports = {
         return ctx.badRequest("Mobile number is required");
       }
 
+      const deviceIp = getDeviceIp(ctx);
+
       const billDeskService = strapi.service("api::billdesk.billdesk-v2");
 
       const orderConfig = await billDeskService.createOrder({
@@ -74,6 +147,7 @@ module.exports = {
         customerMobile,
         feeType: feeType || "JMC_FEE",
         additionalInfo: additionalInfo || {},
+        deviceIp,
       });
 
       ctx.send({
