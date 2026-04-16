@@ -1,18 +1,38 @@
 /**
- * BillDesk Controller - Complete Redesign
+ * BillDesk Controller - v2 (Production Hardened)
  * Based on official documentation: https://docs.billdesk.io/docs/neo-full-redirect
- * 
- * @version 2.0.0
- * @date 2026-04-15
+ *
+ * Key changes from earlier revision:
+ * - Robust client IP extraction behind Render / Cloudflare proxies
+ * - Strict IPv4 validation for BillDesk device.ip field
+ * - Deterministic fail-fast when device IP cannot be resolved
+ * - Structured diagnostic logging on every failure without leaking secrets
+ *
+ * @version 2.1.0
+ * @date 2026-04-16
  */
 
 "use strict";
 
 const net = require("net");
 
+// ── Helpers ─────────────────────────────────────────────
+
 const getErrorMessage = (error) =>
   error instanceof Error ? error.message : String(error);
 
+/**
+ * Normalize a raw header value into a valid IP string (or null).
+ * Handles:
+ * - Comma-separated lists (x-forwarded-for)
+ * - Forwarded header "for=" syntax
+ * - IPv6-mapped IPv4 (::ffff:1.2.3.4)
+ * - Bracketed IPv6 with port
+ * - IPv4 with port (1.2.3.4:12345)
+ *
+ * @param {string | null | undefined} rawIp
+ * @returns {string | null} Cleaned IP or null
+ */
 function normalizeIp(rawIp) {
   if (typeof rawIp !== "string") {
     return null;
@@ -23,16 +43,20 @@ function normalizeIp(rawIp) {
     return null;
   }
 
+  // Take first IP from comma-separated list
   if (candidate.includes(",")) {
     candidate = candidate.split(",")[0].trim();
   }
 
+  // Handle Forwarded header "for=" prefix
   if (candidate.toLowerCase().startsWith("for=")) {
     candidate = candidate.slice(4).trim();
   }
 
+  // Strip enclosing quotes
   candidate = candidate.replace(/^"|"$/g, "");
 
+  // Handle bracketed IPv6 [::1]:port
   if (candidate.startsWith("[")) {
     const endIndex = candidate.indexOf("]");
     if (endIndex > 0) {
@@ -40,10 +64,12 @@ function normalizeIp(rawIp) {
     }
   }
 
+  // Strip IPv6-mapped IPv4 prefix
   if (candidate.startsWith("::ffff:")) {
     candidate = candidate.slice(7);
   }
 
+  // Strip port from IPv4 (1.2.3.4:12345)
   if (/^\d{1,3}(?:\.\d{1,3}){3}:\d+$/.test(candidate)) {
     candidate = candidate.split(":")[0];
   }
@@ -51,45 +77,84 @@ function normalizeIp(rawIp) {
   return net.isIP(candidate) ? candidate : null;
 }
 
+/**
+ * Check whether an IP is a valid *public* IPv4 that BillDesk will accept.
+ * Rejects: null, IPv6, 0.0.0.0, loopback, and RFC-1918 private ranges.
+ *
+ * @param {string | null} ip
+ * @returns {boolean}
+ */
+function isPublicIPv4(ip) {
+  if (typeof ip !== "string" || net.isIP(ip) !== 4) {
+    return false;
+  }
+
+  // Reject obviously invalid
+  if (ip === "0.0.0.0" || ip.startsWith("127.")) {
+    return false;
+  }
+
+  // Reject RFC-1918 private ranges
+  if (ip.startsWith("10.")) return false;
+  if (ip.startsWith("172.")) {
+    const second = parseInt(ip.split(".")[1], 10);
+    if (second >= 16 && second <= 31) return false;
+  }
+  if (ip.startsWith("192.168.")) return false;
+
+  // Reject link-local
+  if (ip.startsWith("169.254.")) return false;
+
+  return true;
+}
+
+/**
+ * Extract the real client IP from the Koa context.
+ * Priority order mirrors what Render / Cloudflare populate.
+ *
+ * @param {Object} ctx - Koa context
+ * @returns {{ ip: string | null, source: string }}
+ */
 function getDeviceIp(ctx) {
   const headers = ctx.request.headers || {};
-  const forwarded = headers.forwarded;
-  const forwardedMatch =
-    typeof forwarded === "string"
-      ? forwarded.match(/for=(?:"?\[?)([^;\]\s",]+)/i)
-      : null;
 
-  const candidates = [
-    headers["x-forwarded-for"],
-    headers["x-real-ip"],
-    headers["cf-connecting-ip"],
-    headers["true-client-ip"],
-    headers["x-client-ip"],
-    forwardedMatch ? forwardedMatch[1] : null,
-    ...(Array.isArray(ctx.request.ips) ? ctx.request.ips : []),
-    ctx.request.ip,
-    ctx.ip,
-    ctx.req?.socket?.remoteAddress,
+  // Ordered list of candidate sources (most reliable first behind a CDN/proxy)
+  const sources = [
+    { name: "cf-connecting-ip", value: headers["cf-connecting-ip"] },
+    { name: "true-client-ip", value: headers["true-client-ip"] },
+    { name: "x-real-ip", value: headers["x-real-ip"] },
+    { name: "x-forwarded-for", value: headers["x-forwarded-for"] },
+    { name: "x-client-ip", value: headers["x-client-ip"] },
+    { name: "ctx.request.ip", value: ctx.request.ip },
+    { name: "ctx.ip", value: ctx.ip },
+    { name: "remoteAddress", value: ctx.req?.socket?.remoteAddress },
   ];
 
-  for (const candidate of candidates) {
-    const ip = normalizeIp(candidate);
-    if (ip) {
-      return ip;
+  for (const { name, value } of sources) {
+    const ip = normalizeIp(value);
+    if (isPublicIPv4(ip)) {
+      return { ip, source: name };
     }
   }
 
-  const fallbackIp = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
-  return fallbackIp;
+  // Env fallback (statically configured Render egress IP)
+  const fallback = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
+  if (isPublicIPv4(fallback)) {
+    return { ip: fallback, source: "BILLDESK_FALLBACK_DEVICE_IP" };
+  }
+
+  return { ip: null, source: "none" };
 }
+
+// ── Controller ──────────────────────────────────────────
 
 module.exports = {
   /**
    * POST /api/billdesk/create-order
-   * 
+   *
    * Creates a BillDesk order and returns SDK configuration
    * for launching the Neo – Full Redirect payment page.
-   * 
+   *
    * Request Body:
    * {
    *   amount: "100.00",
@@ -99,7 +164,7 @@ module.exports = {
    *   feeType: "JMC_FEE",
    *   additionalInfo: { dept: "water" }
    * }
-   * 
+   *
    * Response:
    * {
    *   success: true,
@@ -126,7 +191,7 @@ module.exports = {
         additionalInfo,
       } = ctx.request.body;
 
-      // Validation
+      // ── Input validation ──────────────────────────────
       if (!amount || parseFloat(amount) <= 0) {
         return ctx.badRequest("Amount is required and must be greater than 0");
       }
@@ -137,8 +202,32 @@ module.exports = {
         return ctx.badRequest("Mobile number is required");
       }
 
-      const deviceIp = getDeviceIp(ctx);
+      // ── Resolve device IP (fail-fast) ─────────────────
+      const { ip: deviceIp, source: ipSource } = getDeviceIp(ctx);
 
+      console.log("BILLDESK_DEVICE_IP_RESOLVED:", {
+        source: ipSource,
+        raw: ctx.request.headers["x-forwarded-for"] || ctx.request.ip || "N/A",
+        resolved: deviceIp || "NONE",
+      });
+
+      if (!deviceIp) {
+        console.error("BILLDESK_DEVICE_IP_MISSING: Could not resolve a valid public IPv4.", {
+          headers: {
+            "x-forwarded-for": ctx.request.headers["x-forwarded-for"] || "absent",
+            "x-real-ip": ctx.request.headers["x-real-ip"] || "absent",
+            "cf-connecting-ip": ctx.request.headers["cf-connecting-ip"] || "absent",
+          },
+          ctxIp: ctx.request.ip,
+          fallbackEnv: process.env.BILLDESK_FALLBACK_DEVICE_IP ? "SET" : "NOT_SET",
+        });
+        return ctx.badRequest(
+          "Cannot determine a valid client IP address. " +
+          "Ensure your request includes X-Forwarded-For or configure BILLDESK_FALLBACK_DEVICE_IP on the server."
+        );
+      }
+
+      // ── Call service ──────────────────────────────────
       const billDeskService = strapi.service("api::billdesk.billdesk-v2");
 
       const orderConfig = await billDeskService.createOrder({
@@ -157,7 +246,7 @@ module.exports = {
       });
     } catch (error) {
       const message = getErrorMessage(error);
-      console.error("Create order error:", message);
+      console.error("BILLDESK_CREATE_ORDER_CONTROLLER_ERROR:", message);
 
       if (message.includes("credentials missing")) {
         return ctx.serviceUnavailable(
@@ -173,15 +262,15 @@ module.exports = {
 
   /**
    * POST /api/billdesk/verify
-   * 
+   *
    * Verifies the transaction response received from BillDesk
    * after payment completion.
-   * 
+   *
    * Request Body:
    * {
    *   transactionResponse: "eyJ4NXQjUzI1NiI6..." // JOSE token
    * }
-   * 
+   *
    * Response:
    * {
    *   success: true,
@@ -219,11 +308,11 @@ module.exports = {
 
   /**
    * POST /api/billdesk/webhook
-   * 
+   *
    * Receives webhook notifications from BillDesk for transaction updates.
-   * 
+   *
    * Request Body: JOSE token (application/jose) or JSON with transactionResponse
-   * 
+   *
    * Response:
    * {
    *   received: true,
@@ -262,15 +351,15 @@ module.exports = {
 
   /**
    * POST /api/billdesk/transaction-status
-   * 
+   *
    * Retrieves transaction status from BillDesk by order ID or transaction ID.
-   * 
+   *
    * Request Body:
    * {
    *   orderId: "JMC..." // OR
    *   transactionId: "U1230000041968"
    * }
-   * 
+   *
    * Response:
    * {
    *   success: true,

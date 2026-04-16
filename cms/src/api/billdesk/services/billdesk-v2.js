@@ -1,13 +1,19 @@
 /**
- * BillDesk Payment Service - Complete Redesign
+ * BillDesk Payment Service - v2 (Production Hardened)
  * Based on official documentation: https://docs.billdesk.io/docs/neo-full-redirect
- * 
+ *
  * Integration Type: Neo – Full Redirect (Low-code integration)
  * Authentication: Symmetric JOSE (JWE + JWS)
  * Environment: UAT (ready for production)
- * 
- * @version 2.0.0
- * @date 2026-04-15
+ *
+ * Key changes from earlier revision:
+ * - Strict public IPv4 validation for device.ip
+ * - Structured diagnostic logs with traceId, timestamp, deviceIp on every failure
+ * - No secrets logged (signing/encryption keys never appear in output)
+ * - Deterministic error propagation — no silent fallbacks
+ *
+ * @version 2.1.0
+ * @date 2026-04-16
  */
 
 "use strict";
@@ -21,7 +27,9 @@ const net = require("net");
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Get BillDesk configuration from environment variables
+ * Get BillDesk configuration from environment variables.
+ * Throws immediately if required credentials are missing.
+ *
  * @returns {Object} Configuration object
  */
 function getConfig() {
@@ -56,7 +64,7 @@ function getConfig() {
     ? "https://pay.billdesk.com"
     : "https://uat1.billdesk.com/merchant-uat";
 
-  // Convert keys to bytes
+  // Convert keys to bytes (raw UTF-8)
   const encoder = new TextEncoder();
   const signingKeyBytes = encoder.encode(signingKey);
   const encryptionKeyBytes = encoder.encode(encryptionKey);
@@ -81,11 +89,11 @@ function getConfig() {
 
 /**
  * Create JOSE token (Symmetric: JWE wrapped in JWS)
- * 
+ *
  * Process:
  * 1. Encrypt payload with JWE (A256GCM)
  * 2. Sign JWE with JWS (HS256)
- * 
+ *
  * @param {Object} payload - Request payload
  * @param {Object} config - BillDesk configuration
  * @returns {Promise<string>} JOSE token
@@ -100,7 +108,7 @@ async function createJoseToken(payload, config) {
     enc: "A256GCM",          // AES-256-GCM encryption
     clientid: config.clientId,
   };
-  
+
   // Add kid if available
   if (keyId) {
     jweHeader.kid = keyId;
@@ -115,7 +123,7 @@ async function createJoseToken(payload, config) {
     alg: "HS256",            // HMAC-SHA256 signing
     clientid: config.clientId,
   };
-  
+
   // Add kid if available
   if (keyId) {
     jwsHeader.kid = keyId;
@@ -130,12 +138,12 @@ async function createJoseToken(payload, config) {
 
 /**
  * Verify and decrypt JOSE token from BillDesk
- * 
+ *
  * Process:
  * 1. Verify JWS signature
  * 2. Decrypt JWE payload
  * 3. Return JSON object
- * 
+ *
  * @param {string} token - JOSE token from BillDesk
  * @param {Object} config - BillDesk configuration
  * @returns {Promise<Object>} Decrypted payload
@@ -246,7 +254,7 @@ function generateOrderDate(date = new Date()) {
  */
 function sanitizeValue(value) {
   if (value === null || value === undefined) return "NA";
-  
+
   const normalized = String(value)
     .replace(/\s+/g, " ")
     .replace(/[^a-zA-Z0-9 ._\/-]/g, "")
@@ -255,46 +263,15 @@ function sanitizeValue(value) {
   return normalized || "NA";
 }
 
-function normalizeIp(value) {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  let candidate = value.trim();
-  if (!candidate) {
-    return null;
-  }
-
-  if (candidate.includes(",")) {
-    candidate = candidate.split(",")[0].trim();
-  }
-
-  candidate = candidate.replace(/^"|"$/g, "");
-
-  if (candidate.startsWith("[")) {
-    const endIndex = candidate.indexOf("]");
-    if (endIndex > 0) {
-      candidate = candidate.slice(1, endIndex);
-    }
-  }
-
-  if (candidate.startsWith("::ffff:")) {
-    candidate = candidate.slice(7);
-  }
-
-  if (/^\d{1,3}(?:\.\d{1,3}){3}:\d+$/.test(candidate)) {
-    candidate = candidate.split(":")[0];
-  }
-
-  return net.isIP(candidate) ? candidate : null;
-}
-
+/**
+ * Validate that an IP is a public IPv4 suitable for BillDesk device.ip.
+ * BillDesk rejects: IPv6, 0.0.0.0, 127.x, 10.x, 172.16-31.x, 192.168.x, 169.254.x
+ *
+ * @param {string | null | undefined} ip
+ * @returns {boolean}
+ */
 function isValidBillDeskIp(ip) {
-  if (typeof ip !== "string") {
-    return false;
-  }
-
-  if (net.isIP(ip) !== 4) {
+  if (typeof ip !== "string" || net.isIP(ip) !== 4) {
     return false;
   }
 
@@ -302,23 +279,18 @@ function isValidBillDeskIp(ip) {
     return false;
   }
 
+  // RFC-1918 private ranges
+  if (ip.startsWith("10.")) return false;
+  if (ip.startsWith("172.")) {
+    const second = parseInt(ip.split(".")[1], 10);
+    if (second >= 16 && second <= 31) return false;
+  }
+  if (ip.startsWith("192.168.")) return false;
+
+  // Link-local
+  if (ip.startsWith("169.254.")) return false;
+
   return true;
-}
-
-function resolveDeviceIp(deviceIp) {
-  const normalizedDeviceIp = normalizeIp(deviceIp);
-  if (isValidBillDeskIp(normalizedDeviceIp)) {
-    return normalizedDeviceIp;
-  }
-
-  const fallbackIp = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
-  if (isValidBillDeskIp(fallbackIp)) {
-    return fallbackIp;
-  }
-
-  throw new Error(
-    "Valid IPv4 device IP missing. Configure BILLDESK_FALLBACK_DEVICE_IP with a public IPv4 or ensure proxy forwards x-forwarded-for."
-  );
 }
 
 /**
@@ -344,23 +316,32 @@ function buildAdditionalInfo(feeType, additionalInfo = {}) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Call BillDesk Create Order API
+ * Call BillDesk API with correct JOSE headers.
+ *
+ * Headers sent (per BillDesk spec):
+ * - Content-Type: application/jose
+ * - Accept: application/jose
+ * - BD-Traceid: 32-char hex uppercase
+ * - BD-Timestamp: YYYYMMDDHHmmss (14 digits)
+ *
  * @param {string} url - API endpoint URL
  * @param {string} joseToken - JOSE token
- * @returns {Promise<Object>} API response
+ * @returns {Promise<Object>} API response with metadata
  */
 async function callBillDeskAPI(url, joseToken) {
   const traceId = generateTraceId();
   const timestamp = generateTimestamp();
 
+  const requestHeaders = {
+    "Content-Type": "application/jose",
+    "Accept": "application/jose",
+    "BD-Traceid": traceId,
+    "BD-Timestamp": timestamp,
+  };
+
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/jose",
-      "Accept": "application/jose",
-      "BD-Traceid": traceId,
-      "BD-Timestamp": timestamp,
-    },
+    headers: requestHeaders,
     body: joseToken,
   });
 
@@ -372,6 +353,7 @@ async function callBillDeskAPI(url, joseToken) {
     body: responseBody,
     traceId,
     timestamp,
+    requestHeaders,
   };
 }
 
@@ -382,17 +364,17 @@ async function callBillDeskAPI(url, joseToken) {
 module.exports = () => ({
   /**
    * Create BillDesk Order
-   * 
+   *
    * Creates an order with BillDesk and returns SDK configuration
    * for launching the Neo – Full Redirect payment page.
-   * 
+   *
    * @param {Object} params - Order parameters
    * @param {string|number} params.amount - Amount in INR (e.g., "100.00")
    * @param {string} params.customerName - Customer name
    * @param {string} params.customerEmail - Customer email
    * @param {string} params.customerMobile - Customer mobile (10 digits)
    * @param {string} params.feeType - Fee type/category
-   * @param {string} [params.deviceIp] - Requesting client IP address
+   * @param {string} params.deviceIp - Requesting client public IPv4 address
    * @param {Object} params.additionalInfo - Additional metadata
    * @returns {Promise<Object>} SDK configuration
    */
@@ -408,7 +390,15 @@ module.exports = () => ({
     const config = getConfig();
     const orderId = generateOrderId();
     const parsedAmount = Number(amount);
-    const resolvedDeviceIp = resolveDeviceIp(deviceIp);
+
+    // ── Final device IP validation ────────────────────────
+    // The controller already validates, but defense-in-depth here.
+    if (!isValidBillDeskIp(deviceIp)) {
+      throw new Error(
+        `Invalid device IP for BillDesk: "${deviceIp || "null"}". ` +
+        "Must be a public IPv4 address. Set BILLDESK_FALLBACK_DEVICE_IP."
+      );
+    }
 
     // Build Create Order payload
     const orderPayload = {
@@ -422,7 +412,7 @@ module.exports = () => ({
       itemcode: "DIRECT",
       device: {
         init_channel: "internet",
-        ip: resolvedDeviceIp,
+        ip: deviceIp,
         user_agent: "Mozilla/5.0",
       },
     };
@@ -448,30 +438,29 @@ module.exports = () => ({
       // Call BillDesk API
       const response = await callBillDeskAPI(config.createOrderUrl, joseToken);
 
+      // ── Handle non-OK status ────────────────────────────
       if (!response.ok) {
-        console.error("BillDesk API error:", {
-          status: response.status,
+        console.error("BILLDESK_CREATE_ORDER_FAILED:", {
           traceId: response.traceId,
           timestamp: response.timestamp,
-          deviceIp: resolvedDeviceIp,
-          requestHeaders: {
-            "Content-Type": "application/jose",
-            "Accept": "application/jose",
-          },
-          body: response.body.substring(0, 500), // Log first 500 chars of error
+          resolvedDeviceIp: deviceIp,
+          httpStatus: response.status,
+          responseBodyPreview: response.body.substring(0, 500),
+          joseHeaders: response.requestHeaders,
+          orderId,
         });
         throw new Error(`BillDesk API returned ${response.status}`);
       }
 
+      // ── Handle empty body ───────────────────────────────
       if (!response.body || response.body.trim().length === 0) {
-        console.error("BillDesk returned empty response:", {
+        console.error("BILLDESK_EMPTY_RESPONSE:", {
           traceId: response.traceId,
           timestamp: response.timestamp,
-          deviceIp: resolvedDeviceIp,
-          requestHeaders: {
-            "Content-Type": "application/jose",
-            "Accept": "application/jose",
-          },
+          resolvedDeviceIp: deviceIp,
+          joseHeaders: response.requestHeaders,
+          orderId,
+          hint: "BillDesk returns empty body when device.ip is invalid, payload encryption fails, or credentials are wrong. Verify: (1) deviceIp is public IPv4, (2) keys match BillDesk-issued keys, (3) egress IP is whitelisted.",
         });
         throw new Error("BillDesk returned empty response");
       }
@@ -481,14 +470,19 @@ module.exports = () => ({
 
       // Validate response
       if (orderResponse.status !== "ACTIVE" || orderResponse.objectid !== "order") {
-        console.error("Order creation failed:", orderResponse);
+        console.error("BILLDESK_ORDER_REJECTED:", {
+          traceId: response.traceId,
+          timestamp: response.timestamp,
+          orderResponse,
+          orderId,
+        });
         throw new Error("Order creation rejected by BillDesk");
       }
 
       // Extract SDK configuration from response
       const bdOrderId = orderResponse.bdorderid;
       const redirectLink = orderResponse.links?.find(link => link.rel === "redirect");
-      
+
       if (!redirectLink) {
         throw new Error("Redirect link not found in BillDesk response");
       }
@@ -507,6 +501,13 @@ module.exports = () => ({
         },
       });
 
+      console.log("BILLDESK_ORDER_CREATED:", {
+        orderId,
+        bdOrderId,
+        traceId: response.traceId,
+        deviceIp,
+      });
+
       // Return SDK configuration for frontend
       return {
         merchantId: config.merchantId,
@@ -519,16 +520,16 @@ module.exports = () => ({
         sdkBaseUrl: config.sdkBaseUrl,
       };
     } catch (error) {
-      console.error("Create order error:", error.message);
+      console.error("BILLDESK_CREATE_ORDER_ERROR:", error.message);
       throw error;
     }
   },
 
   /**
    * Verify Transaction Response
-   * 
+   *
    * Verifies the JOSE token received from BillDesk after payment completion.
-   * 
+   *
    * @param {string} transactionResponse - JOSE token from BillDesk
    * @returns {Promise<Object>} Verified transaction details
    */
@@ -577,9 +578,9 @@ module.exports = () => ({
 
   /**
    * Retrieve Transaction Status
-   * 
+   *
    * Queries BillDesk for transaction status by order ID or transaction ID.
-   * 
+   *
    * @param {Object} params - Query parameters
    * @param {string} params.orderId - Merchant order ID
    * @param {string} params.transactionId - BillDesk transaction ID
@@ -603,6 +604,12 @@ module.exports = () => ({
       const response = await callBillDeskAPI(config.transactionStatusUrl, joseToken);
 
       if (!response.ok) {
+        console.error("BILLDESK_TXN_STATUS_FAILED:", {
+          traceId: response.traceId,
+          timestamp: response.timestamp,
+          httpStatus: response.status,
+          responseBodyPreview: response.body.substring(0, 500),
+        });
         throw new Error(`BillDesk API returned ${response.status}`);
       }
 
