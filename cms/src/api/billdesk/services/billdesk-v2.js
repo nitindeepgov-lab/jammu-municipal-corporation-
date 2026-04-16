@@ -217,12 +217,17 @@ function generateTraceId() {
  * @returns {string} Timestamp in YYYYMMDDHHmmss format
  */
 function generateTimestamp(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
+  // BillDesk expects IST (UTC+5:30). Render servers run in UTC,
+  // so we must shift explicitly — getHours() would give UTC on Render.
+  const istOffset = 330; // minutes
+  const istDate = new Date(date.getTime() + istOffset * 60 * 1000);
+
+  const year = istDate.getUTCFullYear();
+  const month = String(istDate.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(istDate.getUTCDate()).padStart(2, "0");
+  const hours = String(istDate.getUTCHours()).padStart(2, "0");
+  const minutes = String(istDate.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(istDate.getUTCSeconds()).padStart(2, "0");
 
   return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
@@ -345,15 +350,28 @@ async function callBillDeskAPI(url, joseToken) {
     body: joseToken,
   });
 
-  const responseBody = await response.text();
+  // Read full response as buffer to capture both binary and text
+  const responseBuffer = Buffer.from(await response.arrayBuffer());
+  const responseBody = responseBuffer.toString("utf8");
+
+  // Capture response headers for diagnostics
+  const responseHeaders = {};
+  response.headers.forEach((value, key) => {
+    responseHeaders[key] = value;
+  });
 
   return {
     ok: response.ok,
     status: response.status,
+    statusText: response.statusText,
     body: responseBody,
+    bodyBytes: responseBuffer.length,
     traceId,
     timestamp,
     requestHeaders,
+    responseHeaders,
+    redirected: response.redirected,
+    finalUrl: response.url,
   };
 }
 
@@ -438,6 +456,21 @@ module.exports = () => ({
       // Call BillDesk API
       const response = await callBillDeskAPI(config.createOrderUrl, joseToken);
 
+      // ── Log every BillDesk response for diagnostics ─────
+      console.log("BILLDESK_HTTP_RESPONSE:", {
+        traceId: response.traceId,
+        timestamp: response.timestamp,
+        httpStatus: response.status,
+        statusText: response.statusText,
+        bodyBytes: response.bodyBytes,
+        redirected: response.redirected,
+        finalUrl: response.finalUrl,
+        responseContentType: response.responseHeaders["content-type"] || "MISSING",
+        responseContentLength: response.responseHeaders["content-length"] || "MISSING",
+        responseServer: response.responseHeaders["server"] || "MISSING",
+        bodyPreview: (response.body || "").substring(0, 200),
+      });
+
       // ── Handle non-OK status ────────────────────────────
       if (!response.ok) {
         console.error("BILLDESK_CREATE_ORDER_FAILED:", {
@@ -445,7 +478,9 @@ module.exports = () => ({
           timestamp: response.timestamp,
           resolvedDeviceIp: deviceIp,
           httpStatus: response.status,
+          statusText: response.statusText,
           responseBodyPreview: response.body.substring(0, 500),
+          responseHeaders: response.responseHeaders,
           joseHeaders: response.requestHeaders,
           orderId,
         });
@@ -458,6 +493,7 @@ module.exports = () => ({
           traceId: response.traceId,
           timestamp: response.timestamp,
           resolvedDeviceIp: deviceIp,
+          responseHeaders: response.responseHeaders,
           joseHeaders: response.requestHeaders,
           orderId,
           hint: "BillDesk returns empty body when device.ip is invalid, payload encryption fails, or credentials are wrong. Verify: (1) deviceIp is public IPv4, (2) keys match BillDesk-issued keys, (3) egress IP is whitelisted.",
