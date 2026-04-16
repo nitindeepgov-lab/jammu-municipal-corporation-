@@ -299,21 +299,25 @@ function isValidBillDeskIp(ip) {
 }
 
 /**
- * Build additional_info array (7 elements required)
+ * Build additional_info object (BillDesk v1.2 requires named keys)
+ *
+ * BillDesk expects: { additional_info1: "...", additional_info2: "...", ... additional_info7: "..." }
+ * NOT an array. Sending an array causes GNAPE0001 (api_processing_error).
+ *
  * @param {string} feeType - Fee type
  * @param {Object} additionalInfo - Additional information object
- * @returns {string[]} Array of 7 strings
+ * @returns {Object} Object with additional_info1 through additional_info7
  */
 function buildAdditionalInfo(feeType, additionalInfo = {}) {
-  return [
-    sanitizeValue(feeType || "JMC_FEE"),
-    sanitizeValue(additionalInfo.reference1 || additionalInfo.dept || "NA"),
-    sanitizeValue(additionalInfo.reference2 || "NA"),
-    "NA",
-    "NA",
-    "NA",
-    "NA",
-  ];
+  return {
+    additional_info1: sanitizeValue(feeType || "JMC_FEE"),
+    additional_info2: sanitizeValue(additionalInfo.reference1 || additionalInfo.dept || "NA"),
+    additional_info3: sanitizeValue(additionalInfo.reference2 || "NA"),
+    additional_info4: "NA",
+    additional_info5: "NA",
+    additional_info6: "NA",
+    additional_info7: "NA",
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -434,6 +438,9 @@ module.exports = () => ({
         user_agent: "Mozilla/5.0",
       },
     };
+
+    // Log the exact payload we're about to encrypt (no secrets)
+    console.log("BILLDESK_ORDER_PAYLOAD:", JSON.stringify(orderPayload));
 
     try {
       // Save pending transaction to database
