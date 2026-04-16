@@ -66,6 +66,7 @@ function getDeviceIp(ctx) {
     headers["true-client-ip"],
     headers["x-client-ip"],
     forwardedMatch ? forwardedMatch[1] : null,
+    ...(Array.isArray(ctx.request.ips) ? ctx.request.ips : []),
     ctx.request.ip,
     ctx.ip,
     ctx.req?.socket?.remoteAddress,
@@ -79,7 +80,7 @@ function getDeviceIp(ctx) {
   }
 
   const fallbackIp = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
-  return fallbackIp || "127.0.0.1";
+  return fallbackIp;
 }
 
 module.exports = {

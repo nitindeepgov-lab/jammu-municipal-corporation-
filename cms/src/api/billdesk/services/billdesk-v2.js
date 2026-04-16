@@ -289,14 +289,36 @@ function normalizeIp(value) {
   return net.isIP(candidate) ? candidate : null;
 }
 
+function isValidBillDeskIp(ip) {
+  if (typeof ip !== "string") {
+    return false;
+  }
+
+  if (net.isIP(ip) !== 4) {
+    return false;
+  }
+
+  if (ip === "0.0.0.0" || ip.startsWith("127.")) {
+    return false;
+  }
+
+  return true;
+}
+
 function resolveDeviceIp(deviceIp) {
   const normalizedDeviceIp = normalizeIp(deviceIp);
-  if (normalizedDeviceIp) {
+  if (isValidBillDeskIp(normalizedDeviceIp)) {
     return normalizedDeviceIp;
   }
 
   const fallbackIp = normalizeIp(process.env.BILLDESK_FALLBACK_DEVICE_IP || "");
-  return fallbackIp || "127.0.0.1";
+  if (isValidBillDeskIp(fallbackIp)) {
+    return fallbackIp;
+  }
+
+  throw new Error(
+    "Valid IPv4 device IP missing. Configure BILLDESK_FALLBACK_DEVICE_IP with a public IPv4 or ensure proxy forwards x-forwarded-for."
+  );
 }
 
 /**
@@ -386,6 +408,7 @@ module.exports = () => ({
     const config = getConfig();
     const orderId = generateOrderId();
     const parsedAmount = Number(amount);
+    const resolvedDeviceIp = resolveDeviceIp(deviceIp);
 
     // Build Create Order payload
     const orderPayload = {
@@ -399,7 +422,7 @@ module.exports = () => ({
       itemcode: "DIRECT",
       device: {
         init_channel: "internet",
-        ip: resolveDeviceIp(deviceIp),
+        ip: resolvedDeviceIp,
         user_agent: "Mozilla/5.0",
       },
     };
@@ -430,6 +453,11 @@ module.exports = () => ({
           status: response.status,
           traceId: response.traceId,
           timestamp: response.timestamp,
+          deviceIp: resolvedDeviceIp,
+          requestHeaders: {
+            "Content-Type": "application/jose",
+            "Accept": "application/jose",
+          },
           body: response.body.substring(0, 500), // Log first 500 chars of error
         });
         throw new Error(`BillDesk API returned ${response.status}`);
@@ -439,6 +467,11 @@ module.exports = () => ({
         console.error("BillDesk returned empty response:", {
           traceId: response.traceId,
           timestamp: response.timestamp,
+          deviceIp: resolvedDeviceIp,
+          requestHeaders: {
+            "Content-Type": "application/jose",
+            "Accept": "application/jose",
+          },
         });
         throw new Error("BillDesk returned empty response");
       }
