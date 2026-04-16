@@ -471,22 +471,6 @@ module.exports = () => ({
         bodyPreview: (response.body || "").substring(0, 200),
       });
 
-      // ── Handle non-OK status ────────────────────────────
-      if (!response.ok) {
-        console.error("BILLDESK_CREATE_ORDER_FAILED:", {
-          traceId: response.traceId,
-          timestamp: response.timestamp,
-          resolvedDeviceIp: deviceIp,
-          httpStatus: response.status,
-          statusText: response.statusText,
-          responseBodyPreview: response.body.substring(0, 500),
-          responseHeaders: response.responseHeaders,
-          joseHeaders: response.requestHeaders,
-          orderId,
-        });
-        throw new Error(`BillDesk API returned ${response.status}`);
-      }
-
       // ── Handle empty body ───────────────────────────────
       if (!response.body || response.body.trim().length === 0) {
         console.error("BILLDESK_EMPTY_RESPONSE:", {
@@ -499,6 +483,41 @@ module.exports = () => ({
           hint: "BillDesk returns empty body when device.ip is invalid, payload encryption fails, or credentials are wrong. Verify: (1) deviceIp is public IPv4, (2) keys match BillDesk-issued keys, (3) egress IP is whitelisted.",
         });
         throw new Error("BillDesk returned empty response");
+      }
+
+      // ── Decrypt JOSE response (even on non-OK status) ───
+      // BillDesk returns encrypted error details inside the body
+      // even on HTTP 4xx/5xx. We MUST decrypt to see the real error.
+      if (!response.ok) {
+        let billdeskError = null;
+        try {
+          billdeskError = await verifyJoseToken(response.body, config);
+        } catch (decryptErr) {
+          console.error("BILLDESK_ERROR_DECRYPT_FAILED:", {
+            traceId: response.traceId,
+            timestamp: response.timestamp,
+            httpStatus: response.status,
+            decryptError: decryptErr.message,
+            rawBodyPreview: response.body.substring(0, 300),
+          });
+        }
+
+        console.error("BILLDESK_CREATE_ORDER_REJECTED:", {
+          traceId: response.traceId,
+          timestamp: response.timestamp,
+          resolvedDeviceIp: deviceIp,
+          httpStatus: response.status,
+          statusText: response.statusText,
+          billdeskError,
+          responseHeaders: response.responseHeaders,
+          joseHeaders: response.requestHeaders,
+          orderId,
+        });
+
+        const errorMsg = billdeskError
+          ? `BillDesk error: ${billdeskError.status || billdeskError.error_code || "unknown"} — ${billdeskError.error_description || billdeskError.message || JSON.stringify(billdeskError)}`
+          : `BillDesk API returned ${response.status}`;
+        throw new Error(errorMsg);
       }
 
       // Decrypt response
