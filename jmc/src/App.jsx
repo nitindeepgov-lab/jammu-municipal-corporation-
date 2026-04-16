@@ -88,6 +88,7 @@ export default function App() {
         <Route path="/news/:id" element={<News />} />
         <Route path="/pay-online" element={<PayOnline />} />
         <Route path="/payment-status" element={<PaymentStatus />} />
+        <Route path="/payment-result" element={<PaymentStatus />} />
         <Route path="/web-info-manager" element={<WebInfoManager />} />
         <Route path="/information" element={<Information />} />
         <Route path="/information/:slug" element={<InformationDetail />} />
