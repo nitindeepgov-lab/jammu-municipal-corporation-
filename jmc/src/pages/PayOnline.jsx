@@ -396,6 +396,7 @@ export default function PayOnline() {
   return (
     <SubpageTemplate
       title="Online Payment"
+      showMobileFloatingNav={false}
       breadcrumb={[
         { name: "Citizen Services", to: "/services" },
         { name: "Online Payment", to: null },
@@ -890,23 +891,35 @@ export default function PayOnline() {
               <div className="grid sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <p className="text-gray-400 mb-0.5">Receipt / Order ID</p>
-                  <p className="text-gray-900 font-mono font-semibold">{receipt.receiptId || "-"}</p>
+                  <p className="text-gray-900 font-mono font-semibold">
+                    {receipt.receiptId || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Transaction ID</p>
-                  <p className="text-gray-900 font-mono font-semibold">{receipt.transactionId || "-"}</p>
+                  <p className="text-gray-900 font-mono font-semibold">
+                    {receipt.transactionId || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Status</p>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    receipt.status === "SUCCESS" ? "bg-green-100 text-green-700"
-                    : receipt.status === "FAILED" ? "bg-red-100 text-red-600"
-                    : "bg-gray-100 text-gray-600"
-                  }`}>{receipt.status}</span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      receipt.status === "SUCCESS"
+                        ? "bg-green-100 text-green-700"
+                        : receipt.status === "FAILED"
+                          ? "bg-red-100 text-red-600"
+                          : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {receipt.status}
+                  </span>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Amount Paid</p>
-                  <p className="text-gray-900 font-semibold">₹ {parseFloat(receipt.amount || 0).toFixed(2)}</p>
+                  <p className="text-gray-900 font-semibold">
+                    ₹ {parseFloat(receipt.amount || 0).toFixed(2)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Paid By</p>
@@ -916,18 +929,24 @@ export default function PayOnline() {
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Parentage</p>
-                  <p className="text-gray-900">{formSnapshot.parentage || "-"}</p>
+                  <p className="text-gray-900">
+                    {formSnapshot.parentage || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Mobile</p>
-                  <p className="text-gray-900">{receipt.customerMobile || formSnapshot.mobile || "-"}</p>
+                  <p className="text-gray-900">
+                    {receipt.customerMobile || formSnapshot.mobile || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Payment Category</p>
                   <p className="text-gray-900">
-                    {receipt.feeType === "TENDER_FEE" ? "Tender Fee"
-                      : receipt.feeType === "OTHER_FEE" ? "Other Fee"
-                      : receipt.feeType || "-"}
+                    {receipt.feeType === "TENDER_FEE"
+                      ? "Tender Fee"
+                      : receipt.feeType === "OTHER_FEE"
+                        ? "Other Fee"
+                        : receipt.feeType || "-"}
                   </p>
                 </div>
                 {formSnapshot.nitTenderNo && (
@@ -939,7 +958,9 @@ export default function PayOnline() {
                 {formSnapshot.nitTenderDate && (
                   <div>
                     <p className="text-gray-400 mb-0.5">NIT / Tender Date</p>
-                    <p className="text-gray-900">{formSnapshot.nitTenderDate}</p>
+                    <p className="text-gray-900">
+                      {formSnapshot.nitTenderDate}
+                    </p>
                   </div>
                 )}
                 {formSnapshot.address && (
@@ -951,7 +972,9 @@ export default function PayOnline() {
                 <div>
                   <p className="text-gray-400 mb-0.5">Date & Time</p>
                   <p className="text-gray-900">
-                    {receipt.createdAt ? new Date(receipt.createdAt).toLocaleString("en-IN") : "-"}
+                    {receipt.createdAt
+                      ? new Date(receipt.createdAt).toLocaleString("en-IN")
+                      : "-"}
                   </p>
                 </div>
               </div>

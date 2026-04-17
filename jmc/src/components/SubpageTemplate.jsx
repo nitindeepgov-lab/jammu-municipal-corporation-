@@ -182,14 +182,19 @@ function MobileFloatingNav({ title }) {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0);
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(
+        docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0,
+      );
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const currentPageIndex = PAGE_NAV.findIndex(item => item.to === location.pathname);
+  const currentPageIndex = PAGE_NAV.findIndex(
+    (item) => item.to === location.pathname,
+  );
   const currentPage = PAGE_NAV[currentPageIndex] || PAGE_NAV[0];
   const CurrentIcon = currentPage.icon;
 
@@ -201,14 +206,18 @@ function MobileFloatingNav({ title }) {
         <button
           onClick={() => setOpen(true)}
           className="flex items-center gap-2 bg-white border border-gray-200 shadow-lg rounded-xl px-3 py-2.5 text-left hover:shadow-xl transition-all group"
-          style={{ writingMode: 'horizontal-tb' }}
+          style={{ writingMode: "horizontal-tb" }}
         >
           <div className="w-7 h-7 rounded-lg bg-[#002B5E] flex items-center justify-center shrink-0">
             <CurrentIcon className="w-3.5 h-3.5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-gray-800 leading-tight truncate max-w-[100px]">{title}</span>
-            <span className="text-[9px] font-medium text-gray-400 leading-tight truncate max-w-[100px]">{currentPage.name}</span>
+            <span className="text-[11px] font-bold text-gray-800 leading-tight truncate max-w-[100px]">
+              {title}
+            </span>
+            <span className="text-[9px] font-medium text-gray-400 leading-tight truncate max-w-[100px]">
+              {currentPage.name}
+            </span>
           </div>
           {/* Progress bar */}
           <div className="w-0.5 h-8 bg-gray-100 rounded-full overflow-hidden ml-1">
@@ -224,15 +233,35 @@ function MobileFloatingNav({ title }) {
       {open && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 bg-black/20 -z-10" onClick={() => setOpen(false)} />
+          <div
+            className="fixed inset-0 bg-black/20 -z-10"
+            onClick={() => setOpen(false)}
+          />
 
           <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl w-56 max-h-[70vh] overflow-hidden animate-fadeIn">
             {/* Card header with page title */}
             <div className="px-4 py-3 border-b border-gray-100">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-[13px] font-bold text-gray-900 leading-tight truncate pr-2">{title}</h3>
-                <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 transition p-0.5 shrink-0">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                <h3 className="text-[13px] font-bold text-gray-900 leading-tight truncate pr-2">
+                  {title}
+                </h3>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition p-0.5 shrink-0"
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -249,12 +278,16 @@ function MobileFloatingNav({ title }) {
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold transition-all ${
                       active
-                        ? 'bg-gray-50 text-[#002B5E]'
-                        : 'text-gray-500 hover:text-[#002B5E] hover:bg-gray-50/60'
+                        ? "bg-gray-50 text-[#002B5E]"
+                        : "text-gray-500 hover:text-[#002B5E] hover:bg-gray-50/60"
                     }`}
                   >
-                    {active && <div className="w-1 h-4 rounded-full bg-[#FF6600] shrink-0" />}
-                    <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-[#FF6600]' : 'text-gray-300'}`} />
+                    {active && (
+                      <div className="w-1 h-4 rounded-full bg-[#FF6600] shrink-0" />
+                    )}
+                    <Icon
+                      className={`w-3.5 h-3.5 shrink-0 ${active ? "text-[#FF6600]" : "text-gray-300"}`}
+                    />
                     <span className="truncate">{item.name}</span>
                   </Link>
                 );
@@ -264,7 +297,9 @@ function MobileFloatingNav({ title }) {
             {/* Progress footer */}
             <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/50">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[9px] font-bold text-gray-400 uppercase">{Math.round(scrollProgress)}% read</span>
+                <span className="text-[9px] font-bold text-gray-400 uppercase">
+                  {Math.round(scrollProgress)}% read
+                </span>
               </div>
               <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
                 <div
@@ -280,7 +315,12 @@ function MobileFloatingNav({ title }) {
   );
 }
 
-export default function SubpageTemplate({ title, breadcrumb = [], children }) {
+export default function SubpageTemplate({
+  title,
+  breadcrumb = [],
+  children,
+  showMobileFloatingNav = true,
+}) {
   return (
     <PageLayout>
       {/* Clean & Professional Banner */}
@@ -339,7 +379,7 @@ export default function SubpageTemplate({ title, breadcrumb = [], children }) {
             </div>
 
             {/* Mobile floating nav card */}
-            <MobileFloatingNav title={title} />
+            {showMobileFloatingNav && <MobileFloatingNav title={title} />}
 
             {/* Content Container */}
             <main className="flex-1 min-w-0">
