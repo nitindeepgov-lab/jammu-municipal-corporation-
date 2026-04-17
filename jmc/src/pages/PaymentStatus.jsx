@@ -264,42 +264,76 @@ export default function PaymentStatus() {
               <div className="grid sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <p className="text-gray-400 mb-0.5">Order ID</p>
-                  <p className="text-gray-900 font-mono font-semibold">
-                    {details.orderId || "-"}
-                  </p>
+                  <p className="text-gray-900 font-mono font-semibold">{details.orderId || "-"}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Transaction ID</p>
-                  <p className="text-gray-900 font-mono font-semibold">
-                    {details.transactionId || "-"}
-                  </p>
+                  <p className="text-gray-900 font-mono font-semibold">{details.transactionId || "-"}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Amount</p>
-                  <p className="text-gray-900 font-semibold">
-                    ₹ {details.amount || "-"}
-                  </p>
+                  <p className="text-gray-900 font-semibold">₹ {parseFloat(details.amount || 0).toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Status</p>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      details.statusMessage === "SUCCESS"
-                        ? "bg-green-100 text-green-700"
-                        : details.statusMessage === "FAILED"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {details.statusMessage}
-                  </span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    details.statusMessage === "SUCCESS" ? "bg-green-100 text-green-700"
+                    : details.statusMessage === "FAILED" ? "bg-red-100 text-red-600"
+                    : "bg-yellow-100 text-yellow-700"
+                  }`}>{details.statusMessage}</span>
                 </div>
+                {details.customerName && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">Paid By</p>
+                    <p className="text-gray-900 font-medium">
+                      {details.customerName || details.additionalInfo?.name || "-"}
+                    </p>
+                  </div>
+                )}
+                {(details.additionalInfo?.parentage) && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">Parentage</p>
+                    <p className="text-gray-900">{details.additionalInfo.parentage}</p>
+                  </div>
+                )}
+                {details.customerMobile && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">Mobile</p>
+                    <p className="text-gray-900">{details.customerMobile || details.additionalInfo?.mobile || "-"}</p>
+                  </div>
+                )}
                 {details.paymentMethod && (
                   <div>
                     <p className="text-gray-400 mb-0.5">Payment Method</p>
-                    <p className="text-gray-900 capitalize">
-                      {details.paymentMethod}
+                    <p className="text-gray-900 capitalize">{details.paymentMethod}</p>
+                  </div>
+                )}
+                {details.feeType && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">Payment Category</p>
+                    <p className="text-gray-900">
+                      {details.feeType === "TENDER_FEE" ? "Tender Fee"
+                        : details.feeType === "OTHER_FEE" ? "Other Fee"
+                        : details.feeType}
                     </p>
+                  </div>
+                )}
+                {details.additionalInfo?.nitTenderNo && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">NIT / Tender No.</p>
+                    <p className="text-gray-900">{details.additionalInfo.nitTenderNo}</p>
+                  </div>
+                )}
+                {details.additionalInfo?.nitTenderDate && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">NIT / Tender Date</p>
+                    <p className="text-gray-900">{details.additionalInfo.nitTenderDate}</p>
+                  </div>
+                )}
+                {details.additionalInfo?.address && (
+                  <div className="sm:col-span-2">
+                    <p className="text-gray-400 mb-0.5">Address</p>
+                    <p className="text-gray-900">{details.additionalInfo.address}</p>
                   </div>
                 )}
               </div>

@@ -890,62 +890,68 @@ export default function PayOnline() {
               <div className="grid sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <p className="text-gray-400 mb-0.5">Receipt / Order ID</p>
-                  <p className="text-gray-900 font-mono font-semibold">
-                    {receipt.receiptId || "-"}
-                  </p>
+                  <p className="text-gray-900 font-mono font-semibold">{receipt.receiptId || "-"}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Transaction ID</p>
-                  <p className="text-gray-900 font-mono font-semibold">
-                    {receipt.transactionId || "-"}
-                  </p>
+                  <p className="text-gray-900 font-mono font-semibold">{receipt.transactionId || "-"}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Status</p>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      receipt.status === "SUCCESS"
-                        ? "bg-green-100 text-green-700"
-                        : receipt.status === "FAILED"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {receipt.status}
-                  </span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    receipt.status === "SUCCESS" ? "bg-green-100 text-green-700"
+                    : receipt.status === "FAILED" ? "bg-red-100 text-red-600"
+                    : "bg-gray-100 text-gray-600"
+                  }`}>{receipt.status}</span>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Amount Paid</p>
-                  <p className="text-gray-900 font-semibold">
-                    ₹ {parseFloat(receipt.amount || 0).toFixed(2)}
+                  <p className="text-gray-900 font-semibold">₹ {parseFloat(receipt.amount || 0).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Paid By</p>
+                  <p className="text-gray-900 font-medium">
+                    {receipt.customerName || formSnapshot.name || "-"}
                   </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Parentage</p>
+                  <p className="text-gray-900">{formSnapshot.parentage || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Mobile</p>
+                  <p className="text-gray-900">{receipt.customerMobile || formSnapshot.mobile || "-"}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-0.5">Payment Category</p>
                   <p className="text-gray-900">
-                    {receipt.feeType === "TENDER_FEE"
-                      ? "Tender Fee"
-                      : receipt.feeType === "OTHER_FEE"
-                        ? "Other Fee"
-                        : receipt.feeType || "-"}
+                    {receipt.feeType === "TENDER_FEE" ? "Tender Fee"
+                      : receipt.feeType === "OTHER_FEE" ? "Other Fee"
+                      : receipt.feeType || "-"}
                   </p>
                 </div>
-                <div>
-                  <p className="text-gray-400 mb-0.5">Paid By</p>
-                  <p className="text-gray-900">{receipt.customerName || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 mb-0.5">Mobile</p>
-                  <p className="text-gray-900">
-                    {receipt.customerMobile || "-"}
-                  </p>
-                </div>
+                {formSnapshot.nitTenderNo && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">NIT / Tender No.</p>
+                    <p className="text-gray-900">{formSnapshot.nitTenderNo}</p>
+                  </div>
+                )}
+                {formSnapshot.nitTenderDate && (
+                  <div>
+                    <p className="text-gray-400 mb-0.5">NIT / Tender Date</p>
+                    <p className="text-gray-900">{formSnapshot.nitTenderDate}</p>
+                  </div>
+                )}
+                {formSnapshot.address && (
+                  <div className="sm:col-span-2">
+                    <p className="text-gray-400 mb-0.5">Address</p>
+                    <p className="text-gray-900">{formSnapshot.address}</p>
+                  </div>
+                )}
                 <div>
                   <p className="text-gray-400 mb-0.5">Date & Time</p>
                   <p className="text-gray-900">
-                    {receipt.createdAt
-                      ? new Date(receipt.createdAt).toLocaleString("en-IN")
-                      : "-"}
+                    {receipt.createdAt ? new Date(receipt.createdAt).toLocaleString("en-IN") : "-"}
                   </p>
                 </div>
               </div>

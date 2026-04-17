@@ -138,16 +138,59 @@ async function loadImageAsDataURL(src) {
  */
 export async function generateReceiptPDF(receipt, formData = {}) {
   // ── 1. Compute all display values ──────────────────────────────────────
+  //
+  // Data can arrive via two paths:
+  //   A) PayOnline inline:   receipt has customerName, formData is formSnapshot
+  //   B) PaymentStatus page: receipt has customerName from DB, formData is additionalInfo
+  //      (additionalInfo = the raw form object with keys: name, parentage, address, etc.)
+  //
+  // We try both path variants so the PDF always populates correctly.
+
+  // Debug: log exactly what we received so any future issues are easy to trace
+  console.log("[generateReceiptPDF] receipt:", {
+    orderId:      receipt.orderId || receipt.receiptId,
+    customerName: receipt.customerName,
+    feeType:      receipt.feeType,
+    status:       receipt.status,
+    amount:       receipt.amount,
+  });
+  console.log("[generateReceiptPDF] formData keys:", Object.keys(formData || {}));
+
   const receiptNo    = receipt.orderId || receipt.receiptId || "-";
   const dateOfIssue  = formatDate(receipt.createdAt || receipt.completedAt);
-  const receivedFrom = (receipt.customerName || formData.name || "-").toUpperCase();
-  const parentage    = (formData.parentage || "-").toUpperCase();
-  const nitNo        = (formData.nitTenderNo || "-").toUpperCase();
-  const nitDate      = formatTenderDate(formData.nitTenderDate);
-  const nitDetails   = (
-    formData.nitTenderDetails || formData.payDetails || formData.feeType || "-"
+
+  // "Received From" — try receipt.customerName first, then form key variants
+  const receivedFrom = (
+    receipt.customerName   ||  // set at order creation time
+    formData.name          ||  // form key for PayOnline / additionalInfo
+    formData.customerName  ||  // fallback
+    "-"
   ).toUpperCase();
-  const address      = (formData.address || "-").toUpperCase();
+
+  // "Parentage" — only in formData
+  const parentage    = (
+    formData.parentage    ||
+    formData.fatherName   ||
+    "-"
+  ).toUpperCase();
+
+  // NIT/Tender fields
+  const nitNo        = (formData.nitTenderNo     || formData.nit_tender_no    || "-").toUpperCase();
+  const nitDate      = formatTenderDate(formData.nitTenderDate || formData.nit_tender_date);
+  const nitDetails   = (
+    formData.nitTenderDetails || formData.nit_tender_details ||
+    formData.payDetails       ||
+    formData.feeType          ||
+    "-"
+  ).toUpperCase();
+
+  // Address
+  const address      = (
+    formData.address  ||
+    receipt.address   ||
+    "-"
+  ).toUpperCase();
+
   const amount       = parseFloat(receipt.amount || formData.amount || 0).toFixed(2);
   const amountWords  = amountToWords(amount);
   const vide         = "Online Payment";
@@ -158,7 +201,7 @@ export async function generateReceiptPDF(receipt, formData = {}) {
     : receipt.feeType === "OTHER_FEE" ? "Other Fee"
     : receipt.feeType || "JMC Fee";
 
-  // Payment status — drives the stamp colour in the PDF
+  // Payment status — drives the coloured stamp
   const rawStatus    = (receipt.status || receipt.statusMessage || "").toUpperCase();
   const paymentStatus =
     rawStatus === "SUCCESS" || rawStatus === "0300" ? "PAYMENT SUCCESSFUL"

@@ -600,13 +600,20 @@ module.exports = () => ({
 
     try {
       const txnData = await verifyJoseToken(transactionResponse, config);
+      const incomingOrderId = txnData.orderid || txnData.orderId || "";
+
+      console.log("BILLDESK_VERIFY_INCOMING:", {
+        orderid: incomingOrderId,
+        auth_status: txnData.auth_status,
+        transactionid: txnData.transactionid,
+      });
 
       // ── Determine precise status ────────────────────────────────────────
       // BillDesk auth_status codes:
       //   0300 = Success
       //   0002 = Pending / awaiting bank confirmation
-      //   0399 / blank / null = Typically user-cancelled
-      //   All others = Failed (bank declined, timeout, etc.)
+      //   0399 / blank  = Typically user-cancelled
+      //   All others    = Failed (bank declined, timeout, etc.)
       const authStatus = txnData.auth_status || "";
       const errorType  = (txnData.transaction_error_type || "").toLowerCase();
       const errorDesc  = txnData.transaction_error_desc || "";
@@ -631,65 +638,115 @@ module.exports = () => ({
         statusMessage = "FAILED";
       }
 
-      // Log every non-success outcome for audit
+      // ── STEP 1: Fetch stored record FIRST (before update) ──────────────
+      // This gives us customerName, additionalInfo etc. that were saved at order creation.
+      // We find by orderId string then update by numeric id — reliable in Strapi v5.
+      let storedTxn = null;
+      try {
+        // Try exact match on orderId attribute
+        storedTxn = await strapi.db
+          .query("api::transaction.transaction")
+          .findOne({ where: { orderId: incomingOrderId } });
+
+        // Strapi v5 db.query uses snake_case column names at the ORM level;
+        // if the above returns null, try the snake_case variant
+        if (!storedTxn) {
+          storedTxn = await strapi.db
+            .query("api::transaction.transaction")
+            .findOne({ where: { order_id: incomingOrderId } });
+        }
+
+        console.log("BILLDESK_STORED_TXN:", {
+          found:            !!storedTxn,
+          id:               storedTxn?.id,
+          orderId:          storedTxn?.orderId || storedTxn?.order_id,
+          customerName:     storedTxn?.customerName || storedTxn?.customer_name,
+          feeType:          storedTxn?.feeType || storedTxn?.fee_type,
+          hasAdditionalInfo: !!(storedTxn?.additionalInfo || storedTxn?.additional_info),
+          additionalInfoKeys: storedTxn
+            ? Object.keys(storedTxn.additionalInfo || storedTxn.additional_info || {})
+            : [],
+        });
+      } catch (fetchError) {
+        console.error("BILLDESK_FETCH_STORED_TXN_ERROR:", fetchError.message);
+      }
+
+      // ── STEP 2: Update status in DB ────────────────────────────────────
+      // Update by numeric id for reliability in Strapi v5.
+      if (storedTxn?.id) {
+        try {
+          await strapi.db.query("api::transaction.transaction").update({
+            where: { id: storedTxn.id },
+            data: {
+              status:        statusMessage,
+              transactionId: txnData.transactionid || null,
+              rawResponse:   txnData,
+            },
+          });
+          console.log("BILLDESK_TXN_UPDATED:", {
+            id: storedTxn.id, statusMessage
+          });
+        } catch (updateError) {
+          console.error("BILLDESK_TXN_UPDATE_ERROR:", updateError.message);
+        }
+      } else {
+        // Fallback: update by orderId string if record not found by attribute
+        console.warn("BILLDESK_TXN_NOT_FOUND_BY_ORDER_ID:", incomingOrderId);
+        try {
+          await strapi.db.query("api::transaction.transaction").update({
+            where: { orderId: incomingOrderId },
+            data: {
+              status:        statusMessage,
+              transactionId: txnData.transactionid || null,
+              rawResponse:   txnData,
+            },
+          });
+        } catch (fallbackError) {
+          console.error("BILLDESK_TXN_FALLBACK_UPDATE_ERROR:", fallbackError.message);
+        }
+      }
+
+      // ── Log outcome ────────────────────────────────────────────────────
       if (statusMessage !== "SUCCESS") {
         console.warn("BILLDESK_PAYMENT_NOT_SUCCESS:", {
-          orderId:     txnData.orderid,
-          authStatus,
-          statusMessage,
-          isCancelled,
-          errorType,
-          errorDesc,
+          orderId: incomingOrderId, authStatus, statusMessage, isCancelled, errorType, errorDesc,
           transactionId: txnData.transactionid || "N/A",
         });
       } else {
         console.log("BILLDESK_PAYMENT_SUCCESS:", {
-          orderId:       txnData.orderid,
+          orderId: incomingOrderId,
           transactionId: txnData.transactionid,
-          amount:        txnData.amount,
+          amount: txnData.amount,
         });
       }
 
-      // ── Persist correct status to DB ────────────────────────────────────
-      await strapi.db.query("api::transaction.transaction").update({
-        where: { orderId: txnData.orderid },
-        data: {
-          status:        statusMessage,   // PENDING | SUCCESS | FAILED
-          transactionId: txnData.transactionid || null,
-          rawResponse:   txnData,
-        },
-      });
-
-      // ── Fetch full stored record for receipt population ─────────────────
-      let storedTxn = null;
-      try {
-        storedTxn = await strapi.db
-          .query("api::transaction.transaction")
-          .findOne({ where: { orderId: txnData.orderid } });
-      } catch (_) {
-        // non-fatal
-      }
+      // ── Extract customer data from stored record ────────────────────────
+      // Handle both camelCase (Strapi attribute) and snake_case (DB column) variants
+      const customerName   = storedTxn?.customerName   || storedTxn?.customer_name   || "";
+      const customerMobile = storedTxn?.customerMobile || storedTxn?.customer_mobile || "";
+      const customerEmail  = storedTxn?.customerEmail  || storedTxn?.customer_email  || "";
+      const feeType        = storedTxn?.feeType        || storedTxn?.fee_type        || "";
+      const additionalInfo = storedTxn?.additionalInfo || storedTxn?.additional_info || {};
 
       return {
         verified:      statusMessage === "SUCCESS",
         cancelled:     isCancelled,
-        orderId:       txnData.orderid,
+        orderId:       incomingOrderId,
         transactionId: txnData.transactionid,
         amount:        txnData.amount,
         status:        authStatus,
         statusMessage,
         paymentMethod: txnData.payment_method_type,
         errorDesc,
-        // Full customer data so the receipt page can be fully populated
-        customerName:   storedTxn?.customerName   || "",
-        customerMobile: storedTxn?.customerMobile  || "",
-        customerEmail:  storedTxn?.customerEmail   || "",
-        feeType:        storedTxn?.feeType         || "",
-        additionalInfo: storedTxn?.additionalInfo  || {},
+        customerName,
+        customerMobile,
+        customerEmail,
+        feeType,
+        additionalInfo,
         raw: txnData,
       };
     } catch (error) {
-      console.error("Verify transaction error:", error.message);
+      console.error("Verify transaction error:", error.message, error.stack);
       return {
         verified:  false,
         cancelled: false,
