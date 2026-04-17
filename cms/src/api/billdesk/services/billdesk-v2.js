@@ -601,39 +601,99 @@ module.exports = () => ({
     try {
       const txnData = await verifyJoseToken(transactionResponse, config);
 
-      // Map auth_status to readable status
-      const statusMessage =
-        txnData.auth_status === "0300"
-          ? "SUCCESS"
-          : txnData.auth_status === "0002"
-          ? "PENDING"
-          : "FAILED";
+      // ── Determine precise status ────────────────────────────────────────
+      // BillDesk auth_status codes:
+      //   0300 = Success
+      //   0002 = Pending / awaiting bank confirmation
+      //   0399 / blank / null = Typically user-cancelled
+      //   All others = Failed (bank declined, timeout, etc.)
+      const authStatus = txnData.auth_status || "";
+      const errorType  = (txnData.transaction_error_type || "").toLowerCase();
+      const errorDesc  = txnData.transaction_error_desc || "";
 
-      // Update database
+      let statusMessage;
+      let isCancelled = false;
+
+      if (authStatus === "0300") {
+        statusMessage = "SUCCESS";
+      } else if (authStatus === "0002") {
+        statusMessage = "PENDING";
+      } else if (
+        authStatus === "0399" ||
+        authStatus === "" ||
+        errorType === "cancel" ||
+        errorType === "cancelled" ||
+        errorDesc.toLowerCase().includes("cancel")
+      ) {
+        statusMessage = "FAILED";
+        isCancelled   = true;
+      } else {
+        statusMessage = "FAILED";
+      }
+
+      // Log every non-success outcome for audit
+      if (statusMessage !== "SUCCESS") {
+        console.warn("BILLDESK_PAYMENT_NOT_SUCCESS:", {
+          orderId:     txnData.orderid,
+          authStatus,
+          statusMessage,
+          isCancelled,
+          errorType,
+          errorDesc,
+          transactionId: txnData.transactionid || "N/A",
+        });
+      } else {
+        console.log("BILLDESK_PAYMENT_SUCCESS:", {
+          orderId:       txnData.orderid,
+          transactionId: txnData.transactionid,
+          amount:        txnData.amount,
+        });
+      }
+
+      // ── Persist correct status to DB ────────────────────────────────────
       await strapi.db.query("api::transaction.transaction").update({
         where: { orderId: txnData.orderid },
         data: {
-          status: statusMessage,
-          transactionId: txnData.transactionid,
-          rawResponse: txnData,
+          status:        statusMessage,   // PENDING | SUCCESS | FAILED
+          transactionId: txnData.transactionid || null,
+          rawResponse:   txnData,
         },
       });
 
+      // ── Fetch full stored record for receipt population ─────────────────
+      let storedTxn = null;
+      try {
+        storedTxn = await strapi.db
+          .query("api::transaction.transaction")
+          .findOne({ where: { orderId: txnData.orderid } });
+      } catch (_) {
+        // non-fatal
+      }
+
       return {
-        verified: true,
-        orderId: txnData.orderid,
+        verified:      statusMessage === "SUCCESS",
+        cancelled:     isCancelled,
+        orderId:       txnData.orderid,
         transactionId: txnData.transactionid,
-        amount: txnData.amount,
-        status: txnData.auth_status,
+        amount:        txnData.amount,
+        status:        authStatus,
         statusMessage,
         paymentMethod: txnData.payment_method_type,
+        errorDesc,
+        // Full customer data so the receipt page can be fully populated
+        customerName:   storedTxn?.customerName   || "",
+        customerMobile: storedTxn?.customerMobile  || "",
+        customerEmail:  storedTxn?.customerEmail   || "",
+        feeType:        storedTxn?.feeType         || "",
+        additionalInfo: storedTxn?.additionalInfo  || {},
         raw: txnData,
       };
     } catch (error) {
       console.error("Verify transaction error:", error.message);
       return {
-        verified: false,
-        error: error.message,
+        verified:  false,
+        cancelled: false,
+        error:     error.message,
       };
     }
   },

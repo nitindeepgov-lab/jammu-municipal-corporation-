@@ -50,12 +50,8 @@ function amountToWords(amount) {
     if (n === 0) return "";
     if (n < 20) return ones[n] + " ";
     if (n < 100)
-      return (
-        tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "") + " "
-      );
-    return (
-      ones[Math.floor(n / 100)] + " Hundred " + convertLessThanThousand(n % 100)
-    );
+      return tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "") + " ";
+    return ones[Math.floor(n / 100)] + " Hundred " + convertLessThanThousand(n % 100);
   }
 
   function toWords(n) {
@@ -89,20 +85,7 @@ function amountToWords(amount) {
 /** Format date as "Apr 4 2026  10:07AM" */
 function formatDate(iso) {
   const d = iso ? new Date(iso) : new Date();
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const month = months[d.getMonth()];
   const day = d.getDate();
   const year = d.getFullYear();
@@ -116,9 +99,7 @@ function formatDate(iso) {
 /** Format NIT/Tender date as DD-MM-YYYY */
 function formatTenderDate(val) {
   if (!val) return "-";
-  // Already formatted
   if (/^\d{2}-\d{2}-\d{4}$/.test(val)) return val;
-  // ISO date input (YYYY-MM-DD)
   if (/^\d{4}-\d{2}-\d{2}/.test(val)) {
     const [y, m, d] = val.split("T")[0].split("-");
     return `${d}-${m}-${y}`;
@@ -152,60 +133,60 @@ async function loadImageAsDataURL(src) {
 /**
  * Generate and download a JMC payment receipt PDF.
  *
- * @param {Object} receipt  - The receipt state object from PayOnline.jsx
- * @param {Object} formData - The raw form values the user filled in
+ * @param {Object} receipt  - The receipt state object from PayOnline.jsx / PaymentStatus.jsx
+ * @param {Object} formData - The raw form values (parentage, address, nitTenderNo, etc.)
  */
 export async function generateReceiptPDF(receipt, formData = {}) {
   // ── 1. Compute all display values ──────────────────────────────────────
-  const receiptNo = receipt.orderId || receipt.receiptId || "-";
-  const dateOfIssue = formatDate(receipt.createdAt || receipt.completedAt);
-  const receivedFrom = (
-    receipt.customerName ||
-    formData.name ||
-    "-"
+  const receiptNo    = receipt.orderId || receipt.receiptId || "-";
+  const dateOfIssue  = formatDate(receipt.createdAt || receipt.completedAt);
+  const receivedFrom = (receipt.customerName || formData.name || "-").toUpperCase();
+  const parentage    = (formData.parentage || "-").toUpperCase();
+  const nitNo        = (formData.nitTenderNo || "-").toUpperCase();
+  const nitDate      = formatTenderDate(formData.nitTenderDate);
+  const nitDetails   = (
+    formData.nitTenderDetails || formData.payDetails || formData.feeType || "-"
   ).toUpperCase();
-  const parentage = (formData.parentage || "-").toUpperCase();
-  const nitNo = (formData.nitTenderNo || "-").toUpperCase();
-  const nitDate = formatTenderDate(formData.nitTenderDate);
-  const nitDetails = (
-    formData.nitTenderDetails ||
-    formData.payDetails ||
-    formData.feeType ||
-    "-"
-  ).toUpperCase();
-  const address = (formData.address || "-").toUpperCase();
-  const amount = parseFloat(receipt.amount || formData.amount || 0).toFixed(2);
-  const amountWords = amountToWords(amount);
-  const vide = "Online Payment";
-  const forYear = financialYear(receipt.createdAt);
-  const transId = receipt.transactionId || "-";
+  const address      = (formData.address || "-").toUpperCase();
+  const amount       = parseFloat(receipt.amount || formData.amount || 0).toFixed(2);
+  const amountWords  = amountToWords(amount);
+  const vide         = "Online Payment";
+  const forYear      = financialYear(receipt.createdAt);
+  const transId      = receipt.transactionId || "-";
   const feeTypeLabel =
-    receipt.feeType === "TENDER_FEE"
-      ? "Tender Fee"
-      : receipt.feeType === "OTHER_FEE"
-        ? "Other Fee"
-        : receipt.feeType || "JMC Fee";
+    receipt.feeType === "TENDER_FEE" ? "Tender Fee"
+    : receipt.feeType === "OTHER_FEE" ? "Other Fee"
+    : receipt.feeType || "JMC Fee";
+
+  // Payment status — drives the stamp colour in the PDF
+  const rawStatus    = (receipt.status || receipt.statusMessage || "").toUpperCase();
+  const paymentStatus =
+    rawStatus === "SUCCESS" || rawStatus === "0300" ? "PAYMENT SUCCESSFUL"
+    : rawStatus === "PENDING" || rawStatus === "0002" ? "PAYMENT PENDING"
+    : rawStatus === "FAILED" ? "PAYMENT FAILED"
+    : "PAYMENT SUCCESSFUL"; // Only SUCCESS receipts should ever be generated
 
   // Dept/zone for Other Fee
-  const dept = formData.dept || "";
-  const zone = formData.location || "";
+  const dept      = formData.dept || "";
+  const zone      = formData.location || "";
   const extraLine =
     dept && dept !== "Select Department"
       ? `${dept}${zone && zone !== "Select Zone" ? ` | ${zone}` : ""}`
       : "";
 
   // ── 2. QR code ────────────────────────────────────────────────────────
+  // Format:  Name | Father Name | Receipt No | Date of Issue
   const qrData = [
-    `Receipt: ${receiptNo}`,
-    `TxnID: ${transId}`,
-    `Amount: Rs.${amount}`,
-    `Date: ${dateOfIssue}`,
-    `Payer: ${receivedFrom}`,
-  ].join("\n");
+    receivedFrom !== "-" ? receivedFrom : "N/A",
+    parentage    !== "-" ? parentage    : "N/A",
+    receiptNo,
+    dateOfIssue,
+  ].join(" | ");
 
   const qrDataUrl = await QRCode.toDataURL(qrData, {
-    width: 120,
+    width: 140,
     margin: 1,
+    errorCorrectionLevel: "M",
     color: { dark: "#000000", light: "#ffffff" },
   });
 
@@ -220,16 +201,15 @@ export async function generateReceiptPDF(receipt, formData = {}) {
   // ── 4. Build PDF ───────────────────────────────────────────────────────
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-  const PW = doc.internal.pageSize.getWidth(); // 210
-  // const PH = doc.internal.pageSize.getHeight()  // 297
+  const PW = doc.internal.pageSize.getWidth(); // 210 mm
 
-  const MARGIN = 14;
-  const COL_W = (PW - MARGIN * 2) / 2; // half-width for two-col rows
+  const MARGIN       = 14;
+  const COL_W        = (PW - MARGIN * 2) / 2;  // half-width for two-col layout
 
   // ── Page border ───────────────────────────────────────────────────────
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.5);
-  doc.rect(MARGIN - 4, MARGIN - 4, PW - (MARGIN - 4) * 2, 265);
+  doc.rect(MARGIN - 4, MARGIN - 4, PW - (MARGIN - 4) * 2, 270);
 
   // ── Header ────────────────────────────────────────────────────────────
   const HEADER_H = 38;
@@ -239,13 +219,11 @@ export async function generateReceiptPDF(receipt, formData = {}) {
     doc.addImage(logoDataUrl, "JPEG", MARGIN - 2, MARGIN + 1, 28, 28);
   }
 
-  // Title block (center/right)
+  // Title block (center/right of logo)
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.setTextColor(0, 51, 102); // JMC navy
-  doc.text("JAMMU MUNICIPAL CORPORATION", PW / 2 + 8, MARGIN + 11, {
-    align: "center",
-  });
+  doc.setTextColor(0, 51, 102);
+  doc.text("JAMMU MUNICIPAL CORPORATION", PW / 2 + 8, MARGIN + 11, { align: "center" });
 
   doc.setFontSize(11);
   doc.setTextColor(60, 60, 60);
@@ -254,39 +232,44 @@ export async function generateReceiptPDF(receipt, formData = {}) {
   // Thin rule under header
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.4);
-  doc.line(
-    MARGIN - 2,
-    MARGIN + HEADER_H - 2,
-    PW - MARGIN + 2,
-    MARGIN + HEADER_H - 2,
-  );
+  doc.line(MARGIN - 2, MARGIN + HEADER_H - 2, PW - MARGIN + 2, MARGIN + HEADER_H - 2);
 
-  // ── Receipt type label (subtle) ────────────────────────────────────────
+  // Receipt type label (subtle)
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(120, 120, 120);
-  doc.text(
-    `Payment Receipt  —  ${feeTypeLabel}`,
-    PW / 2,
-    MARGIN + HEADER_H + 3,
-    { align: "center" },
-  );
+  doc.text(`Payment Receipt  —  ${feeTypeLabel}`, PW / 2, MARGIN + HEADER_H + 3, { align: "center" });
 
-  // ── Data rows ─────────────────────────────────────────────────────────
+  // ── Layout constants ──────────────────────────────────────────────────
   let Y = MARGIN + HEADER_H + 9;
 
-  const LABEL_COLOR = [80, 80, 80];
-  const VALUE_COLOR = [0, 0, 0];
-  const ROW_GAP = 10; // vertical gap between rows
-  const LABEL_FONT = 9;
-  const VALUE_FONT = 9.5;
-  const LABEL_X = MARGIN;
-  const VALUE_X = MARGIN + 34; // indent for value in first col
-  const COL2_LABEL_X = MARGIN + COL_W + 4;
-  const COL2_VALUE_X = MARGIN + COL_W + 36;
+  const LABEL_COLOR  = [80, 80, 80];
+  const VALUE_COLOR  = [0, 0, 0];
+  const ROW_GAP      = 10;   // vertical spacing between rows (mm)
+  const LABEL_FONT   = 9;
+  const VALUE_FONT   = 9.5;
 
-  /** Draw a label + value pair, optional bold value */
-  function row(label, value, x, lx, vx, y, bold = true) {
+  // Column 1
+  const LABEL_X  = MARGIN;
+  const VALUE_X  = MARGIN + 34;
+
+  // Column 2
+  const C2_LABEL = MARGIN + COL_W + 4;
+  const C2_VALUE = MARGIN + COL_W + 36;
+
+  /**
+   * Draw one label + value row.
+   * Returns extra vertical space consumed by multi-line values.
+   *
+   * @param {string}  label  - Bold label text
+   * @param {string}  value  - Value text
+   * @param {number}  lx     - Label x position (mm)
+   * @param {number}  vx     - Value x position (mm)
+   * @param {number}  y      - Vertical position (mm)
+   * @param {boolean} bold   - Whether value should be bold (default true)
+   * @param {number}  maxW   - Override max width for wrapping (optional)
+   */
+  function drawRow(label, value, lx, vx, y, bold = true, maxW = null) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(LABEL_FONT);
     doc.setTextColor(...LABEL_COLOR);
@@ -295,51 +278,30 @@ export async function generateReceiptPDF(receipt, formData = {}) {
     doc.setFont("helvetica", bold ? "bold" : "normal");
     doc.setFontSize(VALUE_FONT);
     doc.setTextColor(...VALUE_COLOR);
-    // Wrap long text within remaining width
-    const maxW = PW - MARGIN - vx - 2;
-    const lines = doc.splitTextToSize(value, maxW);
+    const wrapWidth = maxW !== null ? maxW : PW - MARGIN - vx - 2;
+    const lines = doc.splitTextToSize(String(value), wrapWidth);
     doc.text(lines, vx, y);
     return lines.length > 1 ? (lines.length - 1) * (VALUE_FONT * 0.45) : 0;
   }
 
-  // ── Row 1: Receipt No + Date of Issue ────────────────────────────────
-  row("Receipt No.:", receiptNo, LABEL_X, LABEL_X, VALUE_X, Y);
-  row(
-    "Date of Issue",
-    dateOfIssue,
-    COL2_LABEL_X,
-    COL2_LABEL_X,
-    COL2_VALUE_X,
-    Y,
-  );
+  // ── Row 1: Receipt No  +  Date of Issue ──────────────────────────────
+  drawRow("Receipt No.:", receiptNo, LABEL_X, VALUE_X, Y);
+  drawRow("Date of Issue", dateOfIssue, C2_LABEL, C2_VALUE, Y);
   Y += ROW_GAP;
 
-  // ── Row 2: Received From + Parentage ─────────────────────────────────
-  const extraH2 = row(
-    "Received From:",
-    receivedFrom,
-    LABEL_X,
-    LABEL_X,
-    VALUE_X,
-    Y,
-  );
-  row("Parentage:", parentage, COL2_LABEL_X, COL2_LABEL_X, COL2_VALUE_X, Y);
+  // ── Row 2: Received From  +  Parentage ───────────────────────────────
+  const extraH2 = drawRow("Received From:", receivedFrom, LABEL_X, VALUE_X, Y);
+  drawRow("Parentage:", parentage, C2_LABEL, C2_VALUE, Y);
   Y += ROW_GAP + extraH2;
 
-  // ── Row 3: NIT/Tender No + NIT/Tender Date (only for TENDER_FEE) ─────
+  // ── Row 3+ (fee-type specific) ────────────────────────────────────────
   if (receipt.feeType === "TENDER_FEE") {
-    row("NIT/Tender No.:", nitNo, LABEL_X, LABEL_X, VALUE_X, Y);
-    row(
-      "NIT/Tender Date",
-      nitDate,
-      COL2_LABEL_X,
-      COL2_LABEL_X,
-      COL2_VALUE_X,
-      Y,
-    );
+    // NIT/Tender No  +  NIT/Tender Date
+    drawRow("NIT/Tender No.:", nitNo, LABEL_X, VALUE_X, Y);
+    drawRow("NIT/Tender Date", nitDate, C2_LABEL, C2_VALUE, Y);
     Y += ROW_GAP;
 
-    // ── Row 4: NIT/Tender Details ───────────────────────────────────────
+    // NIT/Tender Details (full width)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(LABEL_FONT);
     doc.setTextColor(...LABEL_COLOR);
@@ -348,23 +310,21 @@ export async function generateReceiptPDF(receipt, formData = {}) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(VALUE_FONT);
     doc.setTextColor(...VALUE_COLOR);
-    const detailLines = doc.splitTextToSize(
-      nitDetails,
-      PW - MARGIN - VALUE_X - 4,
-    );
+    const detailLines = doc.splitTextToSize(nitDetails, PW - MARGIN - VALUE_X - 4);
     doc.text(detailLines, VALUE_X, Y);
     Y += ROW_GAP + (detailLines.length > 1 ? (detailLines.length - 1) * 5 : 0);
   } else {
-    // For OTHER_FEE show type of fee / dept
+    // Other Fee — show dept/zone if present
     if (extraLine) {
-      row("Department:", extraLine.toUpperCase(), LABEL_X, LABEL_X, VALUE_X, Y);
+      drawRow("Department:", extraLine.toUpperCase(), LABEL_X, VALUE_X, Y);
       Y += ROW_GAP;
     }
-    row("Fee Details:", nitDetails, LABEL_X, LABEL_X, VALUE_X, Y);
+    drawRow("Fee Details:", nitDetails, LABEL_X, VALUE_X, Y);
     Y += ROW_GAP;
   }
 
-  // ── Row: Address ───────────────────────────────────────────────────────
+  // ── Row: Address (full width, leaves space for QR code on right later) ─
+  const addrMaxW = PW - MARGIN - VALUE_X - 44; // leave room for QR
   doc.setFont("helvetica", "bold");
   doc.setFontSize(LABEL_FONT);
   doc.setTextColor(...LABEL_COLOR);
@@ -373,64 +333,91 @@ export async function generateReceiptPDF(receipt, formData = {}) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(VALUE_FONT);
   doc.setTextColor(...VALUE_COLOR);
-  const addrLines = doc.splitTextToSize(address, PW - MARGIN - VALUE_X - 44);
+  const addrLines = doc.splitTextToSize(address, addrMaxW);
   doc.text(addrLines, VALUE_X, Y);
   Y += ROW_GAP + (addrLines.length > 1 ? (addrLines.length - 1) * 4.5 : 0);
 
-  // ── QR code (placed to the right from "Sum of Rs." down) ──────────────
-  const QR_SIZE = 33;
+  // ── QR code (right side, aligned from current Y) ──────────────────────
+  const QR_SIZE = 35;
   const QR_X = PW - MARGIN - QR_SIZE + 2;
   const QR_Y = Y - 1;
   doc.addImage(qrDataUrl, "PNG", QR_X, QR_Y, QR_SIZE, QR_SIZE);
 
-  // ── Row: Sum of Rs. + Amount Words ─────────────────────────────────────
-  row("Sum of Rs.", `${parseFloat(amount)}`, LABEL_X, LABEL_X, VALUE_X, Y);
+  // ── Row: Sum of Rs. ───────────────────────────────────────────────────
+  drawRow("Sum of Rs.", `${parseFloat(amount)}`, LABEL_X, VALUE_X, Y);
   Y += ROW_GAP;
 
-  const wordsLines = doc.splitTextToSize(amountWords, QR_X - VALUE_X - 4);
-  row("In Words:", wordsLines.join(" "), LABEL_X, LABEL_X, VALUE_X, Y, false);
+  // ── Row: In Words ─────────────────────────────────────────────────────
+  const wordsMaxW = QR_X - VALUE_X - 4;
+  const wordsLines = doc.splitTextToSize(amountWords, wordsMaxW);
+  drawRow("In Words:", wordsLines.join(" "), LABEL_X, VALUE_X, Y, false, wordsMaxW);
   Y += ROW_GAP + (wordsLines.length > 1 ? (wordsLines.length - 1) * 4.5 : 0);
 
   // ── Row: Vide ──────────────────────────────────────────────────────────
-  row("Vide:", vide, LABEL_X, LABEL_X, VALUE_X, Y);
+  drawRow("Vide:", vide, LABEL_X, VALUE_X, Y);
   Y += ROW_GAP;
 
   // ── Row: For the year ─────────────────────────────────────────────────
-  row("For the year:", forYear, LABEL_X, LABEL_X, VALUE_X, Y);
+  drawRow("For the year:", forYear, LABEL_X, VALUE_X, Y);
   Y += ROW_GAP;
 
-  // ── Row: Transaction ID (extra info) ──────────────────────────────────
+  // ── Row: Transaction ID ───────────────────────────────────────────────
   if (transId && transId !== "-") {
-    row("Transaction ID:", transId, LABEL_X, LABEL_X, VALUE_X, Y);
+    drawRow("Transaction ID:", transId, LABEL_X, VALUE_X, Y);
     Y += ROW_GAP;
   }
 
+  // ── Payment Status stamp ──────────────────────────────────────────────
+  // Coloured pill that makes the payment result unmistakably clear
+  Y += 2;
+  const isSuccessStatus = paymentStatus === "PAYMENT SUCCESSFUL";
+  const stampBgR = isSuccessStatus ? 220 : 254;
+  const stampBgG = isSuccessStatus ? 252 : 202;
+  const stampBgB = isSuccessStatus ? 231 :  13; // green-100 or red-100
+  const stampTxtR = isSuccessStatus ?  22 : 153;
+  const stampTxtG = isSuccessStatus ? 101 :  27;
+  const stampTxtB = isSuccessStatus ?  52 :  27; // green-700 or red-700
+
+  const stampW = 68;
+  const stampH = 8;
+  const stampX = LABEL_X;
+  const stampY = Y - 5.5;
+
+  // Rounded rectangle background
+  doc.setFillColor(stampBgR, stampBgG, stampBgB);
+  doc.setDrawColor(stampBgR, stampBgG, stampBgB);
+  doc.roundedRect(stampX, stampY, stampW, stampH, 2, 2, "F");
+
+  // Status text centred in the pill
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(stampTxtR, stampTxtG, stampTxtB);
+  doc.text(paymentStatus, stampX + stampW / 2, stampY + 5.5, { align: "center" });
+
+  Y += ROW_GAP + 2;
+
   // ── Separator line ─────────────────────────────────────────────────────
-  Y += 3;
+  Y += 2;
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.3);
   doc.line(MARGIN - 2, Y, PW - MARGIN + 2, Y);
   Y += 6;
 
-  // ── Footer note ────────────────────────────────────────────────────────
+  // ── Footer ────────────────────────────────────────────────────────────
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
   doc.setTextColor(100, 100, 100);
   doc.text(
     "This is a computer-generated receipt and does not require a physical signature.",
-    PW / 2,
-    Y,
-    { align: "center" },
+    PW / 2, Y, { align: "center" }
   );
   Y += 4.5;
   doc.text(
     "For queries, contact JMC Helpline: 1800-180-7207  |  Town Hall, Jammu — 180001",
-    PW / 2,
-    Y,
-    { align: "center" },
+    PW / 2, Y, { align: "center" }
   );
 
-  // ── 5. Download ────────────────────────────────────────────────────────
+  // ── 5. Save / Download ─────────────────────────────────────────────────
   const filename = `JMC_Receipt_${receiptNo}.pdf`;
   doc.save(filename);
 }

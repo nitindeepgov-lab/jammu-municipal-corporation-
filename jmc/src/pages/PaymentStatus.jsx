@@ -9,6 +9,7 @@ const STATUS = {
   LOADING: "loading",
   SUCCESS: "success",
   FAILED: "failed",
+  CANCELLED: "cancelled",
   PENDING: "pending",
   ERROR: "error",
 };
@@ -66,25 +67,38 @@ export default function PaymentStatus() {
           (result.status === "0300"
             ? "SUCCESS"
             : result.status === "0002"
-            ? "PENDING"
-            : "FAILED");
+              ? "PENDING"
+              : "FAILED");
 
-        const mappedStatus =
-          statusMessage === "SUCCESS"
-            ? STATUS.SUCCESS
-            : statusMessage === "PENDING"
-            ? STATUS.PENDING
-            : STATUS.FAILED;
+        let mappedStatus;
+        if (result.verified && statusMessage === "SUCCESS") {
+          mappedStatus = STATUS.SUCCESS;
+        } else if (result.cancelled) {
+          mappedStatus = STATUS.CANCELLED;
+        } else if (statusMessage === "PENDING") {
+          mappedStatus = STATUS.PENDING;
+        } else {
+          mappedStatus = STATUS.FAILED;
+        }
 
         setStatus(mappedStatus);
-        setMessage(statusMessage);
+        setMessage(
+          result.cancelled
+            ? "Payment was cancelled. No amount has been charged."
+            : statusMessage
+        );
         setDetails({
-          orderId: result.orderId || "",
-          transactionId: result.transactionId || "",
-          amount: result.amount || "",
-          authStatus: result.status || "",
+          orderId:        result.orderId || "",
+          transactionId:  result.transactionId || "",
+          amount:         result.amount || "",
+          authStatus:     result.status || "",
           statusMessage,
-          paymentMethod: result.paymentMethod || "",
+          paymentMethod:  result.paymentMethod || "",
+          customerName:   result.customerName || "",
+          customerMobile: result.customerMobile || "",
+          customerEmail:  result.customerEmail || "",
+          feeType:        result.feeType || "",
+          additionalInfo: result.additionalInfo || {},
         });
       } catch (error) {
         setStatus(STATUS.ERROR);
@@ -96,21 +110,18 @@ export default function PaymentStatus() {
   }, [token]);
 
   const isSuccess = status === STATUS.SUCCESS;
-  const isResolved =
-    status === STATUS.SUCCESS ||
-    status === STATUS.FAILED ||
-    status === STATUS.PENDING;
 
-  const statusLabel =
-    isSuccess
-      ? "Payment Successful"
+  const statusLabel = isSuccess
+    ? "Payment Successful"
+    : status === STATUS.CANCELLED
+      ? "Payment Cancelled"
       : status === STATUS.PENDING
-      ? "Payment Pending"
-      : status === STATUS.FAILED
-      ? "Payment Failed"
-      : status === STATUS.ERROR
-      ? "Verification Error"
-      : "Payment Status";
+        ? "Payment Pending"
+        : status === STATUS.FAILED
+          ? "Payment Failed"
+          : status === STATUS.ERROR
+            ? "Verification Error"
+            : "Payment Status";
 
   const handleDownload = async () => {
     if (!details) return;
@@ -122,12 +133,14 @@ export default function PaymentStatus() {
         transactionId: details.transactionId,
         amount: details.amount,
         status: details.statusMessage,
-        feeType: "",
-        customerName: "",
-        customerMobile: "",
+        feeType: details.feeType,
+        customerName: details.customerName,
+        customerMobile: details.customerMobile,
         createdAt: new Date().toISOString(),
       };
-      await generateReceiptPDF(receiptData, {});
+      // additionalInfo contains parentage, address, nitTenderNo, etc.
+      const formData = details.additionalInfo || {};
+      await generateReceiptPDF(receiptData, formData);
     } catch (err) {
       console.error("Receipt generation failed:", err);
       alert("Could not generate receipt. Please try again.");
@@ -149,9 +162,11 @@ export default function PaymentStatus() {
           className={`bg-white rounded-2xl border shadow-lg overflow-hidden ${
             isSuccess
               ? "border-green-100"
-              : status === STATUS.FAILED
-              ? "border-red-100"
-              : "border-gray-100"
+              : status === STATUS.CANCELLED
+                ? "border-amber-100"
+                : status === STATUS.FAILED
+                  ? "border-red-100"
+                  : "border-gray-100"
           }`}
         >
           {/* Colored header bar */}
@@ -159,9 +174,11 @@ export default function PaymentStatus() {
             className={`px-6 py-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${
               isSuccess
                 ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-100"
-                : status === STATUS.FAILED
-                ? "bg-gradient-to-r from-red-50 to-rose-50 border-red-100"
-                : "bg-gray-50 border-gray-100"
+                : status === STATUS.CANCELLED
+                  ? "bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-100"
+                  : status === STATUS.FAILED
+                    ? "bg-gradient-to-r from-red-50 to-rose-50 border-red-100"
+                    : "bg-gray-50 border-gray-100"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -169,11 +186,13 @@ export default function PaymentStatus() {
                 className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${
                   isSuccess
                     ? "bg-green-100"
-                    : status === STATUS.FAILED
-                    ? "bg-red-100"
-                    : status === STATUS.LOADING
-                    ? "bg-blue-50"
-                    : "bg-gray-100"
+                    : status === STATUS.CANCELLED
+                      ? "bg-amber-100"
+                      : status === STATUS.FAILED
+                        ? "bg-red-100"
+                        : status === STATUS.LOADING
+                          ? "bg-blue-50"
+                          : "bg-gray-100"
                 }`}
               >
                 {status === STATUS.LOADING ? (
@@ -197,32 +216,16 @@ export default function PaymentStatus() {
                     />
                   </svg>
                 ) : isSuccess ? (
-                  <svg
-                    className="w-6 h-6 text-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M5 13l4 4L19 7"
-                    />
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : status === STATUS.CANCELLED ? (
+                  <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 ) : status === STATUS.FAILED ? (
-                  <svg
-                    className="w-6 h-6 text-red-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
+                  <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 ) : (
                   <svg
@@ -284,8 +287,8 @@ export default function PaymentStatus() {
                       details.statusMessage === "SUCCESS"
                         ? "bg-green-100 text-green-700"
                         : details.statusMessage === "FAILED"
-                        ? "bg-red-100 text-red-600"
-                        : "bg-yellow-100 text-yellow-700"
+                          ? "bg-red-100 text-red-600"
+                          : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {details.statusMessage}
@@ -301,13 +304,11 @@ export default function PaymentStatus() {
                 )}
               </div>
 
-              {/* Download button */}
-              {isResolved && (
+              {/* Download button — only for successful payments */}
+              {isSuccess && (
                 <div className="mt-5 pt-5 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <p className="text-[11px] text-gray-500 max-w-sm">
-                    {isSuccess
-                      ? "Your payment was successful. Download your official JMC receipt below."
-                      : "A payment record has been created. You may download a receipt for reference."}
+                    Your payment was successful. Download your official JMC receipt below.
                   </p>
                   <button
                     type="button"
