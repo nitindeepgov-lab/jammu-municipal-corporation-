@@ -195,7 +195,7 @@ export default function PayOnline() {
           authToken: data.authToken,
           childWindow: false,
           retryCount: 3,
-          prefs: { payment_categories: ['card', 'nb', 'upi', 'wallets', 'qr'] },
+          prefs: { payment_categories: ['card', 'nb', 'upi'] },
         },
         flowType: 'payments',
       })
