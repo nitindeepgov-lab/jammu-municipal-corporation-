@@ -3,6 +3,7 @@ import { FaFileAlt } from 'react-icons/fa'
 import { RiMoneyRupeeCircleLine } from 'react-icons/ri'
 import SubpageTemplate from '../components/SubpageTemplate'
 import { STRAPI_URL } from '../config/api'
+import { generateReceiptPDF } from '../utils/generateReceipt'
 
 /* ═══════════════════════════════════════════════════════
    Payment Categories
@@ -94,6 +95,8 @@ export default function PayOnline() {
   const [status, setStatus] = useState(STATUS.IDLE)
   const [msg, setMsg] = useState('')
   const [receipt, setReceipt] = useState(null)
+  const [formSnapshot, setFormSnapshot] = useState({})   // frozen copy of form at submit time
+  const [downloading, setDownloading] = useState(false)
   const panelRef = useRef(null)
 
   /* helpers */
@@ -103,6 +106,7 @@ export default function PayOnline() {
     setStatus(STATUS.IDLE)
     setMsg('')
     setReceipt(null)
+    setFormSnapshot({})
   }, [])
 
   const pick = (opt) => {
@@ -158,6 +162,9 @@ export default function PayOnline() {
         throw new Error(err.error?.message || `Server error ${res.status}`)
       }
       const { data } = await res.json()
+
+      // Freeze the form data so it's available for the receipt even after reset
+      setFormSnapshot({ ...form })
 
       setReceipt({
         receiptId: data.orderId,
@@ -391,69 +398,116 @@ export default function PayOnline() {
 
         {/* ── Receipt (Success or Failed) ─────────────── */}
         {receipt && (status === STATUS.SUCCESS || status === STATUS.FAILED) && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <p className="text-gray-900 font-semibold text-base">Payment Receipt</p>
-                <p className="text-gray-400 text-xs">Use Receipt ID or Transaction ID for verification.</p>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+            {/* Receipt header bar */}
+            <div className={`px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
+              status === STATUS.SUCCESS
+                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100'
+                : 'bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-100'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                  status === STATUS.SUCCESS ? 'bg-green-100' : 'bg-red-100'
+                }`}>
+                  {status === STATUS.SUCCESS
+                    ? <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                    : <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                  }
+                </div>
+                <div>
+                  <p className="text-gray-900 font-semibold text-sm">Payment Receipt</p>
+                  <p className="text-gray-500 text-[11px]">Reference ID: {receipt.orderId || '-'}</p>
+                </div>
               </div>
+
+              {/* ── Download Receipt button ── */}
               <button
                 type="button"
-                onClick={() => window.print()}
-                className="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-50 transition"
+                disabled={downloading}
+                onClick={async () => {
+                  setDownloading(true)
+                  try {
+                    await generateReceiptPDF(receipt, formSnapshot)
+                  } catch (err) {
+                    console.error('Receipt generation failed:', err)
+                    alert('Could not generate receipt. Please try again.')
+                  } finally {
+                    setDownloading(false)
+                  }
+                }}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm ${
+                  downloading
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-[#003366] text-white hover:bg-[#004080] active:scale-[0.97]'
+                }`}
               >
-                Print Receipt
+                {downloading ? (
+                  <>
+                    <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Generating…
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download Receipt
+                  </>
+                )}
               </button>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4 mt-5 text-xs">
-              <div>
-                <p className="text-gray-400">Receipt ID</p>
-                <p className="text-gray-900 font-mono">{receipt.receiptId || '-'}</p>
+            {/* Receipt detail grid */}
+            <div className="px-6 py-5">
+              <div className="grid sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <p className="text-gray-400 mb-0.5">Receipt / Order ID</p>
+                  <p className="text-gray-900 font-mono font-semibold">{receipt.receiptId || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Transaction ID</p>
+                  <p className="text-gray-900 font-mono font-semibold">{receipt.transactionId || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Status</p>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    receipt.status === 'SUCCESS' ? 'bg-green-100 text-green-700'
+                    : receipt.status === 'FAILED' ? 'bg-red-100 text-red-600'
+                    : 'bg-gray-100 text-gray-600'
+                  }`}>{receipt.status}</span>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Amount Paid</p>
+                  <p className="text-gray-900 font-semibold">₹ {parseFloat(receipt.amount || 0).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Payment Category</p>
+                  <p className="text-gray-900">{receipt.feeType === 'TENDER_FEE' ? 'Tender Fee' : receipt.feeType === 'OTHER_FEE' ? 'Other Fee' : receipt.feeType || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Paid By</p>
+                  <p className="text-gray-900">{receipt.customerName || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Mobile</p>
+                  <p className="text-gray-900">{receipt.customerMobile || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Date & Time</p>
+                  <p className="text-gray-900">{receipt.createdAt ? new Date(receipt.createdAt).toLocaleString('en-IN') : '-'}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-gray-400">Transaction ID</p>
-                <p className="text-gray-900 font-mono">{receipt.transactionId || '-'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Order ID</p>
-                <p className="text-gray-900 font-mono">{receipt.orderId || '-'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Status</p>
-                <p className={`font-semibold ${receipt.status === 'SUCCESS' ? 'text-green-600' : receipt.status === 'FAILED' ? 'text-red-500' : 'text-gray-600'}`}>
-                  {receipt.status}
+
+              <div className="mt-4 pt-4 border-t border-gray-100 flex items-start gap-2">
+                <svg className="w-3.5 h-3.5 text-[#003366] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+                <p className="text-[11px] text-gray-500">
+                  Click <strong>Download Receipt</strong> to save the official JMC PDF receipt to your device. Keep this for future reference and tax purposes.
                 </p>
               </div>
-              <div>
-                <p className="text-gray-400">Amount</p>
-                <p className="text-gray-900">₹ {receipt.amount || '0.00'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Fee Type</p>
-                <p className="text-gray-900">{receipt.feeType || '-'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Customer Name</p>
-                <p className="text-gray-900">{receipt.customerName || '-'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Mobile</p>
-                <p className="text-gray-900">{receipt.customerMobile || '-'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Email</p>
-                <p className="text-gray-900">{receipt.customerEmail || '-'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Message</p>
-                <p className="text-gray-900">{receipt.statusMessage || '-'}</p>
-              </div>
             </div>
-
-            <p className="text-[11px] text-gray-500 mt-4">
-              These receipt details can be shared via email/SMS once notification services are enabled. Admins can verify status in the CMS using the Receipt or Transaction ID.
-            </p>
           </div>
         )}
 
