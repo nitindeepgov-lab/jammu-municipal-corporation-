@@ -44,22 +44,22 @@ const egovServices = [
   },
   {
     name: "Pay Rent – Municipal Shop/Flat",
-    href: "https://jmc.jk.gov.in/OtherFee.html",
+    href: "https://jmc.jk.gov.in/OtherFee.aspx",
     desc: "Pay rent for JMC municipal shops and residential flats online.",
   },
   {
     name: "Online User Charges",
-    href: "https://jmc.jk.gov.in/SanitationFee.html",
+    href: "https://jmc.jk.gov.in/SanitationFee.aspx",
     desc: "Pay sanitation / user charges online.",
   },
   {
     name: "Sewerage Connection Verification",
-    href: "https://jmc.jk.gov.in/sewconnectverify.html",
+    href: "https://jmc.jk.gov.in/sewconnectverify.aspx",
     desc: "Verify sewerage connection permission status.",
   },
   {
     name: "Panjtirthi Slot Booking",
-    href: "https://jmc.jk.gov.in/index-2.html",
+    href: "https://jmc.jk.gov.in/index.html",
     desc: "Book a slot at Panjtirthi facility online.",
   },
   {

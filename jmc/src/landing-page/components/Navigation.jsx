@@ -11,8 +11,6 @@ const navLinks = [
       { name: "About JMC", to: "/about" },
       { name: "History", to: "/about#history" },
       { name: "Vision & Mission", to: "/about#vision" },
-      { name: "Acts & Rules", to: "/about#acts" },
-      { name: "Gallery", to: "/gallery" },
     ],
   },
   {
