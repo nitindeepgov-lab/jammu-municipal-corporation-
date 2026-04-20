@@ -185,4 +185,13 @@ export const updateTender = (documentId, fields) =>
 export const deleteTender = (documentId) =>
   api.delete(`/tenders/${documentId}`);
 
+// ── Visitor Count ───────────────────────────────────────
+
+/** Fetch the current global visitor count */
+export const getVisitorCount = () => api.get("/visitor-count/current");
+
+/** Increment and return the global visitor count */
+export const incrementVisitorCount = () =>
+  api.post("/visitor-count/increment");
+
 export default api;

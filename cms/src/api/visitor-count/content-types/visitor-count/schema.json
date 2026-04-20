@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "visitor_counts",
+  "info": {
+    "singularName": "visitor-count",
+    "pluralName": "visitor-counts",
+    "displayName": "Visitor Count",
+    "description": "Global visitor counter for the public website"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "count": {
+      "type": "integer",
+      "default": 0,
+      "required": true
+    }
+  }
+}
