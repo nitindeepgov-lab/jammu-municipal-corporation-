@@ -1,4 +1,12 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  getVisitorCount,
+  incrementVisitorCount,
+} from "../../services/strapiApi";
+import { logError } from "../../utils/errorLogger";
+
+let hasIncrementedVisitorCount = false;
 
 const footerNavLinks = [
   { name: "Home", to: "/" },
@@ -80,6 +88,50 @@ function FooterLink({ link }) {
 }
 
 export default function Footer() {
+  const [visitorCount, setVisitorCount] = useState(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const applyCount = (count) => {
+      if (!isActive) return;
+      if (Number.isFinite(count)) {
+        setVisitorCount(count);
+      }
+    };
+
+    const loadVisitorCount = async () => {
+      try {
+        if (!hasIncrementedVisitorCount) {
+          const res = await incrementVisitorCount();
+          hasIncrementedVisitorCount = true;
+          applyCount(res?.data?.count);
+          return;
+        }
+      } catch (error) {
+        logError("VisitorCount", error);
+      }
+
+      try {
+        const res = await getVisitorCount();
+        applyCount(res?.data?.count);
+      } catch (error) {
+        logError("VisitorCount", error);
+      }
+    };
+
+    loadVisitorCount();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const safeCount = Number.isFinite(visitorCount)
+    ? Math.max(0, visitorCount)
+    : 0;
+  const countDigits = String(safeCount).padStart(6, "0").split("");
+
   return (
     <footer className="bg-[#0a1929] text-white">
       {/* Orange accent line */}
@@ -384,7 +436,7 @@ export default function Footer() {
                   Visitors:
                 </span>
                 <div className="flex gap-[1px]">
-                  {["0", "4", "8", "2", "1", "5"].map((digit, i) => (
+                  {countDigits.map((digit, i) => (
                     <span
                       key={i}
                       className="bg-black text-[#FF6600] text-xs font-mono font-bold px-1.5 py-0.5 rounded-sm shadow-inner"
