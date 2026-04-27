@@ -3,31 +3,31 @@ import { Link } from 'react-router-dom'
 
 const departments = [
   {
-    name: 'Engineering Department', href: 'https://jmc.jk.gov.in/developwork.aspx',
+    name: 'Engineering Department', to: '/departments/engineering',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.47.47 0 0 0-.59.22L2.74 8.87a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.37 1.04.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
   },
   {
-    name: 'Health Department', href: 'https://jmc.jk.gov.in/swachhgallery.aspx',
+    name: 'Health Department', to: '/departments/health',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V7a1 1 0 0 1 1-1z"/></svg>
   },
   {
-    name: 'Revenue & Taxation', href: 'https://jmc.jk.gov.in/online-payment.html',
+    name: 'Revenue & Taxation', to: '/departments/revenue-taxation',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
   },
   {
-    name: 'Sanitation Department', href: 'https://jmc.jk.gov.in/swachhgallery.aspx',
+    name: 'Sanitation Department', to: '/departments/sanitation',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M21 9l-9-7-9 7v2h2v9h6v-5h2v5h6v-9h2V9zm-9-4.5L18.5 9H5.5L12 4.5z"/></svg>
   },
   {
-    name: 'Urban Planning', href: 'https://jmc.jk.gov.in/smartcity.aspx',
+    name: 'Urban Planning', to: '/departments/urban-planning',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5v-2h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>
   },
   {
-    name: 'Water Supply Division', href: 'https://jmc.jk.gov.in/pddeservices.html',
+    name: 'Water Supply Division', to: '/departments/water-supply',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
   },
   {
-    name: 'Horticulture Department', href: 'https://jmc.jk.gov.in/easedoing.html',
+    name: 'Horticulture Department', to: '/departments/horticulture',
     icon: <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 0 0 8 20c4 0 4-2 8-2s4 2 8 2v-2c-4 0-4-2-8-2-.67 0-1.28.07-1.85.18C14.45 11.25 16 8 17 8z"/></svg>
   },
 ]
@@ -118,20 +118,18 @@ export default function SlidingServices() {
             </div>
             <div className="divide-y divide-gray-100">
               {departments.map((dept, idx) => (
-                <LinkItem key={idx} link={{ ...dept, href: dept.href }} />
+                <LinkItem key={idx} link={dept} />
               ))}
             </div>
-            <a
-              href="https://jmc.jk.gov.in/information.html"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/departments"
               className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6600] hover:text-[#003366] transition-colors"
             >
               View all departments
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
               </svg>
-            </a>
+            </Link>
           </div>
 
           {/* Col 2: Important Links */}
