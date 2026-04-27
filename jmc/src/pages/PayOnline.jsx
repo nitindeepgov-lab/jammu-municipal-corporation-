@@ -185,6 +185,104 @@ const paymentOptions = [
 ];
 
 /* ═══════════════════════════════════════════════════════
+   BillDesk SDK helpers
+   ═══════════════════════════════════════════════════════ */
+const BILLDESK_TOKEN_KEYS = [
+  "transaction_response",
+  "transactionResponse",
+  "txnResponse",
+  "response",
+  "jws",
+  "payload",
+];
+
+const normalizeStatusValue = (value) => {
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+};
+
+const extractBillDeskToken = (payload) => {
+  if (!payload) return "";
+  if (typeof payload === "string") return payload;
+
+  for (const key of BILLDESK_TOKEN_KEYS) {
+    const value = payload[key];
+    if (typeof value === "string" && value.length > 0) {
+      return value;
+    }
+  }
+
+  return "";
+};
+
+const deriveBillDeskOutcome = (payload, fallback = {}) => {
+  if (!payload) {
+    return {
+      isSuccess: false,
+      statusMessage: fallback.statusMessage || "Payment was not completed.",
+      transactionId: fallback.transactionId || "",
+      orderId: fallback.orderId || "",
+      gatewayStatus: fallback.gatewayStatus || "",
+    };
+  }
+
+  const statusCodeRaw =
+    payload.status || payload.auth_status || payload.authStatus || "";
+  const statusTextRaw =
+    payload.statusMessage ||
+    payload.transaction_error_type ||
+    payload.transaction_error_desc ||
+    payload.message ||
+    "";
+
+  const statusCode = normalizeStatusValue(statusCodeRaw).toUpperCase();
+  const statusText = normalizeStatusValue(statusTextRaw).toUpperCase();
+  const statusValue = normalizeStatusValue(payload.status).toLowerCase();
+  const errorType = normalizeStatusValue(
+    payload.transaction_error_type
+  ).toLowerCase();
+
+  const isSuccess =
+    payload.verified === true ||
+    statusCode === "0300" ||
+    statusCode === "SUCCESS" ||
+    statusText === "SUCCESS" ||
+    statusText === "SUCCESSFUL" ||
+    statusValue === "success" ||
+    errorType === "success";
+
+  const isPending = statusCode === "0002" || statusText === "PENDING";
+
+  const statusMessage =
+    payload.statusMessage ||
+    (isPending
+      ? "Payment pending"
+      : isSuccess
+        ? "Payment successful"
+        : payload.transaction_error_desc ||
+          payload.message ||
+          "Payment was not completed.");
+
+  return {
+    isSuccess,
+    statusMessage,
+    transactionId:
+      payload.transactionId ||
+      payload.transactionid ||
+      fallback.transactionId ||
+      "",
+    orderId: payload.orderId || payload.orderid || fallback.orderId || "",
+    gatewayStatus:
+      payload.status ||
+      payload.auth_status ||
+      payload.authStatus ||
+      payload.transaction_error_type ||
+      fallback.gatewayStatus ||
+      "",
+  };
+};
+
+/* ═══════════════════════════════════════════════════════
    Input Component — Clean, minimal
    ═══════════════════════════════════════════════════════ */
 function Field({ field, value, onChange }) {
@@ -294,24 +392,42 @@ export default function PayOnline() {
     setForm((p) => ({ ...p, [e.target.id]: e.target.value }));
 
   /* ── BillDesk response handler ───────────────────────── */
-  const handleBillDeskResponse = useCallback((txn) => {
+  const handleBillDeskResponse = useCallback(async (txn) => {
     console.log("BillDesk SDK response:", txn);
-    const isSuccess =
-      txn &&
-      (txn.status === "0300" || txn.transaction_error_type === "success");
-    const statusMessage = isSuccess
-      ? "Payment successful"
-      : txn?.transaction_error_desc || "Payment was not completed.";
 
-    setStatus(isSuccess ? STATUS.SUCCESS : STATUS.FAILED);
-    setMsg(isSuccess ? txn.transactionid || txn.orderid || "" : statusMessage);
+    const token = extractBillDeskToken(txn);
+    let outcome = deriveBillDeskOutcome(txn);
+
+    if (token) {
+      try {
+        const res = await fetch(`${STRAPI_URL}/api/billdesk/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transactionResponse: token }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.data) {
+          outcome = deriveBillDeskOutcome(data.data, outcome);
+        }
+      } catch (error) {
+        console.error("BillDesk verify failed:", error);
+      }
+    }
+
+    const displayMessage = outcome.isSuccess
+      ? outcome.transactionId || outcome.orderId || "Payment successful"
+      : outcome.statusMessage;
+
+    setStatus(outcome.isSuccess ? STATUS.SUCCESS : STATUS.FAILED);
+    setMsg(displayMessage);
 
     setReceipt((prev) => ({
       ...(prev || {}),
-      status: isSuccess ? "SUCCESS" : "FAILED",
-      statusMessage,
-      transactionId: txn?.transactionid || prev?.transactionId || "",
-      gatewayStatus: txn?.status || txn?.transaction_error_type || "",
+      status: outcome.isSuccess ? "SUCCESS" : "FAILED",
+      statusMessage: outcome.statusMessage,
+      transactionId: outcome.transactionId || prev?.transactionId || "",
+      gatewayStatus: outcome.gatewayStatus || prev?.gatewayStatus || "",
       completedAt: new Date().toISOString(),
     }));
   }, []);
