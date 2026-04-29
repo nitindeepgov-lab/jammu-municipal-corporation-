@@ -1199,6 +1199,194 @@ const injectAdminStyles = () => {
   textObserver.observe(document.body, { childList: true, subtree: true, characterData: false });
 };
 
+/* ═══════════════════════════════════════════════════════════
+   hCaptcha Login Protection
+   ─────────────────────────────────────────────────────────
+   Injects hCaptcha widget on Strapi admin login page.
+   Uses the simple auto-render approach from hCaptcha docs:
+   <div class="h-captcha" data-sitekey="..."></div>
+   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+   Intercepts the login API call to include the captcha token.
+   ═══════════════════════════════════════════════════════════ */
+const injectHCaptchaOnLogin = () => {
+  if (typeof document === 'undefined') return;
+
+  // hCaptcha Site Key (public — safe for frontend)
+  const SITE_KEY = 'd932c48a-f38a-48f0-8982-b32a793c653a';
+
+  // Inject captcha CSS
+  const captchaStyle = document.createElement('style');
+  captchaStyle.textContent = `
+    .jmc-hcaptcha-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 16px 0 8px;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #fafbff 100%);
+      border: 1px solid rgba(0, 51, 102, 0.08);
+      transition: all 0.3s ease;
+    }
+    .jmc-hcaptcha-wrapper:hover {
+      border-color: rgba(0, 51, 102, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.06);
+    }
+    .jmc-captcha-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .jmc-captcha-label::before { content: '🛡️ '; }
+    .jmc-captcha-error {
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 8px;
+      text-align: center;
+      display: none;
+    }
+    .jmc-captcha-error.visible { display: block; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+  `;
+  document.head.appendChild(captchaStyle);
+
+  let hcaptchaToken = null;
+  let injected = false;
+
+  // Listen for hCaptcha token via the global callback
+  window.jmcHCaptchaCallback = (token) => {
+    hcaptchaToken = token;
+    console.log('[hCaptcha] Token received');
+    const errEl = document.getElementById('jmc-captcha-error');
+    if (errEl) errEl.classList.remove('visible');
+  };
+  window.jmcHCaptchaExpired = () => {
+    hcaptchaToken = null;
+    console.warn('[hCaptcha] Token expired');
+  };
+  window.jmcHCaptchaError = () => {
+    hcaptchaToken = null;
+    console.error('[hCaptcha] Error');
+  };
+
+  // Intercept fetch to inject hCaptcha token into login requests
+  const originalFetch = window.fetch;
+  window.fetch = function(...args) {
+    const [url, options] = args;
+    const urlStr = typeof url === 'string' ? url : url?.url || '';
+
+    if (urlStr.includes('/admin/login') && options?.method?.toUpperCase() === 'POST') {
+      try {
+        const body = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+        if (body && typeof body === 'object') {
+          body.hcaptchaToken = hcaptchaToken || '';
+          options.body = JSON.stringify(body);
+        }
+      } catch (e) {
+        console.warn('[hCaptcha] Could not inject token:', e);
+      }
+    }
+
+    return originalFetch.apply(this, [url, options]);
+  };
+
+  // Poll for the login button and inject the widget
+  const tryInject = () => {
+    const isLoginPage = window.location.pathname.includes('/admin/auth/login') ||
+                        window.location.pathname.includes('/admin/auth/');
+
+    if (!isLoginPage) {
+      injected = false;
+      hcaptchaToken = null;
+      return;
+    }
+
+    if (injected) return;
+
+    // Find the Login button by text content
+    const allButtons = document.querySelectorAll('button');
+    let loginBtn = null;
+    for (const btn of allButtons) {
+      const text = btn.textContent?.trim();
+      if (text === 'Login' || text === 'Log in' || text === 'Sign in') {
+        loginBtn = btn;
+        break;
+      }
+    }
+
+    if (!loginBtn) return;
+
+    injected = true;
+    console.log('[hCaptcha] Login button found, injecting captcha widget');
+
+    // Create wrapper with h-captcha div (auto-render by hCaptcha SDK per docs)
+    const wrapper = document.createElement('div');
+    wrapper.className = 'jmc-hcaptcha-wrapper';
+    wrapper.id = 'jmc-hcaptcha-wrapper';
+
+    const label = document.createElement('div');
+    label.className = 'jmc-captcha-label';
+    label.textContent = 'Security Verification';
+
+    // The key element: div with class "h-captcha" and data-sitekey (auto-rendered by hCaptcha SDK)
+    const captchaDiv = document.createElement('div');
+    captchaDiv.className = 'h-captcha';
+    captchaDiv.setAttribute('data-sitekey', SITE_KEY);
+    captchaDiv.setAttribute('data-callback', 'jmcHCaptchaCallback');
+    captchaDiv.setAttribute('data-expired-callback', 'jmcHCaptchaExpired');
+    captchaDiv.setAttribute('data-error-callback', 'jmcHCaptchaError');
+    captchaDiv.id = 'jmc-hcaptcha-container';
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'jmc-captcha-error';
+    errorDiv.id = 'jmc-captcha-error';
+    errorDiv.textContent = 'Please complete the captcha';
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(captchaDiv);
+    wrapper.appendChild(errorDiv);
+
+    // Insert the wrapper before the login button
+    loginBtn.parentNode.insertBefore(wrapper, loginBtn);
+
+    // Load hCaptcha script (auto-renders .h-captcha elements per the docs)
+    if (!document.querySelector('script[src*="hcaptcha.com"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://js.hcaptcha.com/1/api.js';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+      console.log('[hCaptcha] SDK script injected');
+    }
+
+    // Validate on login click
+    loginBtn.addEventListener('click', (e) => {
+      if (!hcaptchaToken) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const errEl = document.getElementById('jmc-captcha-error');
+        if (errEl) errEl.classList.add('visible');
+        wrapper.style.animation = 'none';
+        wrapper.offsetHeight;
+        wrapper.style.animation = 'shake 0.4s ease';
+      }
+    }, true);
+  };
+
+  // Poll every 500ms to detect the login page and inject
+  setInterval(tryInject, 500);
+};
+
 const injectDashboardWidgets = () => {
   const dashObserver = new MutationObserver(() => {
     const isHomepage = window.location.pathname === '/' || window.location.pathname === '/admin/' || window.location.pathname === '/admin';
@@ -1856,6 +2044,7 @@ export default {
   },
   bootstrap() {
     injectAdminStyles();
+    injectHCaptchaOnLogin();
     setTimeout(() => {
       injectDashboardWidgets();
     }, 500);

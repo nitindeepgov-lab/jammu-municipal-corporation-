@@ -732,6 +732,37 @@ export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiVisitorCountVisitorCount extends Struct.SingleTypeSchema {
+  collectionName: 'visitor_counts';
+  info: {
+    description: 'Global visitor counter for the public website';
+    displayName: 'Visitor Count';
+    pluralName: 'visitor-counts';
+    singularName: 'visitor-count';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    count: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::visitor-count.visitor-count'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1251,6 +1282,7 @@ declare module '@strapi/strapi' {
       'api::smart-city-tender.smart-city-tender': ApiSmartCityTenderSmartCityTender;
       'api::tender.tender': ApiTenderTender;
       'api::transaction.transaction': ApiTransactionTransaction;
+      'api::visitor-count.visitor-count': ApiVisitorCountVisitorCount;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

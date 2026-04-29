@@ -10,9 +10,19 @@ module.exports = [
           "connect-src": ["'self'", "https:", "http:"],
           "img-src": ["'self'", "data:", "blob:", "https:", "http:"],
           "media-src": ["'self'", "data:", "blob:", "https:", "http:"],
+          // hCaptcha CSP requirements
+          "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://hcaptcha.com", "https://*.hcaptcha.com", "https://js.hcaptcha.com"],
+          "frame-src": ["'self'", "https://hcaptcha.com", "https://*.hcaptcha.com"],
+          "style-src": ["'self'", "'unsafe-inline'", "https://hcaptcha.com", "https://*.hcaptcha.com", "https://fonts.googleapis.com"],
+          "font-src": ["'self'", "https://fonts.gstatic.com"],
         },
       },
     },
+  },
+  // hCaptcha verification middleware — intercepts POST /admin/login
+  {
+    name: "global::hcaptcha-verify",
+    config: {},
   },
   {
     name: "strapi::cors",
