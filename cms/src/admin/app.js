@@ -13,7 +13,7 @@ const injectAdminStyles = () => {
   if (typeof document === 'undefined') return;
 
   // Force light theme
-  try { localStorage.setItem('strapi-theme', 'light'); } catch (_) {}
+  try { localStorage.setItem('strapi-theme', 'light'); } catch (_) { }
   document.documentElement.setAttribute('data-theme', 'light');
 
   const style = document.createElement('style');
@@ -450,64 +450,12 @@ const injectAdminStyles = () => {
     }
 
     /* ═══════════════════════════════════════════
-       15. LOGIN PAGE
+       15. LOGIN PAGE — Minimalistic
+       Applied via JS DOM manipulation in
+       injectLoginPageEnhancements()
        ═══════════════════════════════════════════ */
-    [class*="UnauthenticatedLayout"] {
-      background: linear-gradient(145deg, #0A1628 0%, #0f2744 40%, #162d50 100%) !important;
-      position: relative;
-    }
-    [class*="UnauthenticatedLayout"]::before {
-      content: '';
-      position: absolute;
-      top: -30%; right: -20%;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 102, 0, 0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    [class*="UnauthenticatedLayout"]::after {
-      content: '';
-      position: absolute;
-      bottom: -20%; left: -10%;
-      width: 500px; height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0, 51, 102, 0.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    /* Login card */
-    [class*="UnauthenticatedLayout"] > div > div,
-    [class*="UnauthenticatedLayout"] form {
-      border-radius: 16px !important;
-    }
-    [class*="UnauthenticatedLayout"] [class*="Box-"] {
-      border-radius: 16px !important;
-      background: var(--jmc-surface) !important;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05) !important;
-      border: none !important;
-    }
-    [class*="UnauthenticatedLayout"] img {
-      max-height: 80px !important;
-      object-fit: contain !important;
-    }
-    /* Login form inputs */
-    [class*="UnauthenticatedLayout"] input {
-      border-radius: 10px !important;
-      padding: 12px 16px !important;
-      font-size: 14px !important;
-    }
-    [class*="UnauthenticatedLayout"] button[type="submit"] {
-      border-radius: 10px !important;
-      padding: 12px !important;
-      font-weight: 600 !important;
-      font-size: 14px !important;
-      background: var(--jmc-blue) !important;
-      box-shadow: 0 4px 16px rgba(0, 51, 102, 0.3) !important;
-    }
-    [class*="UnauthenticatedLayout"] button[type="submit"]:hover {
-      background: #004080 !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 6px 20px rgba(0, 51, 102, 0.4) !important;
-    }
+    .jmc-locale-hidden { display: none !important; }
+    .jmc-login-styled { /* marker class */ }
 
     /* ═══════════════════════════════════════════
        16. CONTENT-TYPE SIDEBAR (Secondary)
@@ -1200,12 +1148,238 @@ const injectAdminStyles = () => {
 };
 
 /* ═══════════════════════════════════════════════════════════
+   Login Page Visual Enhancements — JS DOM approach
+   ─────────────────────────────────────────────────────────
+   Uses direct DOM manipulation instead of CSS selectors
+   because Strapi uses dynamic hashed class names.
+   ═══════════════════════════════════════════════════════════ */
+const injectLoginPageEnhancements = () => {
+  if (typeof document === 'undefined') return;
+
+  let styled = false;
+
+  const applyLoginStyles = () => {
+    const isLogin = window.location.pathname.includes('/admin/auth/login') ||
+      window.location.pathname.includes('/admin/auth/');
+    if (!isLogin) {
+      styled = false;
+      return;
+    }
+
+    const form = document.querySelector('form');
+    if (!form || styled) return;
+    styled = true;
+
+    // ── 1. Hide locale / language selector ──────────────────
+    // It's typically a <select> or a div with role="combobox" at the top-right.
+    // Walk up the DOM from it and hide the entire top bar.
+    const selects = document.querySelectorAll('select, [role="combobox"]');
+    selects.forEach(sel => {
+      // Check if this is the locale selector (contains 'English' or similar)
+      const text = sel.textContent || sel.value || '';
+      if (text.match(/english|français|deutsch|locale|español|हिन्दी/i) || sel.closest('[aria-label*="locale"]')) {
+        // Hide the entire header row containing it
+        let parent = sel.parentElement;
+        for (let i = 0; i < 5 && parent; i++) {
+          if (parent.tagName === 'HEADER' || parent.tagName === 'NAV') {
+            parent.classList.add('jmc-locale-hidden');
+            break;
+          }
+          // If parent has only this child (or very few), keep going up
+          if (parent.children.length <= 2) {
+            parent = parent.parentElement;
+          } else {
+            // Just hide the select container
+            sel.closest('div')?.classList.add('jmc-locale-hidden');
+            break;
+          }
+        }
+      }
+    });
+
+    // Also try the Strapi v5 approach: find any element that says "English" in the top area
+    const allDivs = document.querySelectorAll('#app > div > div > div');
+    allDivs.forEach(div => {
+      const txt = div.textContent?.trim();
+      if (txt === 'English' || txt?.match(/^(English|Français|Deutsch)\s*$/)) {
+        let container = div;
+        for (let i = 0; i < 4 && container.parentElement; i++) {
+          container = container.parentElement;
+          // If we find a container that's positioned at the top, hide it
+          const rect = container.getBoundingClientRect();
+          if (rect.height < 80 && rect.top < 100 && rect.width > 200) {
+            container.classList.add('jmc-locale-hidden');
+            break;
+          }
+        }
+      }
+    });
+
+    // ── 2. Style the outermost wrapper (page background) ────
+    const appRoot = document.querySelector('#app > div');
+    if (appRoot) {
+      appRoot.style.cssText = `
+        background: #f1f3f8 !important;
+        min-height: 100vh !important;
+      `;
+    }
+
+    // ── 3. Find the main content area and center it ─────────
+    const main = document.querySelector('main');
+    if (main) {
+      main.style.cssText = `
+        background: transparent !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
+        padding: 40px 20px !important;
+      `;
+      // The wrapper inside main (holds logo column + form column)
+      const mainChild = main.children[0];
+      if (mainChild) {
+        mainChild.style.cssText = `
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          width: 100% !important;
+          max-width: 420px !important;
+          gap: 0 !important;
+          padding: 0 !important;
+          background: #ffffff !important;
+          border-radius: 16px !important;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.06) !important;
+          border: 1px solid #e5e7eb !important;
+          overflow: hidden !important;
+        `;
+      }
+    }
+
+    // ── 4. Style the logo/branding section ──────────────────
+    // The logo + title are usually in the first child div before the form
+    const logo = document.querySelector('main img');
+    if (logo) {
+      const brandingContainer = logo.closest('div');
+      if (brandingContainer && brandingContainer !== main) {
+        brandingContainer.style.cssText = `
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          text-align: center !important;
+          padding: 36px 32px 0 !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        `;
+      }
+      logo.style.cssText = `
+        max-height: 60px !important;
+        object-fit: contain !important;
+        margin-bottom: 12px !important;
+      `;
+    }
+
+    // ── 5. Style the title ──────────────────────────────────
+    const h1 = document.querySelector('main h1');
+    if (h1) {
+      h1.style.cssText = `
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #111827 !important;
+        margin: 0 0 4px !important;
+        text-align: center !important;
+      `;
+    }
+
+    // ── 6. Style the subtitle ───────────────────────────────
+    const subtitle = document.querySelector('main h1 + p, main h1 ~ p');
+    if (subtitle) {
+      subtitle.style.cssText = `
+        font-size: 13px !important;
+        color: #6b7280 !important;
+        margin: 0 0 20px !important;
+        text-align: center !important;
+      `;
+    }
+
+    // ── 7. Style the form ───────────────────────────────────
+    form.style.cssText = `
+      width: 100% !important;
+      padding: 20px 32px 32px !important;
+      box-sizing: border-box !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+    `;
+
+    // ── 8. Style inputs ─────────────────────────────────────
+    form.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(input => {
+      input.style.cssText = `
+        border-radius: 8px !important;
+        padding: 11px 14px !important;
+        font-size: 14px !important;
+        border: 1px solid #d1d5db !important;
+        background: #fafafa !important;
+        color: #111827 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        transition: border-color 0.2s, box-shadow 0.2s !important;
+      `;
+      input.addEventListener('focus', () => {
+        input.style.borderColor = '#003366';
+        input.style.boxShadow = '0 0 0 3px rgba(0,51,102,0.06)';
+        input.style.background = '#fff';
+      });
+      input.addEventListener('blur', () => {
+        input.style.borderColor = '#d1d5db';
+        input.style.boxShadow = 'none';
+        input.style.background = '#fafafa';
+      });
+    });
+
+    // ── 9. Style the submit button ──────────────────────────
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.style.cssText = `
+        border-radius: 8px !important;
+        padding: 12px 16px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        background: #003366 !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        width: 100% !important;
+        margin-top: 8px !important;
+        transition: background 0.2s !important;
+      `;
+      submitBtn.addEventListener('mouseenter', () => { submitBtn.style.background = '#002244'; });
+      submitBtn.addEventListener('mouseleave', () => { submitBtn.style.background = '#003366'; });
+    }
+
+    // ── 10. Style labels ────────────────────────────────────
+    form.querySelectorAll('label').forEach(label => {
+      label.style.cssText = `
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+      `;
+    });
+
+    form.classList.add('jmc-login-styled');
+  };
+
+  // Run immediately and re-check periodically (SPA navigation)
+  applyLoginStyles();
+  const observer = new MutationObserver(() => applyLoginStyles());
+  observer.observe(document.body, { childList: true, subtree: true });
+};
+
+/* ═══════════════════════════════════════════════════════════
    hCaptcha Login Protection
    ─────────────────────────────────────────────────────────
    Injects hCaptcha widget on Strapi admin login page.
-   Uses the simple auto-render approach from hCaptcha docs:
-   <div class="h-captcha" data-sitekey="..."></div>
-   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
    Intercepts the login API call to include the captcha token.
    ═══════════════════════════════════════════════════════════ */
 const injectHCaptchaOnLogin = () => {
@@ -1221,26 +1395,27 @@ const injectHCaptchaOnLogin = () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 16px 0 8px;
-      padding: 14px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #f0f4ff 0%, #fafbff 100%);
-      border: 1px solid rgba(0, 51, 102, 0.08);
-      transition: all 0.3s ease;
+      margin: 24px 0 16px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #f8f9fb;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s ease;
     }
     .jmc-hcaptcha-wrapper:hover {
-      border-color: rgba(0, 51, 102, 0.15);
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.06);
+      border-color: #d1d5db;
     }
     .jmc-captcha-label {
       font-size: 11px;
       font-weight: 600;
-      color: #9ca3af;
+      color: #6b7280;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .jmc-captcha-label::before { content: '🛡️ '; }
     .jmc-captcha-error {
       color: #dc2626;
       font-size: 12px;
@@ -1249,19 +1424,14 @@ const injectHCaptchaOnLogin = () => {
       text-align: center;
       display: none;
     }
-    .jmc-captcha-error.visible { display: block; }
+    .jmc-captcha-error.visible {
+      display: block;
+    }
     .jmc-captcha-loading {
       font-size: 12px;
       color: #6b7280;
-      padding: 12px;
+      padding: 16px;
       text-align: center;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-6px); }
-      40% { transform: translateX(6px); }
-      60% { transform: translateX(-4px); }
-      80% { transform: translateX(4px); }
     }
   `;
   document.head.appendChild(captchaStyle);
@@ -1288,7 +1458,7 @@ const injectHCaptchaOnLogin = () => {
 
   // Intercept fetch to inject hCaptcha token into login requests
   const originalFetch = window.fetch;
-  window.fetch = function(...args) {
+  window.fetch = function (...args) {
     const [url, options] = args;
     const urlStr = typeof url === 'string' ? url : url?.url || '';
 
@@ -1369,7 +1539,7 @@ const injectHCaptchaOnLogin = () => {
   // Poll for the login button and inject the widget
   const tryInject = async () => {
     const isLoginPage = window.location.pathname.includes('/admin/auth/login') ||
-                        window.location.pathname.includes('/admin/auth/');
+      window.location.pathname.includes('/admin/auth/');
 
     if (!isLoginPage) {
       injected = false;
@@ -2106,6 +2276,7 @@ export default {
   },
   bootstrap() {
     injectAdminStyles();
+    injectLoginPageEnhancements();
     injectHCaptchaOnLogin();
     setTimeout(() => {
       injectDashboardWidgets();
