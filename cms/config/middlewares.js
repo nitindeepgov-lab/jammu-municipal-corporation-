@@ -64,11 +64,6 @@ module.exports = [
       },
     },
   },
-  // hCaptcha verification middleware — intercepts POST /admin/login
-  {
-    name: "global::hcaptcha-verify",
-    config: {},
-  },
   {
     name: "strapi::cors",
     config: {
@@ -94,6 +89,11 @@ module.exports = [
       textLimit: "1mb",
       includeUnparsed: true,
     },
+  },
+  // hCaptcha verification middleware — MUST be after strapi::body so ctx.request.body is parsed
+  {
+    name: "global::hcaptcha-verify",
+    config: {},
   },
   "strapi::session",
   "strapi::favicon",
