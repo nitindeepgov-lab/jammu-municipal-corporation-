@@ -1250,6 +1250,12 @@ const injectHCaptchaOnLogin = () => {
       display: none;
     }
     .jmc-captcha-error.visible { display: block; }
+    .jmc-captcha-loading {
+      font-size: 12px;
+      color: #6b7280;
+      padding: 12px;
+      text-align: center;
+    }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20% { transform: translateX(-6px); }
@@ -1262,6 +1268,7 @@ const injectHCaptchaOnLogin = () => {
 
   let hcaptchaToken = null;
   let injected = false;
+  let widgetId = null;
 
   // Listen for hCaptcha token via the global callback
   window.jmcHCaptchaCallback = (token) => {
@@ -1300,14 +1307,74 @@ const injectHCaptchaOnLogin = () => {
     return originalFetch.apply(this, [url, options]);
   };
 
+  // Load hCaptcha SDK with explicit render mode
+  const loadHCaptchaSDK = () => {
+    return new Promise((resolve) => {
+      if (window.hcaptcha) {
+        resolve();
+        return;
+      }
+      if (document.querySelector('script[src*="hcaptcha.com"]')) {
+        // Script tag exists but SDK not ready yet — wait for it
+        const check = setInterval(() => {
+          if (window.hcaptcha) {
+            clearInterval(check);
+            resolve();
+          }
+        }, 200);
+        // Timeout after 15s
+        setTimeout(() => { clearInterval(check); resolve(); }, 15000);
+        return;
+      }
+      const script = document.createElement('script');
+      // Use explicit render mode so auto-render doesn't fire before our div exists
+      script.src = 'https://js.hcaptcha.com/1/api.js?render=explicit&onload=jmcHCaptchaOnLoad';
+      script.async = true;
+      script.defer = true;
+
+      window.jmcHCaptchaOnLoad = () => {
+        console.log('[hCaptcha] SDK loaded (explicit mode)');
+        resolve();
+      };
+
+      script.onerror = () => {
+        console.error('[hCaptcha] Failed to load SDK script');
+        resolve(); // Resolve anyway so login still works
+      };
+
+      document.head.appendChild(script);
+      console.log('[hCaptcha] SDK script injected (explicit render mode)');
+    });
+  };
+
+  // Explicitly render the hCaptcha widget
+  const renderWidget = (container) => {
+    if (!window.hcaptcha || !container) return;
+    // Remove any previous content
+    container.innerHTML = '';
+    try {
+      widgetId = window.hcaptcha.render(container, {
+        sitekey: SITE_KEY,
+        callback: 'jmcHCaptchaCallback',
+        'expired-callback': 'jmcHCaptchaExpired',
+        'error-callback': 'jmcHCaptchaError',
+        theme: 'light',
+      });
+      console.log('[hCaptcha] Widget rendered, widgetId:', widgetId);
+    } catch (err) {
+      console.error('[hCaptcha] Render error:', err);
+    }
+  };
+
   // Poll for the login button and inject the widget
-  const tryInject = () => {
+  const tryInject = async () => {
     const isLoginPage = window.location.pathname.includes('/admin/auth/login') ||
                         window.location.pathname.includes('/admin/auth/');
 
     if (!isLoginPage) {
       injected = false;
       hcaptchaToken = null;
+      widgetId = null;
       return;
     }
 
@@ -1329,7 +1396,7 @@ const injectHCaptchaOnLogin = () => {
     injected = true;
     console.log('[hCaptcha] Login button found, injecting captcha widget');
 
-    // Create wrapper with h-captcha div (auto-render by hCaptcha SDK per docs)
+    // Create wrapper
     const wrapper = document.createElement('div');
     wrapper.className = 'jmc-hcaptcha-wrapper';
     wrapper.id = 'jmc-hcaptcha-wrapper';
@@ -1338,14 +1405,15 @@ const injectHCaptchaOnLogin = () => {
     label.className = 'jmc-captcha-label';
     label.textContent = 'Security Verification';
 
-    // The key element: div with class "h-captcha" and data-sitekey (auto-rendered by hCaptcha SDK)
+    // Container for explicit render
     const captchaDiv = document.createElement('div');
-    captchaDiv.className = 'h-captcha';
-    captchaDiv.setAttribute('data-sitekey', SITE_KEY);
-    captchaDiv.setAttribute('data-callback', 'jmcHCaptchaCallback');
-    captchaDiv.setAttribute('data-expired-callback', 'jmcHCaptchaExpired');
-    captchaDiv.setAttribute('data-error-callback', 'jmcHCaptchaError');
     captchaDiv.id = 'jmc-hcaptcha-container';
+
+    // Show loading state while SDK loads
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'jmc-captcha-loading';
+    loadingDiv.textContent = 'Loading security check...';
+    captchaDiv.appendChild(loadingDiv);
 
     const errorDiv = document.createElement('div');
     errorDiv.className = 'jmc-captcha-error';
@@ -1359,15 +1427,9 @@ const injectHCaptchaOnLogin = () => {
     // Insert the wrapper before the login button
     loginBtn.parentNode.insertBefore(wrapper, loginBtn);
 
-    // Load hCaptcha script (auto-renders .h-captcha elements per the docs)
-    if (!document.querySelector('script[src*="hcaptcha.com"]')) {
-      const script = document.createElement('script');
-      script.src = 'https://js.hcaptcha.com/1/api.js';
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-      console.log('[hCaptcha] SDK script injected');
-    }
+    // Load SDK then explicitly render
+    await loadHCaptchaSDK();
+    renderWidget(captchaDiv);
 
     // Validate on login click
     loginBtn.addEventListener('click', (e) => {
