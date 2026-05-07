@@ -68,6 +68,14 @@ export const getOfficials = () =>
     "/officials?populate=picture&sort=order:asc&filters[publishedAt][$notNull]=true",
   );
 
+// ── Photo Gallery ─────────────────────────────────────────────
+
+/** Fetch all published photo gallery items ordered by 'order' */
+export const getPhotoGalleryItems = () =>
+  api.get(
+    "/photo-galleries?populate=image&sort=order:asc&status=published&filters[is_active][$eq]=true",
+  );
+
 // ── Ex-Municipal Councillors ───────────────────────────────
 
 /** Fetch all published councillor details ordered by ward number */
