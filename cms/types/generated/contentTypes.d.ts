@@ -609,6 +609,40 @@ export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPhotoGalleryPhotoGallery
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'photo_galleries';
+  info: {
+    description: 'Images used in the public photo gallery page.';
+    displayName: 'Photo Gallery';
+    pluralName: 'photo-galleries';
+    singularName: 'photo-gallery';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    caption: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::photo-gallery.photo-gallery'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSmartCityTenderSmartCityTender
   extends Struct.CollectionTypeSchema {
   collectionName: 'smart_city_tenders';
@@ -1279,6 +1313,7 @@ declare module '@strapi/strapi' {
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
       'api::notice.notice': ApiNoticeNotice;
       'api::official.official': ApiOfficialOfficial;
+      'api::photo-gallery.photo-gallery': ApiPhotoGalleryPhotoGallery;
       'api::smart-city-tender.smart-city-tender': ApiSmartCityTenderSmartCityTender;
       'api::tender.tender': ApiTenderTender;
       'api::transaction.transaction': ApiTransactionTransaction;
