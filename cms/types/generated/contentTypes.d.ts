@@ -613,7 +613,7 @@ export interface ApiPhotoGalleryPhotoGallery
   extends Struct.CollectionTypeSchema {
   collectionName: 'photo_galleries';
   info: {
-    description: 'Images used in the public photo gallery page.';
+    description: 'Photo gallery albums with multiple images.';
     displayName: 'Photo Gallery';
     pluralName: 'photo-galleries';
     singularName: 'photo-gallery';
@@ -626,7 +626,7 @@ export interface ApiPhotoGalleryPhotoGallery
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    images: Schema.Attribute.Media<'images', true> & Schema.Attribute.Required;
     is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
