@@ -98,7 +98,7 @@ const topServices = [
   {
     name: "Trade License",
     desc: "Apply or renew license",
-    href: "https://jmc.jk.gov.in/easedoing.html",
+    href: "https://jansugam.jk.gov.in/",
     color: "bg-purple-600",
     icon: (
       <svg
@@ -119,7 +119,7 @@ const topServices = [
   {
     name: "E-Governance Portal",
     desc: "All digital services hub",
-    href: "https://jmc.jk.gov.in/egov.html",
+    href: "/egov",
     color: "bg-[#002B5E]",
     icon: (
       <svg
@@ -150,11 +150,7 @@ const categories = [
         to: "/pay-online",
         desc: "Pay property tax dues online securely",
       },
-      {
-        name: "Water Bill Payment",
-        href: "https://jmc.jk.gov.in/pddeservices.html",
-        desc: "Pay water and sewerage bills",
-      },
+
       {
         name: "Online Payment Portal",
         to: "/pay-online",
@@ -172,14 +168,10 @@ const categories = [
         href: "https://serviceonline.gov.in/jammu/",
         desc: "Apply online via JAKSMAC portal",
       },
+
       {
-        name: "Trade License",
-        href: "https://jmc.jk.gov.in/easedoing.html",
-        desc: "Apply or renew your trade license",
-      },
-      {
-        name: "Ease of Doing Business",
-        href: "https://jmc.jk.gov.in/easedoing.html",
+        name: "Building Plan",
+        href: "/Building-plan.pdf",
         desc: "Business registration & facilitation",
       },
     ],
@@ -196,7 +188,7 @@ const categories = [
       },
       {
         name: "Rehri / Stall License",
-        href: "https://jmc.jk.gov.in/easedoing.html",
+        href: "https://jansugam.jk.gov.in/",
         desc: "Apply for rehri stall licence",
       },
     ],
@@ -225,12 +217,12 @@ const categories = [
     items: [
       {
         name: "E-Governance Portal",
-        href: "https://jmc.jk.gov.in/egov.html",
+        href: "/egov",
         desc: "Access all e-governance services",
       },
       {
         name: "PDD E-Services",
-        href: "https://jmc.jk.gov.in/pddeservices.html",
+        href: "https://jammu.nic.in/public-utility/jk-pdd-bill-payment/",
         desc: "Power Development Dept services",
       },
       {
@@ -240,18 +232,7 @@ const categories = [
       },
     ],
   },
-  {
-    title: "Smart City Services",
-    accent: "#0369a1",
-    icon: <Activity className="w-4 h-4" />,
-    items: [
-      {
-        name: "Smart City Portal",
-        href: "https://jmc.jk.gov.in/smartcity.aspx",
-        desc: "Smart City Mission — Jammu",
-      },
-    ],
-  },
+ 
 ];
 
 function ServiceLink({ item }) {

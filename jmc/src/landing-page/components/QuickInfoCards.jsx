@@ -7,9 +7,9 @@ const cards = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
       </svg>
     ),
-    title: 'Property Tax',
+    title: 'Pay Online',
     description: 'Pay dues online, download receipts and check outstanding balances.',
-    href: 'https://myjammu.jk.gov.in/Login/Index',
+    href: '/pay-online',
     color: '#003366', // navy
     bg: '#eef2f7',
   },
@@ -19,7 +19,7 @@ const cards = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z"/>
       </svg>
     ),
-    title: 'Register Grievance',
+    title: 'Public Grievance',
     description: 'Report issues, pay water bills and check area supply schedules.',
     href: 'https://myjammu.jk.gov.in/Login/Index',
     color: '#0284c7', // light blue
@@ -31,7 +31,7 @@ const cards = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
       </svg>
     ),
-    title: 'Certificates',
+    title: 'Apply for Birth/Death Certificate',
     description: 'Apply for birth, death and marriage certificates via the govt portal.',
     href: 'https://jansugam.jk.gov.in/login.do',
     color: '#16a34a', // green
