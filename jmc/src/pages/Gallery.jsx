@@ -203,90 +203,95 @@ export default function Gallery() {
         </div>
 
         {activeAlbum ? (
-          <div className="fixed inset-0 z-50 bg-[#05070e]/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-[#05070e]/90 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
             <div className="relative w-full max-w-6xl">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p
-                    className="text-white text-sm font-semibold"
-                    style={{
-                      fontFamily:
-                        '"Space Grotesk", "Segoe UI", sans-serif',
-                    }}
-                  >
-                    {activeAlbum.title}
-                  </p>
-                  {activeAlbum.caption ? (
-                    <p className="text-white/70 text-xs mt-0.5">
-                      {activeAlbum.caption}
+              <div className="flex flex-col bg-[#0b0f1a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden max-h-[82vh]">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                  <div>
+                    <p
+                      className="text-white text-sm font-semibold"
+                      style={{
+                        fontFamily:
+                          '"Space Grotesk", "Segoe UI", sans-serif',
+                      }}
+                    >
+                      {activeAlbum.title}
                     </p>
-                  ) : null}
+                    {activeAlbum.caption ? (
+                      <p className="text-white/70 text-xs mt-0.5">
+                        {activeAlbum.caption}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-white/70 text-[11px] tracking-wide uppercase">
+                      Slide {activeIndex + 1} of {activeAlbum.images.length}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={closeAlbum}
+                      className="text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30 hover:border-white/60 hover:text-white"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={closeAlbum}
-                  className="text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30 hover:border-white/60 hover:text-white"
-                >
-                  Close
-                </button>
-              </div>
 
-              <div className="relative bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                {activeImage ? (
-                  <img
-                    key={activeImage}
-                    src={activeImage}
-                    alt={activeAlbum.title}
-                    className="w-full max-h-[70vh] object-contain bg-black transition-opacity duration-300"
-                    onError={(e) => {
-                      e.target.parentNode.innerHTML =
-                        '<div class="w-full h-[60vh] flex items-center justify-center bg-gray-900 text-gray-400 text-sm">No Image</div>';
-                    }}
-                  />
-                ) : null}
+                <div className="relative flex-1 min-h-[45vh] bg-black">
+                  {activeImage ? (
+                    <img
+                      key={activeImage}
+                      src={activeImage}
+                      alt={activeAlbum.title}
+                      className="w-full h-full object-contain bg-black transition-opacity duration-300"
+                      onError={(e) => {
+                        e.target.parentNode.innerHTML =
+                          '<div class="w-full h-[60vh] flex items-center justify-center bg-gray-900 text-gray-400 text-sm">No Image</div>';
+                      }}
+                    />
+                  ) : null}
 
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
                   <button
                     type="button"
                     onClick={showPrev}
-                    className="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-2 rounded-full border border-white/20"
+                    aria-label="Previous image"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/20 text-white text-lg border border-white/30 shadow-lg backdrop-blur transition"
                   >
                     ←
                   </button>
-                </div>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
                   <button
                     type="button"
                     onClick={showNext}
-                    className="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-2 rounded-full border border-white/20"
+                    aria-label="Next image"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 hover:bg-white/20 text-white text-lg border border-white/30 shadow-lg backdrop-blur transition"
                   >
                     →
                   </button>
                 </div>
-                <div className="absolute top-4 right-4 bg-black/60 text-white text-[11px] px-2.5 py-1 rounded-full">
-                  {activeIndex + 1} / {activeAlbum.images.length}
-                </div>
-              </div>
 
-              <div className="mt-4 flex items-center gap-3 overflow-x-auto pb-1">
-                {activeAlbum.images.map((img, idx) => (
-                  <button
-                    key={`${img}-${idx}`}
-                    type="button"
-                    onClick={() => setActiveIndex(idx)}
-                    className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border transition-all ${
-                      idx === activeIndex
-                        ? "border-white shadow-md scale-[1.03]"
-                        : "border-white/20 opacity-70 hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
+                <div className="px-5 py-4 border-t border-white/10 bg-[#0b0f1a]">
+                  <div className="flex items-center gap-3 overflow-x-auto pb-1">
+                    {activeAlbum.images.map((img, idx) => (
+                      <button
+                        key={`${img}-${idx}`}
+                        type="button"
+                        onClick={() => setActiveIndex(idx)}
+                        className={`flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-lg overflow-hidden border transition-all ${
+                          idx === activeIndex
+                            ? "border-white shadow-lg scale-[1.03]"
+                            : "border-white/20 opacity-70 hover:opacity-100"
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
