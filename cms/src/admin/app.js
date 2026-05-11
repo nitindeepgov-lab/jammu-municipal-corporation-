@@ -1652,7 +1652,7 @@ const injectDashboardWidgets = () => {
           <a href="/admin/content-manager/collection-types/api::news-ticker.news-ticker/create" class="jmc-qa-btn primary">\u2795 News Update</a>
           <a href="/admin/content-manager/collection-types/api::notice.notice/create" class="jmc-qa-btn outline">\ud83d\udcc4 New Notice</a>
           <a href="/admin/content-manager/collection-types/api::bulletin-board.bulletin-board/create" class="jmc-qa-btn outline">\ud83d\udccc New Bulletin</a>
-          <a href="/admin/upload" class="jmc-qa-btn outline">\ud83d\uddbc Media Library</a>
+          <a href="/admin/plugins/upload" class="jmc-qa-btn outline">\ud83d\uddbc Media Library</a>
         </div>
 
         <!-- Stats -->
@@ -1776,7 +1776,7 @@ const injectDashboardWidgets = () => {
             <h3>Admin Settings</h3>
             <p>Roles, permissions, tokens & API config.</p>
           </a>
-          <a href="/admin/upload" class="jmc-widget-card purple">
+          <a href="/admin/plugins/upload" class="jmc-widget-card purple">
             <div class="jmc-widget-icon">\ud83d\uddbc</div>
             <h3>Media Library</h3>
             <p>Upload & manage images, documents and files.</p>
@@ -1904,7 +1904,7 @@ const injectDashboardWidgets = () => {
                     <div class="wo-icon">₹</div>
                     <div class="wo-text"><h4>Transactions</h4><p>Payment logs</p></div>
                   </a>
-                  <a href="/admin/upload" class="jmc-widget-option">
+                  <a href="/admin/plugins/upload" class="jmc-widget-option">
                     <div class="wo-icon">\ud83d\uddbc</div>
                     <div class="wo-text"><h4>Media Library</h4><p>Files & images</p></div>
                   </a>
