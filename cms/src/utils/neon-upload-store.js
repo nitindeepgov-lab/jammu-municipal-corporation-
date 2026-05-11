@@ -85,7 +85,7 @@ async function ensureSchema() {
 
 function getTableRef(knex) {
   const { table, schema } = getConfig();
-  return knex.withSchema(schema)(table);
+  return knex.withSchema(schema).table(table);
 }
 
 async function putFile(file) {
