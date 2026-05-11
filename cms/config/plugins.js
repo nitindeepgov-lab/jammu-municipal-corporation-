@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = ({ env }) => ({
 	'users-permissions': {
 		config: {
@@ -6,7 +8,7 @@ module.exports = ({ env }) => ({
 	},
 	upload: {
 		config: {
-			provider: './providers/neon-upload',
+			provider: path.resolve(__dirname, '..', 'src', 'providers', 'neon-upload'),
 			providerOptions: {
 				table: env('NEON_UPLOADS_TABLE', 'neon_uploads'),
 				schema: env('NEON_UPLOADS_SCHEMA'),
