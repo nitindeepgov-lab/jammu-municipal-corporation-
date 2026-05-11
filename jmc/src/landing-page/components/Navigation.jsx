@@ -68,7 +68,7 @@ const navLinks = [
       },
       {
         name: "Online User Charges",
-        href: "https://jmc.jk.gov.in/online-payment.html",
+        href: "/pay-online",
       },
       { name: "E-Tendering", href: "https://jktenders.gov.in/" },
       {
@@ -77,7 +77,7 @@ const navLinks = [
       },
       {
         name: "Apply for Rehri License",
-        href: "https://jmc.jk.gov.in/easedoing.html",
+        href: "https://jansugam.jk.gov.in/",
       },
     ],
   },

@@ -29,7 +29,7 @@ const egovServices = [
   },
   {
     name: "Online NOC / Trade License",
-    href: "https://serviceonline.gov.in/jammu/",
+    href: "https://jansugam.jk.gov.in/",
     desc: "Apply / renew trade license and obtain NOC online.",
   },
   {
@@ -49,7 +49,7 @@ const egovServices = [
   },
   {
     name: "Online User Charges",
-    href: "https://jmc.jk.gov.in/SanitationFee.aspx",
+    href: "/pay-online",
     desc: "Pay sanitation / user charges online.",
   },
   {
