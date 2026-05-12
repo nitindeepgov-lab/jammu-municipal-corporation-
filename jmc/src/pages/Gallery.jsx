@@ -210,27 +210,33 @@ function Lightbox({ album, index, onClose, onPrev, onNext, onGoto }) {
           }}
         />
 
-        {/* Image */}
-        <img
-          key={src}
-          src={src}
-          alt={`${album.title} – photo ${index + 1} of ${total}`}
+        {/* Image – fills the entire zone, object-fit keeps aspect ratio */}
+        <div
           style={{
-            position: "relative",
+            position: "absolute",
+            inset: "0 60px",   /* 60px gap on each side for nav arrows */
             zIndex: 1,
-            maxWidth: "calc(100% - 120px)",
-            maxHeight: "100%",
-            width: "auto",
-            height: "auto",
-            objectFit: "contain",
-            display: "block",
-            boxShadow: "0 8px 60px rgba(0,0,0,0.8)",
-            borderRadius: 4,
-            userSelect: "none",
-            transition: "opacity 0.25s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          onError={(e) => { e.currentTarget.style.display = "none"; }}
-        />
+        >
+          <img
+            key={src}
+            src={src}
+            alt={`${album.title} – photo ${index + 1} of ${total}`}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              userSelect: "none",
+              boxShadow: "0 8px 60px rgba(0,0,0,0.9)",
+              borderRadius: 4,
+            }}
+            onError={(e) => { e.currentTarget.style.opacity = "0"; }}
+          />
+        </div>
 
         {/* Prev button */}
         {total > 1 && (
