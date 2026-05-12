@@ -1,23 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getPhotoGalleryItems } from "../services/strapiApi";
 import { STRAPI_URL } from "../config/api";
 import { logError } from "../utils/errorLogger";
 
+/* ─── helpers ─────────────────────────────────────────────────────────────── */
+
 const resolveMediaUrls = (media) => {
   if (!media) return [];
-
   let items = [];
-  if (Array.isArray(media)) {
-    items = media;
-  } else if (Array.isArray(media.data)) {
-    items = media.data;
-  } else if (media.data) {
-    items = [media.data];
-  } else {
-    items = [media];
-  }
-
+  if (Array.isArray(media)) items = media;
+  else if (Array.isArray(media.data)) items = media.data;
+  else if (media.data) items = [media.data];
+  else items = [media];
   return items
     .map((item) => item?.url || item?.attributes?.url)
     .filter(Boolean)
@@ -39,6 +34,383 @@ const mapGalleryItems = (res) =>
     })
     .filter(Boolean);
 
+/* ─── Lightbox Component ───────────────────────────────────────────────────── */
+
+function Lightbox({ album, index, onClose, onPrev, onNext, onGoto }) {
+  const closeRef = useRef(null);
+  const stripRef = useRef(null);
+
+  /* keyboard navigation */
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose, onPrev, onNext]);
+
+  /* lock body scroll */
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  /* scroll active thumbnail into view */
+  useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+    const active = strip.querySelector("[data-active='true']");
+    if (active) active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [index]);
+
+  const total = album.images.length;
+  const src = album.images[index];
+
+  return (
+    /* Backdrop */
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${album.title} – image ${index + 1} of ${total}`}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 100000,
+        backgroundColor: "rgba(0,0,0,0.92)",
+        display: "flex",
+        flexDirection: "column",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* ── Top bar ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "12px 20px",
+          flexShrink: 0,
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(0,0,0,0.6)",
+          gap: 12,
+          minHeight: 60,
+          boxSizing: "border-box",
+        }}
+      >
+        {/* Title + caption */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p
+            style={{
+              margin: 0,
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "clamp(13px, 2vw, 17px)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontFamily: "'Segoe UI', system-ui, sans-serif",
+            }}
+          >
+            {album.title}
+          </p>
+          {album.caption ? (
+            <p
+              style={{
+                margin: "2px 0 0",
+                color: "rgba(255,255,255,0.5)",
+                fontSize: "clamp(11px, 1.5vw, 13px)",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {album.caption}
+            </p>
+          ) : null}
+        </div>
+
+        {/* Counter + close */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+          <span
+            style={{
+              color: "rgba(255,255,255,0.65)",
+              fontSize: "clamp(11px, 1.5vw, 13px)",
+              background: "rgba(255,255,255,0.08)",
+              padding: "4px 12px",
+              borderRadius: 999,
+              fontVariantNumeric: "tabular-nums",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {index + 1} / {total}
+          </span>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close slideshow"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              color: "#fff",
+              cursor: "pointer",
+              flexShrink: 0,
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.25)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* ── Main image area ── */}
+      <div
+        style={{
+          flex: 1,
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          minHeight: 0,
+        }}
+      >
+        {/* Blurred background fill */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url(${src})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "blur(20px) brightness(0.3)",
+            transform: "scale(1.1)",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Image */}
+        <img
+          key={src}
+          src={src}
+          alt={`${album.title} – photo ${index + 1} of ${total}`}
+          style={{
+            position: "relative",
+            zIndex: 1,
+            maxWidth: "calc(100% - 120px)",
+            maxHeight: "100%",
+            width: "auto",
+            height: "auto",
+            objectFit: "contain",
+            display: "block",
+            boxShadow: "0 8px 60px rgba(0,0,0,0.8)",
+            borderRadius: 4,
+            userSelect: "none",
+            transition: "opacity 0.25s ease",
+          }}
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
+
+        {/* Prev button */}
+        {total > 1 && (
+          <button
+            type="button"
+            onClick={onPrev}
+            aria-label="Previous photo"
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: "rgba(0,0,0,0.6)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              color: "#fff",
+              cursor: "pointer",
+              flexShrink: 0,
+              backdropFilter: "blur(4px)",
+              transition: "background 0.2s, transform 0.2s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.transform = "translateY(-50%) scale(1.1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.6)"; e.currentTarget.style.transform = "translateY(-50%) scale(1)"; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        )}
+
+        {/* Next button */}
+        {total > 1 && (
+          <button
+            type="button"
+            onClick={onNext}
+            aria-label="Next photo"
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: "rgba(0,0,0,0.6)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              color: "#fff",
+              cursor: "pointer",
+              flexShrink: 0,
+              backdropFilter: "blur(4px)",
+              transition: "background 0.2s, transform 0.2s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.transform = "translateY(-50%) scale(1.1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.6)"; e.currentTarget.style.transform = "translateY(-50%) scale(1)"; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {/* ── Thumbnail strip ── */}
+      {total > 1 && (
+        <div
+          style={{
+            flexShrink: 0,
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(0,0,0,0.7)",
+            padding: "10px 16px",
+            overflowX: "auto",
+            overflowY: "hidden",
+            boxSizing: "border-box",
+          }}
+        >
+          <div
+            ref={stripRef}
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: "max-content",
+              margin: "0 auto",
+            }}
+          >
+            {album.images.map((img, i) => (
+              <button
+                key={`${img}-${i}`}
+                type="button"
+                data-active={i === index ? "true" : "false"}
+                onClick={() => onGoto(i)}
+                aria-label={`Go to photo ${i + 1}`}
+                aria-pressed={i === index}
+                style={{
+                  flexShrink: 0,
+                  width: 72,
+                  height: 50,
+                  padding: 0,
+                  border: i === index ? "2px solid #fff" : "2px solid rgba(255,255,255,0.15)",
+                  borderRadius: 6,
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  opacity: i === index ? 1 : 0.45,
+                  transform: i === index ? "scale(1.06)" : "scale(1)",
+                  transition: "all 0.2s ease",
+                  background: "#000",
+                  outline: "none",
+                }}
+                onMouseEnter={(e) => { if (i !== index) { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "scale(1.04)"; } }}
+                onMouseLeave={(e) => { if (i !== index) { e.currentTarget.style.opacity = "0.45"; e.currentTarget.style.transform = "scale(1)"; } }}
+              >
+                <img
+                  src={img}
+                  alt={`Thumbnail ${i + 1}`}
+                  loading="lazy"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── AlbumCard ────────────────────────────────────────────────────────────── */
+
+function AlbumCard({ album, onOpen }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(album)}
+      className="group text-left bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1 w-full"
+    >
+      <div className="relative h-52 overflow-hidden bg-gray-100">
+        <img
+          src={album.images[0]}
+          alt={album.title}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => {
+            e.target.parentNode.innerHTML =
+              '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 text-xs">No Image</div>';
+          }}
+        />
+        {/* Count badge */}
+        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          {album.images.length}
+        </div>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        {/* Title */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <p className="text-white font-semibold text-sm leading-tight truncate">
+            {album.title}
+          </p>
+        </div>
+      </div>
+      {album.caption ? (
+        <div className="px-4 py-3 text-xs text-gray-500 truncate">{album.caption}</div>
+      ) : null}
+    </button>
+  );
+}
+
+/* ─── Main page ────────────────────────────────────────────────────────────── */
+
 export default function Gallery() {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,359 +420,68 @@ export default function Gallery() {
 
   useEffect(() => {
     getPhotoGalleryItems()
-      .then((res) => {
-        setAlbums(mapGalleryItems(res));
-        setError(false);
-      })
-      .catch((err) => {
-        logError("Gallery - getPhotoGalleryItems", err);
-        setAlbums([]);
-        setError(true);
-      })
+      .then((res) => { setAlbums(mapGalleryItems(res)); setError(false); })
+      .catch((err) => { logError("Gallery - getPhotoGalleryItems", err); setAlbums([]); setError(true); })
       .finally(() => setLoading(false));
   }, []);
 
-  const openAlbum = (album, index = 0) => {
+  const openAlbum = useCallback((album) => {
     setActiveAlbum(album);
-    setActiveIndex(index);
-  };
+    setActiveIndex(0);
+  }, []);
 
-  const closeAlbum = () => {
+  const closeAlbum = useCallback(() => {
     setActiveAlbum(null);
     setActiveIndex(0);
-  };
+  }, []);
 
-  const showPrev = () => {
+  const showPrev = useCallback(() => {
     if (!activeAlbum) return;
-    setActiveIndex(
-      (prev) =>
-        (prev - 1 + activeAlbum.images.length) % activeAlbum.images.length,
-    );
-  };
+    setActiveIndex((p) => (p - 1 + activeAlbum.images.length) % activeAlbum.images.length);
+  }, [activeAlbum]);
 
-  const showNext = () => {
+  const showNext = useCallback(() => {
     if (!activeAlbum) return;
-    setActiveIndex((prev) => (prev + 1) % activeAlbum.images.length);
-  };
-
-  const activeImage = activeAlbum
-    ? activeAlbum.images[activeIndex]
-    : null;
+    setActiveIndex((p) => (p + 1) % activeAlbum.images.length);
+  }, [activeAlbum]);
 
   return (
-    <SubpageTemplate
-      title="Photo Gallery"
-      breadcrumb={[{ name: "Photo Gallery" }]}
-    >
+    <SubpageTemplate title="Photo Gallery" breadcrumb={[{ name: "Photo Gallery" }]}>
       <div>
         {loading ? (
-          <div className="py-12 text-center">
-            <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#003366] rounded-full animate-spin mb-3" />
-            <p className="text-gray-500 text-sm">Loading gallery...</p>
+          <div className="py-16 text-center">
+            <div className="inline-block w-8 h-8 border-[3px] border-gray-200 border-t-[#003366] rounded-full animate-spin mb-3" />
+            <p className="text-gray-500 text-sm">Loading gallery…</p>
           </div>
         ) : albums.length === 0 ? (
-          <div className="py-12 text-center">
-            <div className="w-12 h-12 mx-auto text-gray-300 mb-3">
-              <svg
-                className="w-full h-full"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M3 5h18M3 19h18M5 7l4 4 4-4 6 6"
-                />
-              </svg>
-            </div>
+          <div className="py-16 text-center">
+            <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
             <p className="text-gray-500 text-sm">
-              {error
-                ? "Gallery could not be loaded right now."
-                : "No gallery albums available."}
+              {error ? "Gallery could not be loaded right now." : "No gallery albums available."}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {albums.map((album) => (
-              <button
-                key={album.id}
-                type="button"
-                onClick={() => openAlbum(album)}
-                className="group text-left bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100"
-              >
-                <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[#f8fafc] via-white to-[#eef4ff]">
-                  <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-[#ffedd5] opacity-60" />
-                  <div className="absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-[#dbeafe] opacity-70" />
-                  <div className="absolute inset-0 p-4">
-                    <div className="relative h-full rounded-2xl overflow-hidden shadow-md">
-                      <img
-                        src={album.images[0]}
-                        alt={album.title}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.parentNode.innerHTML =
-                            '<div class="w-full h-full flex items-center justify-center bg-gray-300 text-gray-500 text-xs">No Image</div>';
-                        }}
-                      />
-                      {album.images[1] ? (
-                        <img
-                          src={album.images[1]}
-                          alt=""
-                          className="absolute -bottom-6 -right-6 w-28 h-28 object-cover rounded-xl border-4 border-white shadow-lg"
-                        />
-                      ) : null}
-                      {album.images[2] ? (
-                        <img
-                          src={album.images[2]}
-                          alt=""
-                          className="absolute -top-6 -left-6 w-24 h-24 object-cover rounded-xl border-4 border-white shadow-lg"
-                        />
-                      ) : null}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <p
-                          className="text-white text-[15px] font-semibold truncate"
-                          style={{
-                            fontFamily:
-                              '"Space Grotesk", "Segoe UI", sans-serif',
-                          }}
-                        >
-                          {album.title}
-                        </p>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="bg-white/90 text-[#003366] text-[11px] font-bold px-2 py-0.5 rounded-full">
-                            {album.images.length} photos
-                          </span>
-                          <span className="text-white/80 text-[11px]">
-                            Open slideshow →
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {album.caption ? (
-                  <div className="px-4 py-3 text-xs text-gray-600">
-                    {album.caption}
-                  </div>
-                ) : null}
-              </button>
+              <AlbumCard key={album.id} album={album} onOpen={openAlbum} />
             ))}
           </div>
         )}
-
-
-        {activeAlbum ? (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 99999,
-              background: "rgba(5,5,10,0.97)",
-              display: "flex",
-              flexDirection: "column",
-              height: "100vh",
-              width: "100vw",
-              overflow: "hidden",
-            }}
-          >
-            {/* Header */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "16px 24px",
-                flexShrink: 0,
-                background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)",
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
-                <h3 style={{ color: "#fff", fontSize: 20, fontWeight: 600, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {activeAlbum.title}
-                </h3>
-                {activeAlbum.caption ? (
-                  <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, margin: "4px 0 0" }}>{activeAlbum.caption}</p>
-                ) : null}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-                <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, background: "rgba(255,255,255,0.1)", padding: "5px 14px", borderRadius: 999, letterSpacing: 1 }}>
-                  {activeIndex + 1} / {activeAlbum.images.length}
-                </span>
-                <button
-                  type="button"
-                  onClick={closeAlbum}
-                  aria-label="Close"
-                  style={{
-                    background: "rgba(255,255,255,0.12)",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: 40,
-                    height: 40,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#fff",
-                    transition: "background 0.2s",
-                  }}
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Image Zone */}
-            <div
-              style={{
-                position: "relative",
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "calc(100vh - 80px - 140px)",
-                overflow: "hidden",
-                padding: "0 80px",
-              }}
-            >
-              {activeImage ? (
-                <img
-                  key={activeImage}
-                  src={activeImage}
-                  alt={activeAlbum.title}
-                  style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    width: "auto",
-                    height: "auto",
-                    objectFit: "contain",
-                    display: "block",
-                    userSelect: "none",
-                    filter: "drop-shadow(0 8px 40px rgba(0,0,0,0.9))",
-                    transition: "opacity 0.3s ease",
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
-              ) : null}
-
-              {/* Prev Arrow */}
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); showPrev(); }}
-                aria-label="Previous image"
-                style={{
-                  position: "absolute",
-                  left: 16,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "rgba(0,0,0,0.55)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: "50%",
-                  width: 52,
-                  height: 52,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  cursor: "pointer",
-                  zIndex: 10,
-                  backdropFilter: "blur(8px)",
-                  transition: "all 0.2s",
-                }}
-              >
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-
-              {/* Next Arrow */}
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); showNext(); }}
-                aria-label="Next image"
-                style={{
-                  position: "absolute",
-                  right: 16,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "rgba(0,0,0,0.55)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: "50%",
-                  width: 52,
-                  height: 52,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  cursor: "pointer",
-                  zIndex: 10,
-                  backdropFilter: "blur(8px)",
-                  transition: "all 0.2s",
-                }}
-              >
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Thumbnail Strip */}
-            <div
-              style={{
-                flexShrink: 0,
-                padding: "12px 16px 20px",
-                background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  overflowX: "auto",
-                  justifyContent: "center",
-                  paddingBottom: 4,
-                  scrollbarWidth: "none",
-                }}
-              >
-                {activeAlbum.images.map((img, idx) => (
-                  <button
-                    key={`${img}-${idx}`}
-                    type="button"
-                    onClick={() => setActiveIndex(idx)}
-                    style={{
-                      flexShrink: 0,
-                      width: 90,
-                      height: 60,
-                      borderRadius: 10,
-                      overflow: "hidden",
-                      border: idx === activeIndex ? "2px solid #fff" : "2px solid transparent",
-                      opacity: idx === activeIndex ? 1 : 0.45,
-                      transform: idx === activeIndex ? "scale(1.08)" : "scale(1)",
-                      transition: "all 0.25s ease",
-                      cursor: "pointer",
-                      padding: 0,
-                      background: "none",
-                    }}
-                  >
-                    <img
-                      src={img}
-                      alt={`Slide ${idx + 1}`}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      loading="lazy"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
       </div>
+
+      {/* Lightbox */}
+      {activeAlbum ? (
+        <Lightbox
+          album={activeAlbum}
+          index={activeIndex}
+          onClose={closeAlbum}
+          onPrev={showPrev}
+          onNext={showNext}
+          onGoto={setActiveIndex}
+        />
+      ) : null}
     </SubpageTemplate>
   );
 }
