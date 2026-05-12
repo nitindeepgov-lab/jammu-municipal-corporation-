@@ -44,11 +44,7 @@ const IMPORTANT_LINKS = [
     href: "https://jmc.jk.gov.in/OnlineGrievances.aspx",
     icon: MessageSquare,
   },
-  {
-    name: "JAKSMAC e-Services",
-    href: "https://serviceonline.gov.in/jammu/",
-    icon: Globe,
-  },
+
   {
     name: "PDD E-Services",
     href: "https://jmc.jk.gov.in/pddeservices.html",
@@ -59,7 +55,7 @@ const IMPORTANT_LINKS = [
     href: "https://jmc.jk.gov.in/tenders.aspx",
     icon: FileText,
   },
-  { name: "RTI Online", href: "https://rtionline.gov.in/", icon: Info },
+  
   {
     name: "JMC Official Portal",
     href: "https://jmc.jk.gov.in/",

@@ -351,7 +351,7 @@ export default function Contact() {
             <table className="w-full table-fixed text-xs sm:text-sm border border-gray-200">
               <thead className="bg-[#003366] text-white">
                 <tr>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold w-8 whitespace-normal break-words">
+                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-center text-[11px] font-semibold w-12 whitespace-nowrap">
                     S.No
                   </th>
                   <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
@@ -378,7 +378,7 @@ export default function Contact() {
                         : "bg-gray-50 hover:bg-gray-100"
                     }
                   >
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-xs align-top break-words">
+                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-xs text-center align-middle whitespace-nowrap">
                       {idx + 1}
                     </td>
                     <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-xs align-top break-words">
