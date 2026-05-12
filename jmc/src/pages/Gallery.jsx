@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getPhotoGalleryItems } from "../services/strapiApi";
 import { STRAPI_URL } from "../config/api";
@@ -471,8 +472,8 @@ export default function Gallery() {
         )}
       </div>
 
-      {/* Lightbox */}
-      {activeAlbum ? (
+      {/* Lightbox – rendered via portal so it escapes SubpageTemplate stacking context */}
+      {activeAlbum ? createPortal(
         <Lightbox
           album={activeAlbum}
           index={activeIndex}
@@ -480,7 +481,8 @@ export default function Gallery() {
           onPrev={showPrev}
           onNext={showNext}
           onGoto={setActiveIndex}
-        />
+        />,
+        document.body
       ) : null}
     </SubpageTemplate>
   );
