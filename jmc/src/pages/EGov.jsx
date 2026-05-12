@@ -15,7 +15,7 @@ const egovServices = [
   {
     name: "Water Tanker Booking",
     href: "https://myjammu.in/",
-    desc: "Book a water tanker online through the MyJammu service portal.",
+    desc: "Book a water tanker online through the MyJammu service portal",
   },
   {
     name: "Building Plan Permission",
@@ -100,8 +100,7 @@ export default function EGov() {
           <p className="text-[15px] text-gray-600 leading-relaxed mb-6">
             Aligned with the Government of India's Digital India programme and
             the J&K Government's IT policy, our initiatives aim to reduce
-            paperwork, increase transparency, and improve accountability in
-            civic administration.
+            paperwork, increase transparency, and improve accountability
           </p>
           <a
             href="https://jmc.jk.gov.in/egov.html"
