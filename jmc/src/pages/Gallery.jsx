@@ -226,20 +226,17 @@ export default function Gallery() {
             {/* Main Image Viewport */}
             <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden px-2 sm:px-24 py-2 sm:py-8">
               {activeImage ? (
-                <div className="relative w-full h-full flex items-center justify-center group">
-                  <div className="relative flex items-center justify-center p-2 sm:p-4 bg-white shadow-[0_0_40px_rgba(0,0,0,0.8)] rounded-md transition-transform duration-500 ease-out group-hover:scale-[1.01] max-w-[95%] max-h-full">
-                    <img
-                      key={activeImage}
-                      src={activeImage}
-                      alt={activeAlbum.title}
-                      className="w-auto h-auto max-w-full max-h-[65vh] sm:max-h-[75vh] object-contain select-none"
-                      style={{ width: 'auto', height: 'auto', minWidth: '200px' }}
-                      onError={(e) => {
-                        e.target.parentNode.innerHTML =
-                          '<div class="flex flex-col items-center justify-center text-gray-400 w-full min-h-[300px]"><svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p>Image could not be loaded</p></div>';
-                      }}
-                    />
-                  </div>
+                <div className="relative w-full h-full flex items-center justify-center p-2 sm:p-4">
+                  <img
+                    key={activeImage}
+                    src={activeImage}
+                    alt={activeAlbum.title}
+                    className="w-full h-full object-contain select-none drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out hover:scale-[1.02]"
+                    onError={(e) => {
+                      e.target.outerHTML =
+                        '<div class="flex flex-col items-center justify-center text-gray-500 w-full h-full"><svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p>Image could not be loaded</p></div>';
+                    }}
+                  />
                 </div>
               ) : null}
 
