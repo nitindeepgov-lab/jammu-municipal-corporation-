@@ -7,6 +7,25 @@ import { logError } from "../utils/errorLogger";
 
 /* ─── helpers ─────────────────────────────────────────────────────────────── */
 
+/* Pick the best available Strapi image URL.
+   Strapi stores processed variants in item.attributes.formats (or item.formats).
+   Priority: original url  >  large  >  medium  >  small  >  thumbnail  */
+const getBestUrl = (item) => {
+  const attrs = item?.attributes || item || {};
+  // The top-level `url` is always the original upload – highest quality
+  const original = attrs.url;
+  const formats = attrs.formats || {};
+  // Prefer original, fall back down through format sizes
+  return (
+    original ||
+    formats.large?.url ||
+    formats.medium?.url ||
+    formats.small?.url ||
+    formats.thumbnail?.url ||
+    null
+  );
+};
+
 const resolveMediaUrls = (media) => {
   if (!media) return [];
   let items = [];
@@ -15,10 +34,11 @@ const resolveMediaUrls = (media) => {
   else if (media.data) items = [media.data];
   else items = [media];
   return items
-    .map((item) => item?.url || item?.attributes?.url)
+    .map(getBestUrl)
     .filter(Boolean)
     .map((url) => (url.startsWith("http") ? url : `${STRAPI_URL}${url}`));
 };
+
 
 const mapGalleryItems = (res) =>
   (res.data?.data || [])

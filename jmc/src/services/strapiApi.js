@@ -73,8 +73,9 @@ export const getOfficials = () =>
 /** Fetch all published photo gallery items ordered by 'order' */
 export const getPhotoGalleryItems = () =>
   api.get(
-    "/photo-galleries?populate=images&sort=order:asc&status=published&filters[is_active][$eq]=true",
+    "/photo-galleries?populate[images][populate]=*&sort=order:asc&status=published&filters[is_active][$eq]=true",
   );
+
 
 // ── Ex-Municipal Councillors ───────────────────────────────
 
