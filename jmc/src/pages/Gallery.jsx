@@ -193,107 +193,209 @@ export default function Gallery() {
 
 
         {activeAlbum ? (
-          <div className="fixed inset-0 z-[9999] bg-[#020202]/95 flex flex-col overflow-hidden backdrop-blur-xl transition-all duration-300">
-            {/* Header / Top Bar */}
-            <div className="flex items-start sm:items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-gradient-to-b from-black/80 to-transparent z-10">
-              <div className="flex-1 min-w-0 pr-4">
-                <h3 className="text-white text-lg sm:text-2xl font-semibold tracking-tight truncate">
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 99999,
+              background: "rgba(5,5,10,0.97)",
+              display: "flex",
+              flexDirection: "column",
+              height: "100vh",
+              width: "100vw",
+              overflow: "hidden",
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "16px 24px",
+                flexShrink: 0,
+                background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
+                <h3 style={{ color: "#fff", fontSize: 20, fontWeight: 600, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {activeAlbum.title}
                 </h3>
                 {activeAlbum.caption ? (
-                  <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2 line-clamp-2 sm:line-clamp-1">
-                    {activeAlbum.caption}
-                  </p>
+                  <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, margin: "4px 0 0" }}>{activeAlbum.caption}</p>
                 ) : null}
               </div>
-              <div className="flex items-center gap-4 sm:gap-6 flex-shrink-0">
-                <span className="text-white/80 text-xs sm:text-sm font-medium tracking-widest bg-white/10 px-3 py-1.5 rounded-full hidden sm:block">
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+                <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, background: "rgba(255,255,255,0.1)", padding: "5px 14px", borderRadius: 999, letterSpacing: 1 }}>
                   {activeIndex + 1} / {activeAlbum.images.length}
                 </span>
                 <button
                   type="button"
                   onClick={closeAlbum}
-                  className="group flex items-center justify-center p-2 sm:p-2.5 rounded-full bg-white/10 hover:bg-white text-white hover:text-black transition-all hover:rotate-90 duration-300"
-                  aria-label="Close album"
+                  aria-label="Close"
+                  style={{
+                    background: "rgba(255,255,255,0.12)",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: 40,
+                    height: 40,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    transition: "background 0.2s",
+                  }}
                 >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            {/* Main Image Viewport */}
-            <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden px-2 sm:px-24 py-2 sm:py-8">
+            {/* Image Zone */}
+            <div
+              style={{
+                position: "relative",
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "calc(100vh - 80px - 140px)",
+                overflow: "hidden",
+                padding: "0 80px",
+              }}
+            >
               {activeImage ? (
-                <div className="relative w-full h-full flex items-center justify-center p-2 sm:p-4">
-                  <img
-                    key={activeImage}
-                    src={activeImage}
-                    alt={activeAlbum.title}
-                    className="w-full h-full object-contain select-none drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out hover:scale-[1.02]"
-                    onError={(e) => {
-                      e.target.outerHTML =
-                        '<div class="flex flex-col items-center justify-center text-gray-500 w-full h-full"><svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p>Image could not be loaded</p></div>';
-                    }}
-                  />
-                </div>
+                <img
+                  key={activeImage}
+                  src={activeImage}
+                  alt={activeAlbum.title}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    width: "auto",
+                    height: "auto",
+                    objectFit: "contain",
+                    display: "block",
+                    userSelect: "none",
+                    filter: "drop-shadow(0 8px 40px rgba(0,0,0,0.9))",
+                    transition: "opacity 0.3s ease",
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
               ) : null}
 
-              {/* Navigation Arrows */}
+              {/* Prev Arrow */}
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); showPrev(); }}
-                className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 p-3 sm:p-5 rounded-full bg-black/60 hover:bg-white text-white hover:text-black border border-white/10 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 group z-10"
                 aria-label="Previous image"
+                style={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "rgba(0,0,0,0.55)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: "50%",
+                  width: 52,
+                  height: 52,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  backdropFilter: "blur(8px)",
+                  transition: "all 0.2s",
+                }}
               >
-                <svg className="w-5 h-5 sm:w-7 sm:h-7 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
+
+              {/* Next Arrow */}
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); showNext(); }}
-                className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 p-3 sm:p-5 rounded-full bg-black/60 hover:bg-white text-white hover:text-black border border-white/10 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 group z-10"
                 aria-label="Next image"
+                style={{
+                  position: "absolute",
+                  right: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "rgba(0,0,0,0.55)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: "50%",
+                  width: 52,
+                  height: 52,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  backdropFilter: "blur(8px)",
+                  transition: "all 0.2s",
+                }}
               >
-                <svg className="w-5 h-5 sm:w-7 sm:h-7 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </div>
 
             {/* Thumbnail Strip */}
-            <div className="bg-gradient-to-t from-black to-transparent pt-12 pb-4 sm:pb-8 px-4 z-10">
-              <div 
-                className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-4 justify-start sm:justify-center max-w-7xl mx-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            <div
+              style={{
+                flexShrink: 0,
+                padding: "12px 16px 20px",
+                background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  overflowX: "auto",
+                  justifyContent: "center",
+                  paddingBottom: 4,
+                  scrollbarWidth: "none",
+                }}
               >
                 {activeAlbum.images.map((img, idx) => (
                   <button
                     key={`${img}-${idx}`}
                     type="button"
                     onClick={() => setActiveIndex(idx)}
-                    className={`relative flex-shrink-0 h-16 w-24 sm:h-20 sm:w-32 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer group ${
-                      idx === activeIndex
-                        ? "ring-2 ring-white ring-offset-2 ring-offset-black shadow-2xl scale-110 z-10"
-                        : "opacity-40 hover:opacity-100 hover:scale-105"
-                    }`}
+                    style={{
+                      flexShrink: 0,
+                      width: 90,
+                      height: 60,
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      border: idx === activeIndex ? "2px solid #fff" : "2px solid transparent",
+                      opacity: idx === activeIndex ? 1 : 0.45,
+                      transform: idx === activeIndex ? "scale(1.08)" : "scale(1)",
+                      transition: "all 0.25s ease",
+                      cursor: "pointer",
+                      padding: 0,
+                      background: "none",
+                    }}
                   >
-                    <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${idx === activeIndex ? "opacity-0" : "group-hover:opacity-20"}`} />
                     <img
                       src={img}
-                      alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      alt={`Slide ${idx + 1}`}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                       loading="lazy"
                     />
                   </button>
                 ))}
-              </div>
-              <div className="text-center sm:hidden mt-1">
-                <span className="text-white/60 text-xs font-medium tracking-widest bg-white/10 px-3 py-1 rounded-full">
-                  {activeIndex + 1} OF {activeAlbum.images.length}
-                </span>
               </div>
             </div>
           </div>
