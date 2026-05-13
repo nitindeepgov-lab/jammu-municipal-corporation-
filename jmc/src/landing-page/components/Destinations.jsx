@@ -1,43 +1,49 @@
 import { useState, useEffect, useRef } from 'react'
+import { getEventActivities } from '../../services/strapiApi'
+import { STRAPI_URL } from '../../config/api'
+import { logError } from '../../utils/errorLogger'
 
-const events = [
-  {
-    image: 'circle/circle.jpeg',
-    title: 'JMC Commissioner Field Visit – Street Light Repairs',
-    date: 'April 28, 2025',
-    category: 'Field Visit',
-    description:
-      'JMC Commissioner conducted a comprehensive field visit to oversee ongoing street light repair works across all major roads in Jammu city.',
-  },
-  {
-    image: 'circle/circle2.jpeg',
-    title: 'Public Toilet Complex Foundation Stone Laying',
-    date: 'April 25, 2025',
-    category: 'Infrastructure',
-    description:
-      'JMC Commissioner laid the foundation stone of a new public toilet complex as part of the ODF Plus initiative for cleaner Jammu city.',
-  },
-  {
-    image: 'circle/circle3.jpeg',
-    title: 'Cleanliness Drive at Gandhi Nagar Market',
-    date: 'April 20, 2025',
-    category: 'Swachh Bharat',
-    description:
-      'A large-scale cleanliness drive was conducted at Gandhi Nagar Market involving sanitation staff, citizens, and local traders.',
-  },
-  {
-    image: 'circle/circle4.jpeg',
-    title: 'Ward-Level Review Meeting on Smart City Projects',
-    date: 'April 15, 2025',
-    category: 'Smart City',
-    description:
-      'A comprehensive ward-level review meeting was held to assess the progress of ongoing Smart City projects and urban development initiatives.',
-  },
-]
+const getBestUrl = (item) => {
+  const attrs = item?.attributes || item || {}
+  const original = attrs.url
+  const formats = attrs.formats || {}
+  return (
+    original ||
+    formats.large?.url ||
+    formats.medium?.url ||
+    formats.small?.url ||
+    formats.thumbnail?.url ||
+    null
+  )
+}
+
+const resolveMediaUrl = (media) => {
+  if (!media) return null
+  let item = media
+  if (Array.isArray(media)) item = media[0]
+  else if (media.data) item = Array.isArray(media.data) ? media.data[0] : media.data
+  const url = getBestUrl(item)
+  if (!url) return null
+  return url.startsWith('http') ? url : `${STRAPI_URL}${url}`
+}
+
+const formatDate = (value) => {
+  if (!value) return ''
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 /* helper: parse "April 28, 2025" → { day, month } */
 function parseDate(str) {
   const d = new Date(str)
+  if (Number.isNaN(d.getTime())) {
+    return { day: '--', month: '---' }
+  }
   return {
     day: d.getDate(),
     month: d.toLocaleString('en-US', { month: 'short' }).toUpperCase(),
@@ -56,6 +62,9 @@ export default function Destinations() {
   /* stagger-in animation */
   const sectionRef = useRef(null)
   const [visible, setVisible] = useState(false)
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -64,6 +73,31 @@ export default function Destinations() {
     )
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    getEventActivities()
+      .then((res) => {
+        const items = (res.data?.data || []).map((item) => {
+          const a = item.attributes || item
+          return {
+            id: item.id ?? item.documentId ?? a.id ?? a.documentId ?? a.title,
+            image: resolveMediaUrl(a.image),
+            title: a.title || 'Event',
+            date: formatDate(a.event_date || a.date),
+            category: a.category || 'Activity',
+            description: a.description || '',
+            link: a.link || '',
+          }
+        })
+        setEvents(items)
+      })
+      .catch((err) => {
+        logError('EventsActivities', err)
+        setError(true)
+        setEvents([])
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -171,78 +205,105 @@ export default function Destinations() {
               className="space-y-4 pr-1 overflow-y-auto"
               style={{ maxHeight: '460px', scrollbarWidth: 'thin', scrollbarColor: '#003366 transparent' }}
             >
-              {events.map((event, idx) => {
-                const { day, month } = parseDate(event.date)
-                const cat = catColors[event.category] || { bg: '#F5F5F5', text: '#333' }
-
-                return (
-                  <div
-                    key={idx}
-                    className="group bg-white rounded-xl shadow-md ring-1 ring-black/5 overflow-hidden flex hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-                    style={{
-                      opacity: visible ? 1 : 0,
-                      transform: visible ? 'translateX(0)' : 'translateX(40px)',
-                      transition: `opacity 0.5s ease ${200 + idx * 120}ms, transform 0.5s ease ${200 + idx * 120}ms, box-shadow 0.3s ease, translate 0.3s ease`,
-                    }}
-                  >
-                    {/* image with overlay */}
-                    <div className="w-28 md:w-32 flex-shrink-0 relative overflow-hidden">
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onError={(e) => {
-                          e.target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400'
-                        }}
-                      />
-                      {/* gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                      {/* date badge */}
-                      <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 text-center shadow-sm min-w-[42px]">
-                        <span className="block text-lg font-extrabold leading-none text-[#003366]">{day}</span>
-                        <span className="block text-[10px] font-bold tracking-wider text-[#FF6600] uppercase">{month}</span>
-                      </div>
-                    </div>
-
-                    {/* content */}
-                    <div className="p-4 flex-1 min-w-0 flex flex-col justify-center">
-                      {/* category tag */}
-                      <span
-                        className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 self-start"
-                        style={{ background: cat.bg, color: cat.text }}
-                      >
-                        {event.category}
-                      </span>
-
-                      <a
-                        href="#"
-                        className="text-sm font-bold text-[#003366] leading-snug line-clamp-2 group-hover:text-[#FF6600] transition-colors duration-300"
-                      >
-                        {event.title}
-                      </a>
-
-                      <p className="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
-                        {event.description}
-                      </p>
-
-                      {/* footer with date text + read more */}
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                          </svg>
-                          {event.date}
-                        </div>
-                        <span className="text-[11px] font-semibold text-[#FF6600] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                          Read More
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
-                        </span>
-                      </div>
-                    </div>
+              {loading ? (
+                <div className="flex items-center justify-center h-40">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-6 h-6 border-2 border-[#003366] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-xs text-gray-400">Loading…</p>
                   </div>
-                )
-              })}
+                </div>
+              ) : error ? (
+                <p className="text-sm text-red-400 text-center mt-6">
+                  Could not load events &amp; activities.
+                </p>
+              ) : events.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center mt-6">
+                  No events available right now.
+                </p>
+              ) : (
+                events.map((event, idx) => {
+                  const { day, month } = parseDate(event.date)
+                  const cat = catColors[event.category] || { bg: '#F5F5F5', text: '#333' }
+                  const hasLink = Boolean(event.link)
+                  const linkProps =
+                    hasLink && event.link.startsWith('http')
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {}
+                  const displayDate = event.date || 'Date TBA'
+
+                  return (
+                    <div
+                      key={event.id || idx}
+                      className="group bg-white rounded-xl shadow-md ring-1 ring-black/5 overflow-hidden flex hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+                      style={{
+                        opacity: visible ? 1 : 0,
+                        transform: visible ? 'translateX(0)' : 'translateX(40px)',
+                        transition: `opacity 0.5s ease ${200 + idx * 120}ms, transform 0.5s ease ${200 + idx * 120}ms, box-shadow 0.3s ease, translate 0.3s ease`,
+                      }}
+                    >
+                      {/* image with overlay */}
+                      <div className="w-28 md:w-32 flex-shrink-0 relative overflow-hidden">
+                        <img
+                          src={event.image || 'circle/circle.jpeg'}
+                          alt={event.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400'
+                          }}
+                        />
+                        {/* gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                        {/* date badge */}
+                        <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 text-center shadow-sm min-w-[42px]">
+                          <span className="block text-lg font-extrabold leading-none text-[#003366]">{day}</span>
+                          <span className="block text-[10px] font-bold tracking-wider text-[#FF6600] uppercase">{month}</span>
+                        </div>
+                      </div>
+
+                      {/* content */}
+                      <div className="p-4 flex-1 min-w-0 flex flex-col justify-center">
+                        {/* category tag */}
+                        <span
+                          className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 self-start"
+                          style={{ background: cat.bg, color: cat.text }}
+                        >
+                          {event.category}
+                        </span>
+
+                        <a
+                          href={hasLink ? event.link : '#'}
+                          onClick={(e) => { if (!hasLink) e.preventDefault() }}
+                          {...linkProps}
+                          className="text-sm font-bold text-[#003366] leading-snug line-clamp-2 group-hover:text-[#FF6600] transition-colors duration-300"
+                        >
+                          {event.title}
+                        </a>
+
+                        <p className="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+                          {event.description || 'Details will be updated soon.'}
+                        </p>
+
+                        {/* footer with date text + read more */}
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10"/>
+                              <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            {displayDate}
+                          </div>
+                          {hasLink && (
+                            <span className="text-[11px] font-semibold text-[#FF6600] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                              Read More
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             </div>
 
             {/* CTA button */}

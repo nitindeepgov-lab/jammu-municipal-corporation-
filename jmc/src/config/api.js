@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
   OFFICIALS: "/officials",
   COUNCILLORS: "/councillor-details",
   NEWS_TICKER: "/news-tickers",
+  EVENT_ACTIVITIES: "/event-activities",
   NOTICES: "/notices",
   TENDERS: "/tenders",
   SMART_CITY_TENDERS: "/smart-city-tenders",
