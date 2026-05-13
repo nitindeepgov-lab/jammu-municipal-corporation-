@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "event_activities",
+  "info": {
+    "singularName": "event-activity",
+    "pluralName": "event-activities",
+    "displayName": "📅 Events & Activities",
+    "description": "Events and civic activities shown on the JMC homepage."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "event_date": {
+      "type": "date",
+      "required": true
+    },
+    "category": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "link": {
+      "type": "string",
+      "required": false
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "required": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    }
+  }
+}

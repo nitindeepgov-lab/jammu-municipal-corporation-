@@ -147,6 +147,14 @@ export const updateNewsTickerItem = (documentId, fields) =>
 export const deleteNewsTickerItem = (documentId) =>
   api.delete(`/news-tickers/${documentId}`);
 
+// ── Events & Activities ─────────────────────────────────────
+
+/** Fetch all published events & activities (ordered by 'order', newest date first) */
+export const getEventActivities = () =>
+  api.get(
+    "/event-activities?sort=order:asc,event_date:desc&populate=image&status=published&filters[is_active][$eq]=true",
+  );
+
 // ── Notices & Tenders ───────────────────────────────────────
 
 /** Fetch all published notices (newest first), optionally filtered by type */
