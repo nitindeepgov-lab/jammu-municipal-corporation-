@@ -8,7 +8,7 @@ const slides = [
     subtitle: 'Building roads, parks, and amenities for a better Jammu',
   },
   {
-    image: '/banner/banner5.png',
+    image: '/banner/banner10.png',
     title: 'Jammu Municipal Corporation',
     subtitle: 'Committed to serving the residents of Jammu City',
   },
@@ -59,7 +59,7 @@ export default function HeroSlider() {
               src={slide.image}
               alt={slide.title}
               className="w-full h-full object-cover md:object-fill  bg-black"
-              onError={(e) => { e.target.src = '/banner/banner12.jpg' }}
+              onError={(e) => { e.target.src = '/banner/banner10.png' }}
             />
             {/* gradient overlays */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import SubpageTemplate from '../components/SubpageTemplate'
 
 const quickLinksData = [
@@ -27,7 +28,7 @@ const quickLinksData = [
 const sidebarCards = [
   {
     title: 'Information',
-    href: 'https://jmc.jk.gov.in/information.html',
+    to: '/information',
     gradient: 'from-blue-600 to-blue-800',
     icon: (
       <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
@@ -46,8 +47,8 @@ const sidebarCards = [
     ),
   },
   {
-    title: 'Register a Complaint',
-    href: 'https://jmc.jk.gov.in/OnlineGrievances.aspx',
+    title: 'File Complaint',
+    to: '/feedback',
     gradient: 'from-amber-600 to-amber-800',
     icon: (
       <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
@@ -56,12 +57,52 @@ const sidebarCards = [
     ),
   },
   {
-    title: "Commissioner's Desk",
-    href: 'https://jmc.jk.gov.in/commissioner.html',
+    title: "Commissioner",
+    to: '/commissioner',
     gradient: 'from-slate-600 to-slate-800',
     icon: (
       <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Gallery',
+    to: '/gallery',
+    gradient: 'from-pink-600 to-pink-800',
+    icon: (
+      <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Tenders',
+    to: '/smart-city-tenders',
+    gradient: 'from-purple-600 to-purple-800',
+    icon: (
+      <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Notices',
+    to: '/notices',
+    gradient: 'from-indigo-600 to-indigo-800',
+    icon: (
+      <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 9.5c0 .83-.67 1.5-1.5 1.5S11 13.33 11 12.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm3 2c-1.1 0-3.33.92-4 2.05-.67-1.13-2.9-2.05-4-2.05-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2 1.1 0 2-.9 2-2s-.9-2-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Contact Us',
+    to: '/contact',
+    gradient: 'from-cyan-600 to-cyan-800',
+    icon: (
+      <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
       </svg>
     ),
   },
@@ -144,11 +185,11 @@ export default function QuickLinksPage() {
               )
 
               if (card.to) {
-                // Internal link — use Link but import is already handled by SubpageTemplate
+                // Internal link
                 return (
-                  <a key={idx} href={card.to} style={{ textDecoration: 'none' }}>
+                  <Link key={idx} to={card.to} style={{ textDecoration: 'none' }}>
                     {inner}
-                  </a>
+                  </Link>
                 )
               }
               return (
