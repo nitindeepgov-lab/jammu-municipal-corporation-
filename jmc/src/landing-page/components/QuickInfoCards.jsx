@@ -101,16 +101,20 @@ const cards = [
 
 export default function QuickInfoCards() {
   return (
-    <section className="py-4 bg-white border-b border-gray-100">
+    <section className="py-10 md:py-14 bg-white border-b border-gray-100">
       <div className="max-w-[1250px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
           <div>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight mb-2">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-[3px] rounded-full bg-[#003366]" />
+              <span className="text-[11px] font-bold text-[#003366] tracking-widest uppercase">Services</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">
               Citizen Services
             </h2>
-            <p className="text-gray-500 text-sm md:text-base">
+            <p className="text-gray-500 text-sm md:text-base max-w-md">
               Quick access to essential municipal services.
             </p>
           </div>
@@ -132,27 +136,28 @@ export default function QuickInfoCards() {
             
             const cardInner = (
               <div 
-                className="group h-full bg-white rounded-xl p-6 border border-gray-200 hover:shadow-sm transition-all duration-200 flex flex-col"
-                style={{ '--hover-color': card.color }}
+                className="group h-full bg-white rounded-xl p-6 border border-gray-200 hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12)] hover:border-gray-300 transition-all duration-300 flex flex-col relative overflow-hidden hover:-translate-y-0.5"
               >
+                {/* Top color accent */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl transition-all duration-300 opacity-70 group-hover:opacity-100" style={{ backgroundColor: card.color }} />
                 <div 
-                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-5 transition-colors"
+                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
                   style={{ backgroundColor: card.bg, color: card.color }}
                 >
                   {card.icon}
                 </div>
-                <h3 className="text-[15px] font-semibold text-gray-900 mb-2 transition-colors">
+                <h3 className="text-[15px] font-semibold text-gray-900 mb-2 group-hover:text-[#003366] transition-colors">
                   {card.title}
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">
+                <p className="text-[13px] text-gray-500 leading-relaxed mb-4 flex-1">
                   {card.description}
                 </p>
                 <div 
-                  className="mt-auto flex items-center text-sm font-medium text-gray-400 transition-colors"
+                  className="mt-auto flex items-center text-[13px] font-semibold transition-colors"
                   style={{ color: card.color }}
                 >
                   Access Portal
-                  <svg className="w-4 h-4 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>
                 </div>
