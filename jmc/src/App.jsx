@@ -49,6 +49,7 @@ import Information from "./pages/Information";
 import InformationDetail from "./pages/InformationDetail";
 import QuickLinksPage from "./pages/QuickLinksPage";
 import SmartCityTenders from "./pages/SmartCityTenders";
+import SmartCityInitiatives from "./pages/SmartCityInitiatives";
 import Sitemap from "./pages/Sitemap";
 import CouncillorDetails from "./pages/CouncillorDetails";
 import {
@@ -84,6 +85,10 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/services" element={<Services />} />
         <Route path="/smart-city" element={<SmartCity />} />
+        <Route
+          path="/smart-city-initiatives"
+          element={<SmartCityInitiatives />}
+        />
         <Route path="/development-works" element={<DevelopmentWorks />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/rti" element={<RTI />} />
@@ -112,13 +117,28 @@ export default function App() {
         <Route path="/copyright-policy" element={<CopyrightPolicyPage />} />
         <Route path="/terms-conditions" element={<TermsConditionsPage />} />
         <Route path="/departments" element={<DepartmentsPage />} />
-        <Route path="/departments/engineering" element={<EngineeringDepartment />} />
+        <Route
+          path="/departments/engineering"
+          element={<EngineeringDepartment />}
+        />
         <Route path="/departments/health" element={<HealthDepartment />} />
-        <Route path="/departments/revenue-taxation" element={<RevenueTaxation />} />
-        <Route path="/departments/sanitation" element={<SanitationDepartment />} />
+        <Route
+          path="/departments/revenue-taxation"
+          element={<RevenueTaxation />}
+        />
+        <Route
+          path="/departments/sanitation"
+          element={<SanitationDepartment />}
+        />
         <Route path="/departments/urban-planning" element={<UrbanPlanning />} />
-        <Route path="/departments/water-supply" element={<WaterSupplyDivision />} />
-        <Route path="/departments/horticulture" element={<HorticultureDepartment />} />
+        <Route
+          path="/departments/water-supply"
+          element={<WaterSupplyDivision />}
+        />
+        <Route
+          path="/departments/horticulture"
+          element={<HorticultureDepartment />}
+        />
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>

@@ -33,9 +33,9 @@ function MinisterCard({ minister }) {
         <h3 className="text-[13px] font-bold text-[#003366] mb-1.5 leading-tight">{minister.title}</h3>
         <p className="text-xs text-gray-600 font-medium">{honorific} {minister.name}</p>
       </div>
-      <button className="w-full bg-[#003366]/5 hover:bg-[#003366] text-[#003366] hover:text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 border border-[#003366]/10 hover:border-[#003366]">
+      {/* <button className="w-full bg-[#003366]/5 hover:bg-[#003366] text-[#003366] hover:text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 border border-[#003366]/10 hover:border-[#003366]">
         View Profile
-      </button>
+      </button> */}
     </div>
   )
 }

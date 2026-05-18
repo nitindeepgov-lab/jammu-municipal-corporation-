@@ -6,6 +6,16 @@ export default function Officials() {
   const [officials, setOfficials] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const getAvatarName = (fullName = "") => {
+    const trimmed = String(fullName).trim();
+    if (!trimmed) return "";
+    const primary = trimmed.split(",")[0].trim();
+    if (!primary) return trimmed;
+    const parts = primary.split(/\s+/).filter(Boolean);
+    if (parts.length <= 2) return parts.join(" ");
+    return `${parts[0]} ${parts[parts.length - 1]}`;
+  };
+
   useEffect(() => {
     getOfficials()
       .then((res) => setOfficials(res.data.data || []))
@@ -78,7 +88,7 @@ export default function Officials() {
                         />
                       ) : (
                         <img
-                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(officer.name)}&size=256&background=1f2937&color=fff`}
+                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(getAvatarName(officer.name))}&size=256&background=1f2937&color=fff`}
                           alt={officer.name}
                           className="w-full h-full object-cover rounded-full"
                         />

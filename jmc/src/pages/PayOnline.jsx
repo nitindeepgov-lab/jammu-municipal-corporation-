@@ -239,7 +239,7 @@ const deriveBillDeskOutcome = (payload, fallback = {}) => {
   const statusText = normalizeStatusValue(statusTextRaw).toUpperCase();
   const statusValue = normalizeStatusValue(payload.status).toLowerCase();
   const errorType = normalizeStatusValue(
-    payload.transaction_error_type
+    payload.transaction_error_type,
   ).toLowerCase();
 
   const isSuccess =
@@ -287,7 +287,7 @@ const deriveBillDeskOutcome = (payload, fallback = {}) => {
    ═══════════════════════════════════════════════════════ */
 function Field({ field, value, onChange }) {
   const cls =
-    "w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-[14px] text-gray-800 " +
+    "w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 " +
     "placeholder:text-gray-400 placeholder:font-light outline-none transition-all duration-200 " +
     "hover:border-gray-300 focus:bg-white focus:border-[#003366] focus:ring-4 focus:ring-[#003366]/5";
 
@@ -522,7 +522,7 @@ export default function PayOnline() {
         {/* ── Hero ─────────────────────────────────────── */}
         <div className="mb-10 px-2 flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-gray-100">
           <div>
-            <p className="text-[#003366] text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-3">
+            <p className="text-[#003366] text-md font-bold uppercase tracking-widest mb-3 flex items-center gap-3">
               <span className="w-6 h-[2px] bg-[#003366]/40"></span>
               Jammu Municipal Corporation
             </p>
@@ -554,7 +554,7 @@ export default function PayOnline() {
                   <div key={label} className="flex items-center flex-1">
                     <div className="flex flex-col items-center flex-1 gap-1.5">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                        className={`font-m w-8 h-8 rounded-full flex items-center justify-center text-md font-bold transition-all duration-300 ${
                           done
                             ? "bg-green-500 text-white"
                             : active
@@ -565,7 +565,7 @@ export default function PayOnline() {
                         {done ? "✓" : i + 1}
                       </div>
                       <span
-                        className={`text-[10px] font-semibold hidden sm:block ${done ? "text-green-600" : active ? "text-[#003366]" : "text-gray-400"}`}
+                        className={`text-md font-semibold hidden sm:block ${done ? "text-green-600" : active ? "text-[#003366]" : "text-gray-400"}`}
                       >
                         {label}
                       </span>
@@ -606,7 +606,7 @@ export default function PayOnline() {
                   <button
                     key={opt.id}
                     onClick={() => pick(opt)}
-                    className={`group relative flex items-center gap-4 rounded-xl p-4 sm:p-5 w-full text-left transition-all duration-300 ${
+                    className={`group relative flex items-center gap-4 rounded-xl p-4 sm:p-5 w-full text-left  transition-all duration-300 ${
                       active
                         ? "bg-gray-50 border-[#003366] ring-1 ring-[#003366]"
                         : "bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
@@ -623,11 +623,11 @@ export default function PayOnline() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`font-medium text-[15px] tracking-tight ${active ? "text-[#003366]" : "text-gray-900"}`}
+                        className={`text-md font-bold tracking-tight ${active ? "text-[#003366]" : "text-gray-900"}`}
                       >
                         {opt.name}
                       </p>
-                      <p className="text-gray-500 text-xs mt-1 font-light leading-relaxed">
+                      <p className="text-gray-500 text-base mt-1 font-light leading-relaxed">
                         {opt.desc}
                       </p>
                     </div>
@@ -664,10 +664,10 @@ export default function PayOnline() {
                   <selected.icon size={18} />
                 </div>
                 <div>
-                  <p className="font-medium text-[15px] tracking-tight text-gray-900">
+                  <p className="font-medium text-md tracking-tight text-gray-900">
                     {selected.name}
                   </p>
-                  <p className="text-gray-400 text-[10px] mt-0.5 uppercase tracking-wider font-semibold">
+                  <p className="text-gray-400 text-sm mt-0.5 uppercase tracking-wider font-semibold">
                     Fields marked * are required
                   </p>
                 </div>
@@ -1020,7 +1020,7 @@ export default function PayOnline() {
                 <div>
                   <p className="text-gray-400 mb-0.5">Status</p>
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-md font-bold ${
                       receipt.status === "SUCCESS"
                         ? "bg-green-100 text-green-700"
                         : receipt.status === "FAILED"
@@ -1146,7 +1146,7 @@ export default function PayOnline() {
               <span className="text-xl">{icon}</span>
               <div>
                 <p className="font-semibold text-xs text-gray-800">{title}</p>
-                <p className="text-gray-500 text-[10px]">{desc}</p>
+                <p className="text-gray-500 text-md">{desc}</p>
               </div>
             </div>
           ))}

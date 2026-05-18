@@ -22,7 +22,7 @@ export default function WebInfoManager() {
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Working Hours: 10:00 AM to 04:00 PM
+          Working Hours: 10:00 AM to 05:00 PM
         </div>
 
         {/* Office Address */}
@@ -90,7 +90,7 @@ export default function WebInfoManager() {
                     Shri Ankush Kapoor
                   </td>
                   <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-500 align-top break-words">
-                    Informatics Officer
+                    Chief Informatics Officer
                   </td>
                   <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-700 align-top break-all">
                     <a

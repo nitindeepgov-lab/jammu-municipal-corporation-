@@ -334,7 +334,7 @@ export default function Contact() {
           <h2 className="text-lg font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">
             Officer Directory
           </h2>
-          <p className="text-xs text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 mb-4">
             For PHE Water Supply helpline numbers,{" "}
             <a
               href="https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf"
@@ -348,7 +348,7 @@ export default function Contact() {
             <strong>0191-2578503</strong>.
           </p>
           <div className="w-full">
-            <table className="w-full table-fixed text-xs sm:text-sm border border-gray-200">
+            <table className="w-full table-fixed text-sm sm:text-sm border border-gray-200">
               <thead className="bg-[#003366] text-white">
                 <tr>
                   <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-center text-[11px] font-semibold w-12 whitespace-nowrap">
@@ -378,19 +378,19 @@ export default function Contact() {
                         : "bg-gray-50 hover:bg-gray-100"
                     }
                   >
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-xs text-center align-middle whitespace-nowrap">
+                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-sm text-center align-middle whitespace-nowrap">
                       {idx + 1}
                     </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-xs align-top break-words">
+                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-sm align-top break-words">
                       {officer.name}
                     </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-xs align-top break-words">
+                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
                       {officer.designation}
                     </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-xs align-top break-words">
+                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
                       {officer.office || "—"}
                     </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-xs align-top break-all">
+                    <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
                       {officer.mobile ? (
                         <a
                           href={`tel:${officer.mobile}`}

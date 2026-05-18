@@ -508,6 +508,43 @@ export interface ApiCouncillorDetailCouncillorDetail
   };
 }
 
+export interface ApiEventActivityEventActivity
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'event_activities';
+  info: {
+    description: 'Events and civic activities shown on the JMC homepage.';
+    displayName: '\uD83D\uDCC5 Events & Activities';
+    pluralName: 'event-activities';
+    singularName: 'event-activity';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    category: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    event_date: Schema.Attribute.Date & Schema.Attribute.Required;
+    image: Schema.Attribute.Media<'images'>;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    link: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::event-activity.event-activity'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsTickerNewsTicker extends Struct.CollectionTypeSchema {
   collectionName: 'news_tickers';
   info: {
@@ -1310,6 +1347,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::bulletin-board.bulletin-board': ApiBulletinBoardBulletinBoard;
       'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
+      'api::event-activity.event-activity': ApiEventActivityEventActivity;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
       'api::notice.notice': ApiNoticeNotice;
       'api::official.official': ApiOfficialOfficial;

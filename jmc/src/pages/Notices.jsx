@@ -10,7 +10,7 @@ import { formatDate } from "../utils/dateFormatter";
 import { logError } from "../utils/errorLogger";
 
 const tabs = [
-  { id: "public", label: "Public Notices" },
+  { id: "public", label: "Orders & Circulars" },
   { id: "tender", label: "Tenders" },
   { id: "council", label: "Council Updates" },
 ];
@@ -93,7 +93,7 @@ export default function Notices() {
 
   return (
     <SubpageTemplate
-      title="Notices &amp; Tenders"
+      title="Orders &amp; Circulars"
       breadcrumb={[{ name: "Notices & Tenders" }]}
     >
       <div>
