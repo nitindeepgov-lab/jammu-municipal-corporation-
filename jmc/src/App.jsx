@@ -67,6 +67,7 @@ import SanitationDepartment from "./pages/SanitationDepartment";
 import UrbanPlanning from "./pages/UrbanPlanning";
 import WaterSupplyDivision from "./pages/WaterSupplyDivision";
 import HorticultureDepartment from "./pages/HorticultureDepartment";
+// import ChatBot from "./components/ChatBot";
 
 export default function App() {
   return (
@@ -121,6 +122,7 @@ export default function App() {
         <Route path="/admin" element={<AdminRedirect />} />
         <Route path="/Admin" element={<AdminRedirect />} />
       </Routes>
+      {/* <ChatBot /> */}
     </BrowserRouter>
   );
 }

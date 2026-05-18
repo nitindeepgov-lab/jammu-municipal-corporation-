@@ -14,9 +14,9 @@ const allSlides = [...ministerSlides, ministerSlides[0]]
 function MinisterCard({ minister }) {
   const honorific = minister.gender === 'F' ? 'Ms.' : 'Mr.'
   return (
-    <div className="bg-white border border-slate-200 p-4 md:p-7 shadow-sm flex flex-col items-center transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#003366]/30 hover:bg-gradient-to-b hover:from-white hover:via-[#f7fbff] hover:to-white">
-      <div className="mb-4">
-        <div className="w-28 h-28 md:w-36 md:h-36 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-full overflow-hidden border-[3px] border-gray-200">
+    <div className="group bg-white border border-gray-200 rounded-2xl p-4 md:p-6 shadow-sm flex flex-col items-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_-12px_rgba(0,51,102,0.15)] hover:border-[#003366]/20">
+      <div className="mb-4 relative">
+        <div className="w-28 h-28 md:w-32 md:h-32 flex items-center justify-center rounded-full overflow-hidden border-[3px] border-gray-200 group-hover:border-[#FF6600]/50 transition-colors duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
           <img
             src={minister.image}
             alt={minister.name}
@@ -26,13 +26,15 @@ function MinisterCard({ minister }) {
             }}
           />
         </div>
+        {/* Online indicator */}
+        <div className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-sm" />
       </div>
-      <div className="text-center mb-5 flex-1 w-full">
-        <h3 className="text-sm font-semibold text-[#003366] mb-2 leading-tight">{minister.title}</h3>
-        <p className="text-xs text-gray-700 font-medium">{honorific} {minister.name}</p>
+      <div className="text-center mb-4 flex-1 w-full">
+        <h3 className="text-[13px] font-bold text-[#003366] mb-1.5 leading-tight">{minister.title}</h3>
+        <p className="text-xs text-gray-600 font-medium">{honorific} {minister.name}</p>
       </div>
-      <button className="w-full border-2 border-gray-300 hover:border-gray-400 text-gray-600 hover:text-gray-700 text-xs font-semibold py-2.5 px-4 rounded-md transition-all hover:bg-gray-50">
-        Profile
+      <button className="w-full bg-[#003366]/5 hover:bg-[#003366] text-[#003366] hover:text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 border border-[#003366]/10 hover:border-[#003366]">
+        View Profile
       </button>
     </div>
   )
