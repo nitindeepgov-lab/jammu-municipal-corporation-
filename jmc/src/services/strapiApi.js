@@ -104,7 +104,7 @@ export const getCouncillorsPaginated = (
 /** Fetch all published payment locations ordered by ward number (desc) */
 export const getLocations = () =>
   api.get(
-    "/locations?sort=ward_no:desc&pagination[pageSize]=200&status=published&filters[is_active][$eq]=true",
+    "/locations?sort=ward_no:desc&pagination[pageSize]=200&filters[is_active][$eq]=true",
   );
 
 // ── Smart City Tenders ──────────────────────────────────────
