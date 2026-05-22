@@ -87,14 +87,13 @@ const navLinks = [
     hasDropdown: true,
     dropdown: [
       { name: "Public Notices", to: "/notices" },
-      { name: "Tenders", to: "/notices" },
       { name: "Council Updates", to: "/notices" },
       { name: "Smart City", to: "/smart-city" },
       { name: "Swachh Mission", to: "/swachh-mission" },
       { name: "Development Works", to: "/development-works" },
     ],
   },
-  { name: "Tenders", href: "/notices" },
+
   {
     name: "RTI",
     to: "/rti",

@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { STRAPI_URL } from "../config/api";
 import { generateReceiptPDF } from "../utils/generateReceipt";
+import { getLocations } from "../services/strapiApi";
 
 /* ═══════════════════════════════════════════════════════
    Payment Categories
@@ -57,7 +58,7 @@ const paymentOptions = [
       },
       {
         id: "nitTenderNo",
-        label: "NIT / Tender No.",
+        label: "NIT/Tender No.",
         type: "text",
         placeholder: "e.g. NIT-2025/001",
         required: true,
@@ -65,20 +66,20 @@ const paymentOptions = [
       },
       {
         id: "nitTenderDate",
-        label: "NIT / Tender Date",
+        label: "NIT/Tender Date",
         type: "date",
         required: true,
         half: true,
       },
       {
         id: "nitTenderDetails",
-        label: "Tender Details",
+        label: "NIT/Tender Details",
         type: "textarea",
         placeholder: "Brief description of the tender",
       },
       {
         id: "amount",
-        label: "Amount",
+        label: "NIT/Tender Amount",
         type: "number",
         placeholder: "₹ 0.00",
         required: true,
@@ -129,16 +130,9 @@ const paymentOptions = [
       },
       {
         id: "location",
-        label: "Zone",
+        label: "Location",
         type: "select",
-        options: [
-          "Select Zone",
-          "Zone A",
-          "Zone B",
-          "Zone C",
-          "Zone D",
-          "Zone E",
-        ],
+        options: ["Select Location"],
         required: true,
         half: true,
       },
@@ -174,7 +168,7 @@ const paymentOptions = [
       },
       {
         id: "amount",
-        label: "Amount",
+        label: "Enter Amount",
         type: "number",
         placeholder: "₹ 0.00",
         required: true,
@@ -357,7 +351,39 @@ export default function PayOnline() {
   const [receipt, setReceipt] = useState(null);
   const [formSnapshot, setFormSnapshot] = useState({}); // frozen copy of form at submit time
   const [downloading, setDownloading] = useState(false);
+  const [locationOptions, setLocationOptions] = useState(["Select Location"]);
   const panelRef = useRef(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    getLocations()
+      .then((res) => {
+        const options = (res.data?.data || [])
+          .map((entry) => {
+            const attrs = entry.attributes || entry;
+            const name = String(attrs.name || "").trim();
+            if (!name) return null;
+            const wardNo = attrs.ward_no ?? attrs.wardNo;
+            const suffix = wardNo ? ` (Ward No.${wardNo})` : "";
+            return `${name}${suffix}`;
+          })
+          .filter(Boolean);
+
+        if (isActive && options.length > 0) {
+          setLocationOptions(["Select Location", ...options]);
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          setLocationOptions(["Select Location"]);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   /* helpers */
   const reset = useCallback(() => {
@@ -505,6 +531,14 @@ export default function PayOnline() {
   /* derived */
   const step = status === STATUS.IDLE ? (selected ? 1 : 0) : 2;
   const amount = form.amount ? parseFloat(form.amount) : 0;
+  const fieldsToRender = selected?.fields?.map((field) => {
+    if (field.id !== "location") return field;
+    return {
+      ...field,
+      label: "Location",
+      options: locationOptions,
+    };
+  });
 
   /* ═══════════════════════════════════════════════════════
      Render
@@ -606,14 +640,14 @@ export default function PayOnline() {
                   <button
                     key={opt.id}
                     onClick={() => pick(opt)}
-                    className={`group relative flex items-center gap-4 rounded-xl p-4 sm:p-5 w-full text-left  transition-all duration-300 ${
+                    className={`group relative flex items-center gap-4 rounded-xl p-2 sm:p-2 w-full text-left transition-all duration-300 ${
                       active
                         ? "bg-gray-50 border-[#003366] ring-1 ring-[#003366]"
                         : "bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
                     }`}
                   >
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 ${
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 ${
                         active
                           ? "bg-[#003366] text-white"
                           : "bg-gray-100 text-gray-500 group-hover:text-gray-700"
@@ -696,7 +730,7 @@ export default function PayOnline() {
             <form onSubmit={handleSubmit}>
               <div className="px-6 py-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
-                  {selected.fields.map((f) => (
+                  {fieldsToRender?.map((f) => (
                     <div
                       key={f.id}
                       className={

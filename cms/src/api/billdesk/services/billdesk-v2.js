@@ -18,7 +18,12 @@
 
 "use strict";
 
-const { CompactSign, compactVerify, CompactEncrypt, compactDecrypt } = require("jose");
+const {
+  CompactSign,
+  compactVerify,
+  CompactEncrypt,
+  compactDecrypt,
+} = require("jose");
 const crypto = require("crypto");
 const net = require("net");
 
@@ -42,15 +47,15 @@ function getConfig() {
   // Validate required credentials
   if (!merchantId || !clientId || !signingKey || !encryptionKey) {
     throw new Error(
-      "BillDesk credentials missing. Required: BILLDESK_MERCHANT_ID, BILLDESK_CLIENT_ID, BILLDESK_SIGNING_PASSWORD, BILLDESK_ENCRYPTION_PASSWORD"
+      "BillDesk credentials missing. Required: BILLDESK_MERCHANT_ID, BILLDESK_CLIENT_ID, BILLDESK_SIGNING_PASSWORD, BILLDESK_ENCRYPTION_PASSWORD",
     );
   }
 
   // Environment-specific URLs
   const isProduction = env === "PRODUCTION";
-  const baseUrl = process.env.BILLDESK_BASE_URL || (isProduction
-    ? "https://api.billdesk.com"
-    : "https://uat1.billdesk.com");
+  const baseUrl =
+    process.env.BILLDESK_BASE_URL ||
+    (isProduction ? "https://api.billdesk.com" : "https://uat1.billdesk.com");
 
   const createOrderUrl = isProduction
     ? `${baseUrl}/pgsi/v1_2/orders/create`
@@ -79,7 +84,9 @@ function getConfig() {
     createOrderUrl,
     transactionStatusUrl,
     sdkBaseUrl,
-    returnUrl: process.env.BILLDESK_RETURN_URL || "https://jammu-municipal-corporation.vercel.app/payment-status",
+    returnUrl:
+      process.env.BILLDESK_RETURN_URL ||
+      "https://jammu-municipal-corporation.vercel.app/payment-status",
   };
 }
 
@@ -104,8 +111,8 @@ async function createJoseToken(payload, config) {
 
   // Step 1: Encrypt payload with JWE
   const jweHeader = {
-    alg: "dir",              // Direct key agreement
-    enc: "A256GCM",          // AES-256-GCM encryption
+    alg: "dir", // Direct key agreement
+    enc: "A256GCM", // AES-256-GCM encryption
     clientid: config.clientId,
   };
 
@@ -120,7 +127,7 @@ async function createJoseToken(payload, config) {
 
   // Step 2: Sign JWE with JWS
   const jwsHeader = {
-    alg: "HS256",            // HMAC-SHA256 signing
+    alg: "HS256", // HMAC-SHA256 signing
     clientid: config.clientId,
   };
 
@@ -170,14 +177,14 @@ async function verifyJoseToken(token, config) {
     // Step 1: Verify JWS signature
     const { payload: jwsPayload } = await compactVerify(
       trimmedToken,
-      config.signingKeyBytes
+      config.signingKeyBytes,
     );
     const jweToken = decoder.decode(jwsPayload).trim();
 
     // Step 2: Decrypt JWE
     const { plaintext } = await compactDecrypt(
       jweToken,
-      config.encryptionKeyBytes
+      config.encryptionKeyBytes,
     );
 
     // Step 3: Parse JSON
@@ -311,7 +318,9 @@ function isValidBillDeskIp(ip) {
 function buildAdditionalInfo(feeType, additionalInfo = {}) {
   return {
     additional_info1: sanitizeValue(feeType || "JMC_FEE"),
-    additional_info2: sanitizeValue(additionalInfo.reference1 || additionalInfo.dept || "NA"),
+    additional_info2: sanitizeValue(
+      additionalInfo.reference1 || additionalInfo.dept || "NA",
+    ),
     additional_info3: sanitizeValue(additionalInfo.reference2 || "NA"),
     additional_info4: "NA",
     additional_info5: "NA",
@@ -343,7 +352,7 @@ async function callBillDeskAPI(url, joseToken) {
 
   const requestHeaders = {
     "Content-Type": "application/jose",
-    "Accept": "application/jose",
+    Accept: "application/jose",
     "BD-Traceid": traceId,
     "BD-Timestamp": timestamp,
   };
@@ -418,7 +427,7 @@ module.exports = () => ({
     if (!isValidBillDeskIp(deviceIp)) {
       throw new Error(
         `Invalid device IP for BillDesk: "${deviceIp || "null"}". ` +
-        "Must be a public IPv4 address. Set BILLDESK_FALLBACK_DEVICE_IP."
+          "Must be a public IPv4 address. Set BILLDESK_FALLBACK_DEVICE_IP.",
       );
     }
 
@@ -472,8 +481,10 @@ module.exports = () => ({
         bodyBytes: response.bodyBytes,
         redirected: response.redirected,
         finalUrl: response.finalUrl,
-        responseContentType: response.responseHeaders["content-type"] || "MISSING",
-        responseContentLength: response.responseHeaders["content-length"] || "MISSING",
+        responseContentType:
+          response.responseHeaders["content-type"] || "MISSING",
+        responseContentLength:
+          response.responseHeaders["content-length"] || "MISSING",
         responseServer: response.responseHeaders["server"] || "MISSING",
         bodyPreview: (response.body || "").substring(0, 200),
       });
@@ -531,7 +542,10 @@ module.exports = () => ({
       const orderResponse = await verifyJoseToken(response.body, config);
 
       // Validate response
-      if (orderResponse.status !== "ACTIVE" || orderResponse.objectid !== "order") {
+      if (
+        orderResponse.status !== "ACTIVE" ||
+        orderResponse.objectid !== "order"
+      ) {
         console.error("BILLDESK_ORDER_REJECTED:", {
           traceId: response.traceId,
           timestamp: response.timestamp,
@@ -543,7 +557,9 @@ module.exports = () => ({
 
       // Extract SDK configuration from response
       const bdOrderId = orderResponse.bdorderid;
-      const redirectLink = orderResponse.links?.find(link => link.rel === "redirect");
+      const redirectLink = orderResponse.links?.find(
+        (link) => link.rel === "redirect",
+      );
 
       if (!redirectLink) {
         throw new Error("Redirect link not found in BillDesk response");
@@ -558,7 +574,6 @@ module.exports = () => ({
         where: { orderId },
         data: {
           bdOrderId,
-          authToken,
           rawResponse: orderResponse,
         },
       });
@@ -615,8 +630,8 @@ module.exports = () => ({
       //   0399 / blank  = Typically user-cancelled
       //   All others    = Failed (bank declined, timeout, etc.)
       const authStatus = txnData.auth_status || "";
-      const errorType  = (txnData.transaction_error_type || "").toLowerCase();
-      const errorDesc  = txnData.transaction_error_desc || "";
+      const errorType = (txnData.transaction_error_type || "").toLowerCase();
+      const errorDesc = txnData.transaction_error_desc || "";
 
       let statusMessage;
       let isCancelled = false;
@@ -633,7 +648,7 @@ module.exports = () => ({
         errorDesc.toLowerCase().includes("cancel")
       ) {
         statusMessage = "FAILED";
-        isCancelled   = true;
+        isCancelled = true;
       } else {
         statusMessage = "FAILED";
       }
@@ -657,14 +672,18 @@ module.exports = () => ({
         }
 
         console.log("BILLDESK_STORED_TXN:", {
-          found:            !!storedTxn,
-          id:               storedTxn?.id,
-          orderId:          storedTxn?.orderId || storedTxn?.order_id,
-          customerName:     storedTxn?.customerName || storedTxn?.customer_name,
-          feeType:          storedTxn?.feeType || storedTxn?.fee_type,
-          hasAdditionalInfo: !!(storedTxn?.additionalInfo || storedTxn?.additional_info),
+          found: !!storedTxn,
+          id: storedTxn?.id,
+          orderId: storedTxn?.orderId || storedTxn?.order_id,
+          customerName: storedTxn?.customerName || storedTxn?.customer_name,
+          feeType: storedTxn?.feeType || storedTxn?.fee_type,
+          hasAdditionalInfo: !!(
+            storedTxn?.additionalInfo || storedTxn?.additional_info
+          ),
           additionalInfoKeys: storedTxn
-            ? Object.keys(storedTxn.additionalInfo || storedTxn.additional_info || {})
+            ? Object.keys(
+                storedTxn.additionalInfo || storedTxn.additional_info || {},
+              )
             : [],
         });
       } catch (fetchError) {
@@ -678,13 +697,14 @@ module.exports = () => ({
           await strapi.db.query("api::transaction.transaction").update({
             where: { id: storedTxn.id },
             data: {
-              status:        statusMessage,
+              status: statusMessage,
               transactionId: txnData.transactionid || null,
-              rawResponse:   txnData,
+              rawResponse: txnData,
             },
           });
           console.log("BILLDESK_TXN_UPDATED:", {
-            id: storedTxn.id, statusMessage
+            id: storedTxn.id,
+            statusMessage,
           });
         } catch (updateError) {
           console.error("BILLDESK_TXN_UPDATE_ERROR:", updateError.message);
@@ -696,20 +716,28 @@ module.exports = () => ({
           await strapi.db.query("api::transaction.transaction").update({
             where: { orderId: incomingOrderId },
             data: {
-              status:        statusMessage,
+              status: statusMessage,
               transactionId: txnData.transactionid || null,
-              rawResponse:   txnData,
+              rawResponse: txnData,
             },
           });
         } catch (fallbackError) {
-          console.error("BILLDESK_TXN_FALLBACK_UPDATE_ERROR:", fallbackError.message);
+          console.error(
+            "BILLDESK_TXN_FALLBACK_UPDATE_ERROR:",
+            fallbackError.message,
+          );
         }
       }
 
       // ── Log outcome ────────────────────────────────────────────────────
       if (statusMessage !== "SUCCESS") {
         console.warn("BILLDESK_PAYMENT_NOT_SUCCESS:", {
-          orderId: incomingOrderId, authStatus, statusMessage, isCancelled, errorType, errorDesc,
+          orderId: incomingOrderId,
+          authStatus,
+          statusMessage,
+          isCancelled,
+          errorType,
+          errorDesc,
           transactionId: txnData.transactionid || "N/A",
         });
       } else {
@@ -722,19 +750,23 @@ module.exports = () => ({
 
       // ── Extract customer data from stored record ────────────────────────
       // Handle both camelCase (Strapi attribute) and snake_case (DB column) variants
-      const customerName   = storedTxn?.customerName   || storedTxn?.customer_name   || "";
-      const customerMobile = storedTxn?.customerMobile || storedTxn?.customer_mobile || "";
-      const customerEmail  = storedTxn?.customerEmail  || storedTxn?.customer_email  || "";
-      const feeType        = storedTxn?.feeType        || storedTxn?.fee_type        || "";
-      const additionalInfo = storedTxn?.additionalInfo || storedTxn?.additional_info || {};
+      const customerName =
+        storedTxn?.customerName || storedTxn?.customer_name || "";
+      const customerMobile =
+        storedTxn?.customerMobile || storedTxn?.customer_mobile || "";
+      const customerEmail =
+        storedTxn?.customerEmail || storedTxn?.customer_email || "";
+      const feeType = storedTxn?.feeType || storedTxn?.fee_type || "";
+      const additionalInfo =
+        storedTxn?.additionalInfo || storedTxn?.additional_info || {};
 
       return {
-        verified:      statusMessage === "SUCCESS",
-        cancelled:     isCancelled,
-        orderId:       incomingOrderId,
+        verified: statusMessage === "SUCCESS",
+        cancelled: isCancelled,
+        orderId: incomingOrderId,
         transactionId: txnData.transactionid,
-        amount:        txnData.amount,
-        status:        authStatus,
+        amount: txnData.amount,
+        status: authStatus,
         statusMessage,
         paymentMethod: txnData.payment_method_type,
         errorDesc,
@@ -748,9 +780,9 @@ module.exports = () => ({
     } catch (error) {
       console.error("Verify transaction error:", error.message, error.stack);
       return {
-        verified:  false,
+        verified: false,
         cancelled: false,
-        error:     error.message,
+        error: error.message,
       };
     }
   },
@@ -780,7 +812,10 @@ module.exports = () => ({
 
     try {
       const joseToken = await createJoseToken(payload, config);
-      const response = await callBillDeskAPI(config.transactionStatusUrl, joseToken);
+      const response = await callBillDeskAPI(
+        config.transactionStatusUrl,
+        joseToken,
+      );
 
       if (!response.ok) {
         console.error("BILLDESK_TXN_STATUS_FAILED:", {
@@ -799,8 +834,8 @@ module.exports = () => ({
         txnResponse.auth_status === "0300"
           ? "SUCCESS"
           : txnResponse.auth_status === "0002"
-          ? "PENDING"
-          : "FAILED";
+            ? "PENDING"
+            : "FAILED";
 
       // Update database if transaction exists
       const where = orderId ? { orderId } : { transactionId };

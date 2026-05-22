@@ -76,7 +76,6 @@ export const getPhotoGalleryItems = () =>
     "/photo-galleries?populate[images][populate]=*&sort=order:asc&status=published&filters[is_active][$eq]=true",
   );
 
-
 // ── Ex-Municipal Councillors ───────────────────────────────
 
 /** Fetch all published councillor details ordered by ward number */
@@ -99,6 +98,14 @@ export const getCouncillorsPaginated = (
 
   return api.get(url);
 };
+
+// ── Payment Locations ─────────────────────────────────────
+
+/** Fetch all published payment locations ordered by ward number (desc) */
+export const getLocations = () =>
+  api.get(
+    "/locations?sort=ward_no:desc&pagination[pageSize]=200&status=published&filters[is_active][$eq]=true",
+  );
 
 // ── Smart City Tenders ──────────────────────────────────────
 
@@ -208,7 +215,6 @@ export const deleteTender = (documentId) =>
 export const getVisitorCount = () => api.get("/visitor-count/current");
 
 /** Increment and return the global visitor count */
-export const incrementVisitorCount = () =>
-  api.post("/visitor-count/increment");
+export const incrementVisitorCount = () => api.post("/visitor-count/increment");
 
 export default api;

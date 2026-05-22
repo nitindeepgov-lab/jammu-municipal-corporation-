@@ -4,7 +4,7 @@
 
 export const PROD_STRAPI_URL =
   "https://jammu-municipal-corporation.onrender.com";
-const LOCAL_STRAPI_URL = "http://localhost:1338";
+const LOCAL_STRAPI_URL = "http://localhost:1337";
 
 // Validate and get Strapi URL
 const getStrapiUrl = () => {
@@ -20,7 +20,7 @@ const getStrapiUrl = () => {
   }
 
   console.warn(
-    `⚠️ VITE_STRAPI_URL not set, using production fallback: ${PROD_STRAPI_URL}`
+    `⚠️ VITE_STRAPI_URL not set, using production fallback: ${PROD_STRAPI_URL}`,
   );
   return PROD_STRAPI_URL;
 };
