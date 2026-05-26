@@ -160,43 +160,46 @@ const injectAdminStyles = () => {
 
     /* ═══════════════════════════════════════════
        2. MAIN SIDEBAR (Left Navigation)
-       Professional, readable, responsive
+       Premium glassmorphic dark nav
        ═══════════════════════════════════════════ */
     body > div:first-child > div > nav:first-of-type,
     [class*="LeftMenu"], [class*="leftMenu"] {
-      background: linear-gradient(180deg, var(--jmc-navy) 0%, #0d1f36 50%, var(--jmc-navy-light) 100%) !important;
-      border-right: 1px solid rgba(255,255,255,0.04) !important;
-      box-shadow: 2px 0 30px rgba(0,0,0,0.18) !important;
+      background: linear-gradient(180deg, #0a1628 0%, #0f1d33 40%, #122240 100%) !important;
+      border-right: 1px solid rgba(255,255,255,0.06) !important;
+      box-shadow: 2px 0 40px rgba(0,0,0,0.25), inset -1px 0 0 rgba(255,255,255,0.03) !important;
       overflow-y: auto !important;
       scrollbar-width: none !important;
     }
     body > div:first-child > div > nav:first-of-type::-webkit-scrollbar,
     [class*="LeftMenu"]::-webkit-scrollbar { width: 0; display: none; }
 
-    /* Sidebar links — larger touch targets, readable */
+    /* Sidebar links — refined touch targets */
     body > div:first-child > div > nav:first-of-type a,
     [class*="LeftMenu"] a, [class*="leftMenu"] a {
-      transition: var(--jmc-transition) !important;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
       border-radius: 10px !important;
       margin: 3px 8px !important;
       padding: 10px 14px !important;
       min-height: 42px !important;
       display: flex !important;
       align-items: center !important;
+      position: relative !important;
     }
     body > div:first-child > div > nav:first-of-type a:hover,
     [class*="LeftMenu"] a:hover, [class*="leftMenu"] a:hover {
-      background: rgba(255, 255, 255, 0.07) !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      transform: translateX(2px) !important;
     }
     body > div:first-child > div > nav:first-of-type a[aria-current="page"],
     [class*="LeftMenu"] a[aria-current="page"], [class*="leftMenu"] a[aria-current="page"] {
-      background: rgba(255, 255, 255, 0.1) !important;
-      box-shadow: inset 3px 0 0 var(--jmc-accent) !important;
+      background: linear-gradient(135deg, rgba(255, 102, 0, 0.12), rgba(255, 102, 0, 0.05)) !important;
+      box-shadow: inset 3px 0 0 var(--jmc-accent), 0 0 20px rgba(255, 102, 0, 0.06) !important;
     }
     body > div:first-child > div > nav:first-of-type a[aria-current="page"] svg,
     [class*="LeftMenu"] a[aria-current="page"] svg {
       color: var(--jmc-accent) !important;
       fill: var(--jmc-accent) !important;
+      filter: drop-shadow(0 0 4px rgba(255, 102, 0, 0.3)) !important;
     }
     body > div:first-child > div > nav:first-of-type a[aria-current="page"] span,
     [class*="LeftMenu"] a[aria-current="page"] span {
@@ -204,29 +207,32 @@ const injectAdminStyles = () => {
       font-weight: 600 !important;
     }
 
-    /* Sidebar icons */
+    /* Sidebar icons — subtle glow on hover */
     body > div:first-child > div > nav:first-of-type svg,
     [class*="LeftMenu"] svg, [class*="leftMenu"] svg {
-      color: rgba(255,255,255,0.5) !important;
-      fill: rgba(255,255,255,0.5) !important;
+      color: rgba(255,255,255,0.45) !important;
+      fill: rgba(255,255,255,0.45) !important;
       width: 18px !important;
       height: 18px !important;
       flex-shrink: 0 !important;
+      transition: all 0.25s ease !important;
     }
     body > div:first-child > div > nav:first-of-type a:hover svg,
     [class*="LeftMenu"] a:hover svg, [class*="leftMenu"] a:hover svg {
-      color: rgba(255,255,255,0.85) !important;
-      fill: rgba(255,255,255,0.85) !important;
+      color: rgba(255,255,255,0.95) !important;
+      fill: rgba(255,255,255,0.95) !important;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,0.15)) !important;
     }
 
-    /* Sidebar text — larger, more readable */
+    /* Sidebar text — premium typography */
     body > div:first-child > div > nav:first-of-type span,
     [class*="LeftMenu"] span, [class*="leftMenu"] span {
-      color: rgba(255,255,255,0.7) !important;
+      color: rgba(255,255,255,0.65) !important;
       font-weight: 500 !important;
       font-size: 13.5px !important;
-      letter-spacing: 0.005em !important;
+      letter-spacing: 0.01em !important;
       line-height: 1.3 !important;
+      transition: color 0.2s ease !important;
     }
     body > div:first-child > div > nav:first-of-type a:hover span,
     [class*="LeftMenu"] a:hover span, [class*="leftMenu"] a:hover span {
@@ -236,7 +242,7 @@ const injectAdminStyles = () => {
     /* Sidebar section labels */
     body > div:first-child > div > nav:first-of-type p,
     [class*="LeftMenu"] p, [class*="leftMenu"] p {
-      color: rgba(255,255,255,0.3) !important;
+      color: rgba(255,255,255,0.25) !important;
       font-size: 9px !important;
       text-transform: uppercase !important;
       letter-spacing: 0.15em !important;
@@ -578,35 +584,61 @@ const injectAdminStyles = () => {
     .jmc-login-styled { /* marker class */ }
 
     /* ═══════════════════════════════════════════
-       16. CONTENT-TYPE SIDEBAR (Secondary)
-       Clean, readable, responsive
+       16. CONTENT-TYPE SIDEBAR (SubNav) — Premium
        ═══════════════════════════════════════════ */
     [class*="SubNav"] {
-      background: var(--jmc-surface) !important;
+      background: linear-gradient(180deg, #ffffff 0%, #fafbfd 100%) !important;
       border-right: 1px solid var(--jmc-border-light) !important;
-      min-width: 220px !important;
-      padding: 8px 0 !important;
+      min-width: 230px !important;
+      padding: 0 !important;
       overflow-y: auto !important;
+      box-shadow: 1px 0 8px rgba(0,0,0,0.03) !important;
     }
+
+    /* SubNav header area — title bar */
+    [class*="SubNav"] > div:first-child {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 2 !important;
+      background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%) !important;
+      border-bottom: 1px solid var(--jmc-border-light) !important;
+      padding: 16px 16px 12px !important;
+    }
+    [class*="SubNav"] > div:first-child h2 {
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.01em !important;
+      color: var(--jmc-text-primary) !important;
+      text-transform: none !important;
+      padding: 0 !important;
+      margin: 0 0 8px !important;
+    }
+
+    /* SubNav links — refined with smooth hover */
     [class*="SubNav"] a {
       border-radius: 8px !important;
       margin: 2px 10px !important;
-      padding: 10px 14px !important;
-      transition: var(--jmc-transition) !important;
+      padding: 9px 12px !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
       font-size: 13.5px !important;
       font-weight: 500 !important;
       display: flex !important;
       align-items: center !important;
       gap: 10px !important;
-      min-height: 40px !important;
+      min-height: 38px !important;
       color: var(--jmc-text-secondary) !important;
+      position: relative !important;
     }
     [class*="SubNav"] a:hover {
-      background: var(--jmc-bg) !important;
-      color: var(--jmc-text-primary) !important;
+      background: linear-gradient(135deg, #f0f4ff, #f5f7fb) !important;
+      color: var(--jmc-blue) !important;
+      transform: translateX(3px) !important;
+    }
+    [class*="SubNav"] a:hover svg {
+      color: var(--jmc-blue) !important;
     }
     [class*="SubNav"] a[aria-current="page"] {
-      background: linear-gradient(135deg, rgba(0, 51, 102, 0.06), rgba(0, 51, 102, 0.03)) !important;
+      background: linear-gradient(135deg, rgba(0, 51, 102, 0.08), rgba(0, 51, 102, 0.03)) !important;
       color: var(--jmc-blue) !important;
       font-weight: 600 !important;
       box-shadow: inset 3px 0 0 var(--jmc-blue) !important;
@@ -619,45 +651,72 @@ const injectAdminStyles = () => {
       height: 16px !important;
       flex-shrink: 0 !important;
       color: var(--jmc-text-dim) !important;
+      transition: color 0.2s ease !important;
     }
+
+    /* Section headers — with accent line */
     [class*="SubNav"] h2, [class*="SubNav"] h3 {
       font-size: 10px !important;
       text-transform: uppercase !important;
       letter-spacing: 0.12em !important;
       color: var(--jmc-text-dim) !important;
       font-weight: 800 !important;
-      padding: 18px 16px 8px 24px !important;
+      padding: 20px 16px 8px 14px !important;
       margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
     }
-    /* SubNav counter badges */
+    [class*="SubNav"] h2::before, [class*="SubNav"] h3::before {
+      content: '' !important;
+      width: 3px !important;
+      height: 12px !important;
+      background: var(--jmc-blue) !important;
+      border-radius: 2px !important;
+      flex-shrink: 0 !important;
+    }
+    /* First section header (inside sticky area) */
+    [class*="SubNav"] > div:first-child h2::before {
+      display: none !important;
+    }
+
+    /* Counter badges — refined pill */
     [class*="SubNav"] [class*="Badge"],
     [class*="SubNav"] [class*="badge"] {
-      background: var(--jmc-bg) !important;
-      color: var(--jmc-text-dim) !important;
+      background: linear-gradient(135deg, #eef2ff, #e8ecf8) !important;
+      color: var(--jmc-blue) !important;
       font-size: 10px !important;
-      min-width: 22px !important;
+      min-width: 24px !important;
       height: 20px !important;
       border-radius: 10px !important;
       font-weight: 700 !important;
+      border: 1px solid rgba(0, 51, 102, 0.08) !important;
     }
-    /* SubNav search */
+
+    /* Search input — elevated */
     [class*="SubNav"] input {
       border-radius: 8px !important;
       font-size: 13px !important;
       background: var(--jmc-bg) !important;
       border: 1px solid var(--jmc-border-light) !important;
-      margin: 4px 12px !important;
+      margin: 0 !important;
       padding: 8px 12px !important;
+      transition: all 0.2s ease !important;
     }
     [class*="SubNav"] input:focus {
       background: var(--jmc-surface) !important;
       border-color: var(--jmc-blue) !important;
-      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.06) !important;
+      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.08), 0 2px 8px rgba(0,0,0,0.04) !important;
     }
+    [class*="SubNav"] input::placeholder {
+      color: var(--jmc-text-dim) !important;
+      font-size: 12.5px !important;
+    }
+
     /* SubNav responsive */
     @media (max-width: 768px) {
       [class*="SubNav"] {
-        min-width: 180px !important;
+        min-width: 190px !important;
       }
       [class*="SubNav"] a {
         font-size: 12.5px !important;
@@ -671,17 +730,19 @@ const injectAdminStyles = () => {
       content: '' !important;
       width: 6px !important; height: 6px !important;
       border-radius: 50% !important;
-      background: var(--jmc-text-dim) !important;
+      background: var(--jmc-border) !important;
       flex-shrink: 0 !important;
-      transition: all 0.2s ease !important;
+      transition: all 0.25s ease !important;
     }
     [class*="SubNav"] a:hover::before {
       background: var(--jmc-blue) !important;
-      box-shadow: 0 0 6px rgba(0, 51, 102, 0.3) !important;
+      box-shadow: 0 0 8px rgba(0, 51, 102, 0.35) !important;
+      transform: scale(1.3) !important;
     }
     [class*="SubNav"] a[aria-current="page"]::before {
       background: var(--jmc-blue) !important;
       box-shadow: 0 0 8px rgba(0, 51, 102, 0.4) !important;
+      width: 7px !important; height: 7px !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -1052,8 +1113,11 @@ const injectAdminStyles = () => {
     /* ═══════════════════════════════════════════
        29. DASHBOARD — Custom Widgets
        ═══════════════════════════════════════════ */
-    .dashboard-active #custom-jmc-dashboard ~ * {
+    .dashboard-active main > *:not(#custom-jmc-dashboard) {
       display: none !important;
+    }
+    #custom-jmc-dashboard {
+      display: block !important;
     }
 
     #custom-jmc-dashboard {
@@ -2558,12 +2622,27 @@ const injectDashboardWidgets = () => {
         });
       }
 
-    } else if (!isHomepage && existingDash) {
-      existingDash.remove();
+    }
+  };
+
+  // Fast route detector — runs immediately (no debounce) to toggle class instantly
+  const fastRouteCheck = () => {
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '/admin/' || window.location.pathname === '/admin';
+    if (isHomepage) {
+      document.body.classList.add('dashboard-active');
+    } else {
+      const existingDash = document.getElementById('custom-jmc-dashboard');
+      if (existingDash) existingDash.remove();
       document.body.classList.remove('dashboard-active');
     }
   };
 
+  // Run fast check immediately and on every DOM mutation (not debounced)
+  const routeObserver = new MutationObserver(fastRouteCheck);
+  routeObserver.observe(document.body, { childList: true, subtree: false });
+  fastRouteCheck();
+
+  // Heavy dashboard build — debounced
   const dashObserver = new MutationObserver(debounce(dashHandler, 300));
   dashObserver.observe(document.body, { childList: true, subtree: true });
 };
