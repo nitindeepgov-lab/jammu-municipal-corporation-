@@ -21,9 +21,16 @@ const debounce = (fn, ms) => {
 const injectAdminStyles = () => {
   if (typeof document === 'undefined') return;
 
-  // Force light theme
-  try { localStorage.setItem('strapi-theme', 'light'); } catch (_) { }
+  // Force light theme — cover all known Strapi 5 localStorage keys
+  try {
+    localStorage.setItem('strapi-theme', 'light');
+    localStorage.setItem('STRAPI_THEME', 'light');
+    localStorage.setItem('strapi-admin-theme', 'light');
+    localStorage.setItem('theme', 'light');
+  } catch (_) { }
   document.documentElement.setAttribute('data-theme', 'light');
+  document.documentElement.classList.remove('dark');
+  document.documentElement.style.colorScheme = 'light';
 
   const style = document.createElement('style');
   style.textContent = `
@@ -53,13 +60,35 @@ const injectAdminStyles = () => {
       --jmc-shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
       --jmc-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    html[data-theme="dark"] { color-scheme: light !important; }
+    /* ═══ ABSOLUTE DARK MODE LOCK ═══ */
+    html, html[data-theme="dark"], html[data-theme="light"],
+    html.dark, :root {
+      color-scheme: light only !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root, html { color-scheme: light only !important; }
+    }
 
-    /* ── Nuclear dark mode prevention ── */
+    /* Force ALL Strapi design-system tokens to light values */
     html[data-theme="dark"],
     html[data-theme="dark"] body,
-    html[data-theme="dark"] #app {
-      color-scheme: light !important;
+    html[data-theme="dark"] #app,
+    html[data-theme="dark"] #app > div {
+      --colors-neutral0: #ffffff !important;
+      --colors-neutral100: #f8f9fb !important;
+      --colors-neutral150: #f1f5f9 !important;
+      --colors-neutral200: #e5e7eb !important;
+      --colors-neutral300: #d4d8dd !important;
+      --colors-neutral400: #c0c5cc !important;
+      --colors-neutral500: #8e99a4 !important;
+      --colors-neutral600: #666e7a !important;
+      --colors-neutral700: #4a4f56 !important;
+      --colors-neutral800: #32373d !important;
+      --colors-neutral900: #1c2028 !important;
+      --colors-neutral1000: #0d1015 !important;
+      --colors-primary600: #003366 !important;
+      --colors-primary700: #002855 !important;
+      color-scheme: light only !important;
       background: var(--jmc-bg) !important;
       color: var(--jmc-text-primary) !important;
     }
@@ -69,19 +98,44 @@ const injectAdminStyles = () => {
     html[data-theme="dark"] header,
     html[data-theme="dark"] [class*="SubNav"],
     html[data-theme="dark"] [class*="Dialog"],
-    html[data-theme="dark"] [class*="Modal"] {
+    html[data-theme="dark"] [class*="Modal"],
+    html[data-theme="dark"] [class*="Popover"],
+    html[data-theme="dark"] [class*="Sidebar"],
+    html[data-theme="dark"] [role="dialog"],
+    html[data-theme="dark"] table,
+    html[data-theme="dark"] thead,
+    html[data-theme="dark"] tbody,
+    html[data-theme="dark"] td,
+    html[data-theme="dark"] th {
       background: var(--jmc-surface) !important;
       color: var(--jmc-text-primary) !important;
     }
     html[data-theme="dark"] input,
     html[data-theme="dark"] textarea,
-    html[data-theme="dark"] select {
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] [class*="Input"],
+    html[data-theme="dark"] [class*="Textarea"],
+    html[data-theme="dark"] [class*="Select"] {
       background: var(--jmc-surface) !important;
       color: var(--jmc-text-primary) !important;
       border-color: var(--jmc-border) !important;
     }
-    @media (prefers-color-scheme: dark) {
-      :root { color-scheme: light !important; }
+    html[data-theme="dark"] label,
+    html[data-theme="dark"] span,
+    html[data-theme="dark"] p,
+    html[data-theme="dark"] h1,
+    html[data-theme="dark"] h2,
+    html[data-theme="dark"] h3,
+    html[data-theme="dark"] h4,
+    html[data-theme="dark"] h5,
+    html[data-theme="dark"] a {
+      color: inherit !important;
+    }
+    html[data-theme="dark"] svg {
+      fill: currentColor !important;
+    }
+    html[data-theme="dark"] [class*="Badge"] {
+      background: var(--jmc-bg) !important;
     }
 
     * {
@@ -794,11 +848,21 @@ const injectAdminStyles = () => {
     [class*="NpsSurvey"],
     a[href*="strapi.io"] { display: none !important; }
 
-    /* Theme toggle */
+    /* Theme toggle — comprehensive hide */
     [data-strapi-theme-toggle],
     button[data-strapi-theme-toggle],
     [class*="ThemeToggle"],
-    [aria-label="Change theme"] { display: none !important; }
+    [class*="themeToggle"],
+    [class*="theme-toggle"],
+    [aria-label="Change theme"],
+    [aria-label="Toggle theme"],
+    [aria-label*="dark mode"],
+    [aria-label*="Dark mode"],
+    [aria-label*="theme"],
+    button[title*="theme"],
+    button[title*="Theme"],
+    button[title*="dark"],
+    button[title*="Dark"] { display: none !important; visibility: hidden !important; }
 
     /* Plugins, Marketplace, Cloud */
     a[href*="/plugins"],
@@ -897,7 +961,17 @@ const injectAdminStyles = () => {
       100% { background-position: 200% 0; }
     }
 
-    /* Page transition */
+    /* Page entrance — start hidden, fade in once layout is ready */
+    #app > div {
+      opacity: 0;
+      animation: appFadeIn 0.5s ease-out 0.3s forwards;
+    }
+    @keyframes appFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Per-page content transition */
     main > div {
       animation: fadeIn 0.3s ease-out;
     }
@@ -1350,17 +1424,41 @@ const injectAdminStyles = () => {
   noscript.appendChild(noscriptLink);
   document.head.appendChild(noscript);
 
-  // Theme guard — MutationObserver enforces light mode
+  // Theme guard — MutationObserver enforces light mode aggressively
+  const forceLight = () => {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try {
+      localStorage.setItem('strapi-theme', 'light');
+      localStorage.setItem('STRAPI_THEME', 'light');
+      localStorage.setItem('strapi-admin-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    } catch (_) {}
+  };
   const themeGuard = new MutationObserver(() => {
-    if (document.documentElement.getAttribute('data-theme') !== 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      try { localStorage.setItem('strapi-theme', 'light'); } catch (_) {}
-    }
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme !== 'light') forceLight();
   });
   themeGuard.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['data-theme'],
+    attributeFilter: ['data-theme', 'class', 'style'],
   });
+  // Periodically enforce + remove theme toggle buttons from DOM
+  setInterval(() => {
+    forceLight();
+    // Actively remove theme toggle buttons
+    const toggleSelectors = [
+      '[class*="ThemeToggle"]', '[class*="themeToggle"]',
+      '[data-strapi-theme-toggle]', '[aria-label="Change theme"]',
+      '[aria-label="Toggle theme"]', 'button[title*="theme" i]',
+    ];
+    document.querySelectorAll(toggleSelectors.join(',')).forEach(el => {
+      el.style.display = 'none';
+      el.style.visibility = 'hidden';
+      el.setAttribute('aria-hidden', 'true');
+    });
+  }, 2000);
 
   // Replace "Strapi" text globally (debounced 200ms)
   const replaceStapiText = debounce(() => {
@@ -1855,6 +1953,9 @@ const injectDashboardWidgets = () => {
     const existingDash = document.getElementById('custom-jmc-dashboard');
 
     if (isHomepage && mainContainer && !existingDash) {
+      // Wait for sidebar nav to be fully rendered before showing dashboard
+      const sidebarNav = document.querySelector('nav, [class*="LeftMenu"], [class*="leftMenu"]');
+      if (!sidebarNav) return; // Sidebar not ready yet — observer will retry
       document.body.classList.add('dashboard-active');
 
       const dashboard = document.createElement('div');
@@ -2477,9 +2578,10 @@ const injectTransactionFieldEnhancements = () => {
   if (typeof document === 'undefined') return;
 
   const handleTransactionFields = debounce(() => {
-    const isTransactionEdit = window.location.pathname.includes(
-      'api::transaction.transaction/'
-    );
+    const path = window.location.pathname;
+    // Match both URL-encoded and plain content-type paths
+    const isTransactionEdit = path.includes('transaction.transaction/') ||
+      path.includes('transaction.transaction%2F');
     if (!isTransactionEdit) return;
 
     const fieldNames = ['rawResponse', 'additionalInfo'];
@@ -2488,49 +2590,100 @@ const injectTransactionFieldEnhancements = () => {
       const labels = document.querySelectorAll('label');
       labels.forEach(label => {
         const labelText = label.textContent?.trim();
-        // Match field names like "rawResponse" or "Raw Response" or "raw_response"
-        const normalised = labelText?.replace(/[\s_]/g, '').toLowerCase();
-        const target = fieldName.replace(/[\s_]/g, '').toLowerCase();
+        if (!labelText) return;
+
+        // Normalise both sides for comparison
+        const normalised = labelText.replace(/[\s_-]/g, '').toLowerCase();
+        const target = fieldName.replace(/[\s_-]/g, '').toLowerCase();
 
         if (normalised === target && !label.dataset.jmcToggled) {
           label.dataset.jmcToggled = 'true';
 
-          // Find the parent field wrapper
-          const fieldWrapper = label.closest('[class*="Field"]')
-            || label.parentElement?.parentElement;
+          // Strategy: walk UP from the label to find the outermost field container.
+          // In Strapi 5, the structure is typically:
+          //   <div>             ← field wrapper (what we want)
+          //     <div>           ← label row
+          //       <label>       ← the label we found
+          //     </div>
+          //     <div>           ← editor container (what we want to hide)
+          //       <div class="cm-editor">...</div>
+          //     </div>
+          //   </div>
+          let fieldWrapper = label.closest('[class*="Field"]');
+          if (!fieldWrapper) {
+            // Fallback: go up 3-4 levels from label to find a div that contains
+            // both the label and an editor/textarea
+            let candidate = label.parentElement;
+            for (let i = 0; i < 4 && candidate; i++) {
+              const hasEditor = candidate.querySelector(
+                'textarea, [class*="cm-editor"], [class*="CodeMirror"], [class*="JSONInput"], pre'
+              );
+              if (hasEditor && candidate.contains(label)) {
+                fieldWrapper = candidate;
+                break;
+              }
+              candidate = candidate.parentElement;
+            }
+          }
           if (!fieldWrapper) return;
 
-          // Find the content to collapse (textarea or JSON editor)
-          const content = fieldWrapper.querySelector(
-            'textarea, [class*="JSONInput"], [class*="CodeMirror"], [class*="json"]'
-          );
-          if (!content) return;
+          // Find ALL child divs in the field wrapper that are NOT the label row
+          const labelRow = label.closest('div');
+          const editorContainers = [];
+          for (const child of fieldWrapper.children) {
+            if (child !== labelRow && child.nodeType === 1) {
+              editorContainers.push(child);
+            }
+          }
 
-          // Collapse by default
-          content.classList.add('jmc-field-collapsed');
+          if (editorContainers.length === 0) return;
+
+          // Collapse all editor containers by default
+          editorContainers.forEach(c => {
+            c.classList.add('jmc-field-collapsed');
+            c.dataset.jmcFieldContent = fieldName;
+          });
 
           // Create toggle button
           const toggle = document.createElement('button');
           toggle.className = 'jmc-field-toggle';
           toggle.type = 'button';
-          toggle.textContent = '\u25B6 Show ' + fieldName;
+          toggle.innerHTML = '\u25B6 Show ' + fieldName;
+          let collapsed = true;
+
           toggle.addEventListener('click', (e) => {
             e.preventDefault();
-            const isCollapsed = content.classList.toggle('jmc-field-collapsed');
-            toggle.textContent = isCollapsed
+            e.stopPropagation();
+            collapsed = !collapsed;
+            editorContainers.forEach(c => {
+              if (collapsed) {
+                c.classList.add('jmc-field-collapsed');
+              } else {
+                c.classList.remove('jmc-field-collapsed');
+              }
+            });
+            toggle.innerHTML = collapsed
               ? '\u25B6 Show ' + fieldName
               : '\u25BC Hide ' + fieldName;
           });
 
-          // Insert after label
-          label.parentElement.appendChild(toggle);
+          // Insert toggle right after the label
+          if (labelRow && labelRow.parentElement) {
+            labelRow.style.display = 'flex';
+            labelRow.style.alignItems = 'center';
+            labelRow.style.gap = '8px';
+            labelRow.style.flexWrap = 'wrap';
+            labelRow.appendChild(toggle);
+          }
         }
       });
     });
-  }, 300);
+  }, 500);
 
   const txnObserver = new MutationObserver(handleTransactionFields);
   txnObserver.observe(document.body, { childList: true, subtree: true });
+  // Also run once immediately after a delay
+  setTimeout(handleTransactionFields, 1500);
 };
 
 export default {
