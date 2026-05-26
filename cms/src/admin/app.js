@@ -9,6 +9,15 @@ import favicon from './favicon.png';
    forms, modals, settings, dashboard widgets.
    ═══════════════════════════════════════════════════════════ */
 
+/* ── Shared debounce utility ── */
+const debounce = (fn, ms) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+};
+
 const injectAdminStyles = () => {
   if (typeof document === 'undefined') return;
 
@@ -18,7 +27,7 @@ const injectAdminStyles = () => {
 
   const style = document.createElement('style');
   style.textContent = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    /* Font loaded via JS <link> preload for non-blocking render — see below */
 
     /* ═══════════════════════════════════════════
        1. GLOBAL FOUNDATION
@@ -44,7 +53,36 @@ const injectAdminStyles = () => {
       --jmc-shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
       --jmc-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    html[data-theme="dark"] { color-scheme: light; }
+    html[data-theme="dark"] { color-scheme: light !important; }
+
+    /* ── Nuclear dark mode prevention ── */
+    html[data-theme="dark"],
+    html[data-theme="dark"] body,
+    html[data-theme="dark"] #app {
+      color-scheme: light !important;
+      background: var(--jmc-bg) !important;
+      color: var(--jmc-text-primary) !important;
+    }
+    html[data-theme="dark"] [class*="Box-"],
+    html[data-theme="dark"] [class*="ContentBox"],
+    html[data-theme="dark"] main,
+    html[data-theme="dark"] header,
+    html[data-theme="dark"] [class*="SubNav"],
+    html[data-theme="dark"] [class*="Dialog"],
+    html[data-theme="dark"] [class*="Modal"] {
+      background: var(--jmc-surface) !important;
+      color: var(--jmc-text-primary) !important;
+    }
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] textarea,
+    html[data-theme="dark"] select {
+      background: var(--jmc-surface) !important;
+      color: var(--jmc-text-primary) !important;
+      border-color: var(--jmc-border) !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { color-scheme: light !important; }
+    }
 
     * {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
@@ -57,9 +95,13 @@ const injectAdminStyles = () => {
       background: var(--jmc-bg) !important;
     }
 
-    /* Global smoother transitions */
-    *, *::before, *::after {
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+    /* Targeted transition timing — replaces expensive global * rule */
+    a, button, input, textarea, select,
+    [class*="SubNav"] a, [class*="AssetCard"],
+    [class*="FolderCard"], tbody tr, .jmc-widget-card,
+    .jmc-stat-card, .jmc-qa-btn, [class*="Badge"],
+    [role="tab"], [class*="SettingsNav"] a {
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ═══════════════════════════════════════════
@@ -232,6 +274,30 @@ const injectAdminStyles = () => {
     }
     tbody tr:last-child td {
       border-bottom: none !important;
+    }
+
+    /* ── Zebra striping ── */
+    tbody tr:nth-child(even) {
+      background: #fafbfd !important;
+    }
+    tbody tr:nth-child(odd) {
+      background: var(--jmc-surface) !important;
+    }
+    tbody tr:nth-child(even):hover,
+    tbody tr:nth-child(odd):hover {
+      background: #f0f4ff !important;
+    }
+
+    /* ── CSS Row numbers ── */
+    table { counter-reset: row-num !important; }
+    tbody tr { counter-increment: row-num !important; }
+    tbody tr td:first-child::before {
+      content: counter(row-num) '. ' !important;
+      color: var(--jmc-text-dim) !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      min-width: 20px !important;
+      display: inline !important;
     }
     th:first-child, td:first-child {
       padding-left: 20px !important;
@@ -546,6 +612,24 @@ const injectAdminStyles = () => {
       }
     }
 
+    /* ── SubNav colored dot indicators ── */
+    [class*="SubNav"] a::before {
+      content: '' !important;
+      width: 6px !important; height: 6px !important;
+      border-radius: 50% !important;
+      background: var(--jmc-text-dim) !important;
+      flex-shrink: 0 !important;
+      transition: all 0.2s ease !important;
+    }
+    [class*="SubNav"] a:hover::before {
+      background: var(--jmc-blue) !important;
+      box-shadow: 0 0 6px rgba(0, 51, 102, 0.3) !important;
+    }
+    [class*="SubNav"] a[aria-current="page"]::before {
+      background: var(--jmc-blue) !important;
+      box-shadow: 0 0 8px rgba(0, 51, 102, 0.4) !important;
+    }
+
     /* ═══════════════════════════════════════════
        17. ENTRY EDIT VIEW — Professional Layout
        ═══════════════════════════════════════════ */
@@ -626,6 +710,22 @@ const injectAdminStyles = () => {
       border-bottom: 1px solid var(--jmc-border-light) !important;
       box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
       z-index: 10 !important;
+    }
+
+    /* ── Edit form field grouping ── */
+    [class*="EditViewColumn"] > div > div + div {
+      border-top: 1px solid var(--jmc-border-light) !important;
+      padding-top: 20px !important;
+      margin-top: 16px !important;
+    }
+    [class*="GridItem"], [class*="grid-item"] {
+      margin-bottom: 8px !important;
+    }
+    /* Relation field list scroll */
+    [class*="RelationInput"] [class*="list"] {
+      max-height: 200px !important;
+      overflow-y: auto !important;
+      scrollbar-width: thin !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -719,6 +819,26 @@ const injectAdminStyles = () => {
       transform: translateY(-2px) !important;
     }
 
+    /* ── Media library card polish ── */
+    [class*="AssetCard"] img, [class*="AssetCard"] video {
+      object-fit: cover !important;
+    }
+    [class*="AssetCard"] [class*="Extension"] {
+      background: rgba(0, 0, 0, 0.6) !important;
+      color: #fff !important;
+      border-radius: 4px !important;
+      font-size: 9px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      padding: 2px 6px !important;
+    }
+    [class*="FolderCard"] {
+      background: linear-gradient(135deg, #f8f9fb, #f1f3f8) !important;
+    }
+    [class*="FolderCard"] svg {
+      color: var(--jmc-blue) !important;
+    }
+
     /* ═══════════════════════════════════════════
        25. SETTINGS PAGE REFINEMENTS
        ═══════════════════════════════════════════ */
@@ -768,10 +888,91 @@ const injectAdminStyles = () => {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
+    @keyframes slideInUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
 
     /* Page transition */
     main > div {
       animation: fadeIn 0.3s ease-out;
+    }
+
+    /* ── Staggered dashboard widget entrance ── */
+    .jmc-dash-grid > * {
+      opacity: 0;
+      animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .jmc-dash-grid > *:nth-child(1) { animation-delay: 0.05s; }
+    .jmc-dash-grid > *:nth-child(2) { animation-delay: 0.1s; }
+    .jmc-dash-grid > *:nth-child(3) { animation-delay: 0.15s; }
+    .jmc-dash-grid > *:nth-child(4) { animation-delay: 0.2s; }
+    .jmc-dash-grid > *:nth-child(5) { animation-delay: 0.25s; }
+    .jmc-dash-grid > *:nth-child(6) { animation-delay: 0.3s; }
+    .jmc-dash-grid > *:nth-child(7) { animation-delay: 0.35s; }
+    .jmc-dash-grid > *:nth-child(8) { animation-delay: 0.4s; }
+
+    /* ═══════════════════════════════════════════
+       31. LOADING STATES
+       ═══════════════════════════════════════════ */
+    [class*="Loading"], [class*="Loader"] {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+      background-size: 200% 100% !important;
+      animation: shimmer 1.5s infinite !important;
+      border-radius: 8px !important;
+    }
+
+    /* ═══════════════════════════════════════════
+       32. NOTIFICATION TOASTS
+       ═══════════════════════════════════════════ */
+    [class*="Notification"], [class*="notification"] {
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+      backdrop-filter: blur(8px) !important;
+      animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    /* ═══════════════════════════════════════════
+       33. TYPOGRAPHY HIERARCHY
+       ═══════════════════════════════════════════ */
+    h1 { font-weight: 800 !important; letter-spacing: -0.025em !important; }
+    h2 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
+    h3 { font-weight: 600 !important; letter-spacing: -0.01em !important; }
+    [class*="ContentLayout"] > div {
+      margin-bottom: 24px;
+    }
+
+    /* ═══════════════════════════════════════════
+       34. FOCUS RINGS (Accessibility)
+       ═══════════════════════════════════════════ */
+    *:focus-visible {
+      outline: 2px solid var(--jmc-blue) !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1) !important;
+    }
+
+    /* ═══════════════════════════════════════════
+       35. TRANSACTION FIELD TOGGLE
+       ═══════════════════════════════════════════ */
+    .jmc-field-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 11px; font-weight: 600;
+      color: var(--jmc-text-dim); background: var(--jmc-bg);
+      border: 1px solid var(--jmc-border-light);
+      cursor: pointer; transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+    .jmc-field-toggle:hover {
+      color: var(--jmc-blue); border-color: var(--jmc-blue);
+      background: rgba(0, 51, 102, 0.04);
+    }
+    .jmc-field-collapsed {
+      display: none !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -1134,8 +1335,35 @@ const injectAdminStyles = () => {
   `;
   document.head.appendChild(style);
 
-  // Replace "Strapi" text globally
-  const textObserver = new MutationObserver(() => {
+  // Non-blocking font load via <link> preload
+  const fontLink = document.createElement('link');
+  fontLink.rel = 'preload';
+  fontLink.as = 'style';
+  fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap';
+  fontLink.onload = function () { this.rel = 'stylesheet'; };
+  document.head.appendChild(fontLink);
+  // Noscript fallback (built via DOM to avoid Vite import analysis)
+  const noscript = document.createElement('noscript');
+  const noscriptLink = document.createElement('link');
+  noscriptLink.rel = 'stylesheet';
+  noscriptLink.href = fontLink.href;
+  noscript.appendChild(noscriptLink);
+  document.head.appendChild(noscript);
+
+  // Theme guard — MutationObserver enforces light mode
+  const themeGuard = new MutationObserver(() => {
+    if (document.documentElement.getAttribute('data-theme') !== 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      try { localStorage.setItem('strapi-theme', 'light'); } catch (_) {}
+    }
+  });
+  themeGuard.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+
+  // Replace "Strapi" text globally (debounced 200ms)
+  const replaceStapiText = debounce(() => {
     document.querySelectorAll('span, p, h1, h2, h3, h4').forEach(el => {
       if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
         if (el.textContent.includes('Strapi')) {
@@ -1143,7 +1371,8 @@ const injectAdminStyles = () => {
         }
       }
     });
-  });
+  }, 200);
+  const textObserver = new MutationObserver(replaceStapiText);
   textObserver.observe(document.body, { childList: true, subtree: true, characterData: false });
 };
 
@@ -1372,8 +1601,8 @@ const injectLoginPageEnhancements = () => {
 
   // Run immediately and re-check periodically (SPA navigation)
   applyLoginStyles();
-  const observer = new MutationObserver(() => applyLoginStyles());
-  observer.observe(document.body, { childList: true, subtree: true });
+  const loginObserver = new MutationObserver(debounce(() => applyLoginStyles(), 250));
+  loginObserver.observe(document.body, { childList: true, subtree: true });
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -1620,7 +1849,7 @@ const injectHCaptchaOnLogin = () => {
 };
 
 const injectDashboardWidgets = () => {
-  const dashObserver = new MutationObserver(() => {
+  const dashHandler = () => {
     const isHomepage = window.location.pathname === '/' || window.location.pathname === '/admin/' || window.location.pathname === '/admin';
     const mainContainer = document.querySelector('main');
     const existingDash = document.getElementById('custom-jmc-dashboard');
@@ -2232,9 +2461,76 @@ const injectDashboardWidgets = () => {
       existingDash.remove();
       document.body.classList.remove('dashboard-active');
     }
-  });
+  };
 
+  const dashObserver = new MutationObserver(debounce(dashHandler, 300));
   dashObserver.observe(document.body, { childList: true, subtree: true });
+};
+
+/* ═══════════════════════════════════════════════════════════
+   Transaction Field Enhancements
+   ─────────────────────────────────────────────────────────
+   Collapses rawResponse and additionalInfo JSON fields by
+   default with a styled toggle button.
+   ═══════════════════════════════════════════════════════════ */
+const injectTransactionFieldEnhancements = () => {
+  if (typeof document === 'undefined') return;
+
+  const handleTransactionFields = debounce(() => {
+    const isTransactionEdit = window.location.pathname.includes(
+      'api::transaction.transaction/'
+    );
+    if (!isTransactionEdit) return;
+
+    const fieldNames = ['rawResponse', 'additionalInfo'];
+
+    fieldNames.forEach(fieldName => {
+      const labels = document.querySelectorAll('label');
+      labels.forEach(label => {
+        const labelText = label.textContent?.trim();
+        // Match field names like "rawResponse" or "Raw Response" or "raw_response"
+        const normalised = labelText?.replace(/[\s_]/g, '').toLowerCase();
+        const target = fieldName.replace(/[\s_]/g, '').toLowerCase();
+
+        if (normalised === target && !label.dataset.jmcToggled) {
+          label.dataset.jmcToggled = 'true';
+
+          // Find the parent field wrapper
+          const fieldWrapper = label.closest('[class*="Field"]')
+            || label.parentElement?.parentElement;
+          if (!fieldWrapper) return;
+
+          // Find the content to collapse (textarea or JSON editor)
+          const content = fieldWrapper.querySelector(
+            'textarea, [class*="JSONInput"], [class*="CodeMirror"], [class*="json"]'
+          );
+          if (!content) return;
+
+          // Collapse by default
+          content.classList.add('jmc-field-collapsed');
+
+          // Create toggle button
+          const toggle = document.createElement('button');
+          toggle.className = 'jmc-field-toggle';
+          toggle.type = 'button';
+          toggle.textContent = '\u25B6 Show ' + fieldName;
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isCollapsed = content.classList.toggle('jmc-field-collapsed');
+            toggle.textContent = isCollapsed
+              ? '\u25B6 Show ' + fieldName
+              : '\u25BC Hide ' + fieldName;
+          });
+
+          // Insert after label
+          label.parentElement.appendChild(toggle);
+        }
+      });
+    });
+  }, 300);
+
+  const txnObserver = new MutationObserver(handleTransactionFields);
+  txnObserver.observe(document.body, { childList: true, subtree: true });
 };
 
 export default {
@@ -2280,6 +2576,7 @@ export default {
     injectHCaptchaOnLogin();
     setTimeout(() => {
       injectDashboardWidgets();
+      injectTransactionFieldEnhancements();
     }, 500);
   },
 };
