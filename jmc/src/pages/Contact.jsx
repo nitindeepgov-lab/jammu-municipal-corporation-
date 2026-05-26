@@ -6,6 +6,7 @@ const officers = [
     designation: "Commissioner",
     office: "2542192, 2547846",
     mobile: "9797999495",
+    email: "mc.jmc@jk.gov.in",
   },
   {
     name: "Rajeev Khajuria, JKAS",
@@ -30,6 +31,7 @@ const officers = [
     designation: "Secretary",
     office: "",
     mobile: "7006046450",
+    email: "secy.jmcjmu@gmail.com",
   },
   {
     name: "Sanjay Badyal, JKAS",
@@ -156,6 +158,7 @@ const officers = [
     designation: "Private Secretary to Commissioner",
     office: "2542192",
     mobile: "9419104451",
+    email: "commissionerjmc@gmail.com",
   },
 ];
 
@@ -366,6 +369,9 @@ export default function Contact() {
                   <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
                     Mobile
                   </th>
+                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
+                    Email
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -397,6 +403,18 @@ export default function Contact() {
                           className="text-[#003366] hover:underline"
                         >
                           {officer.mobile}
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
+                      {officer.email ? (
+                        <a
+                          href={`mailto:${officer.email}`}
+                          className="text-[#003366] hover:underline break-all"
+                        >
+                          {officer.email}
                         </a>
                       ) : (
                         "—"
