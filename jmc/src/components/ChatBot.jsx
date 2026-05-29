@@ -595,7 +595,7 @@ export default function ChatBot() {
             ))}
 
             {/* Quick action chips */}
-            {/* {showQuickActions && (
+            {showQuickActions && (
               <div className="ml-10 mb-4 animate-msgIn">
                 <p className="text-[10.5px] font-semibold text-gray-400 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
                   <Zap size={10} className="text-[#FF6600]" /> Quick Topics
@@ -612,7 +612,7 @@ export default function ChatBot() {
                   ))}
                 </div>
               </div>
-            )} */}
+            )}
 
             {typing && <TypingIndicator />}
             <div className="h-2" />
@@ -673,7 +673,7 @@ export default function ChatBot() {
                     : ""
               }`}
             >
-              {/* <input
+               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -683,7 +683,7 @@ export default function ChatBot() {
                 }
                 disabled={typing}
                 className="flex-1 bg-transparent text-[13px] text-gray-800 placeholder-gray-400 outline-none py-1 disabled:opacity-60"
-              /> */}
+              /> 
 
               {/* Mic button */}
               {/* {voiceSupported && !input.trim() && (
@@ -702,7 +702,7 @@ export default function ChatBot() {
               )} */}
 
               {/* Send button */}
-              {/* <button
+              <button
                 onClick={handleSend}
                 disabled={!input.trim() || typing}
                 className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
@@ -712,7 +712,7 @@ export default function ChatBot() {
                 }`}
               >
                 <Send size={14} />
-              </button> */}
+              </button> 
             </div>
             <p className="text-center text-[10px] text-gray-400 mt-2.5 font-medium tracking-wider">
               JMC KNOWLEDGE BASE • OFFICIAL SERVICE BOT
