@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "audit_logs",
+  "info": {
+    "singularName": "audit-log",
+    "pluralName": "audit-logs",
+    "displayName": "📋 Audit Log",
+    "description": "Immutable audit trail for all admin actions on transactions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "action": {
+      "type": "enumeration",
+      "enum": [
+        "STATUS_CHANGE",
+        "REFUND",
+        "REVERSAL",
+        "BALANCE_ADJUSTMENT",
+        "RETRY",
+        "MANUAL_OVERRIDE",
+        "SYNC_ATTEMPT"
+      ],
+      "required": true
+    },
+    "transactionId": {
+      "type": "string",
+      "required": true
+    },
+    "orderId": {
+      "type": "string",
+      "required": true
+    },
+    "performedBy": {
+      "type": "string",
+      "required": true
+    },
+    "previousValue": {
+      "type": "json"
+    },
+    "newValue": {
+      "type": "json"
+    },
+    "reason": {
+      "type": "text"
+    },
+    "ipAddress": {
+      "type": "string"
+    }
+  }
+}

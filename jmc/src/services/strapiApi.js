@@ -7,7 +7,8 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 second timeout
+  // 30s timeout — Render free tier cold starts can take 15-20s
+  timeout: 30000,
 });
 
 // Request interceptor for logging
@@ -21,14 +22,33 @@ api.interceptors.request.use(
   },
 );
 
-// Response interceptor for error handling
+// Response interceptor for error handling with retry logic
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const context = error.config?.url || "Unknown endpoint";
+  async (error) => {
+    const config = error.config;
+    const context = config?.url || "Unknown endpoint";
+
+    // Retry on network errors or 5xx server errors (up to 2 retries)
+    const isRetryable =
+      !error.response || // Network error
+      (error.response.status >= 500 && error.response.status < 600); // Server error
+
+    if (isRetryable && config && !config.__retryCount) {
+      config.__retryCount = 0;
+    }
+
+    if (isRetryable && config && config.__retryCount < 2) {
+      config.__retryCount += 1;
+      const delay = config.__retryCount * 1000; // 1s, 2s
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return api(config);
+    }
+
     logError(`API Response [${context}]`, error, {
       status: error.response?.status,
       data: error.response?.data,
+      retryCount: config?.__retryCount || 0,
     });
     return Promise.reject(error);
   },

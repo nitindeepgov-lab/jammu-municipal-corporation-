@@ -2,7 +2,12 @@
  * BillDesk Routes
  *
  * Custom routes — not content-type based, so we use custom route config.
- * Both endpoints are public (no auth required) for payment processing.
+ *
+ * SECURITY NOTES:
+ * - create-order and verify are public (called by the frontend payment flow)
+ * - webhook is public (called by BillDesk servers)
+ * - transaction-status is public (used by the payment status page)
+ * - config-check has been REMOVED — it leaked server metadata (see security audit)
  */
 
 "use strict";
@@ -45,14 +50,8 @@ module.exports = {
         description: "Retrieve BillDesk transaction status",
       },
     },
-    {
-      method: "GET",
-      path: "/billdesk/config-check",
-      handler: "diagnostic.configCheck",
-      config: {
-        auth: false,
-        description: "Check BillDesk configuration status",
-      },
-    },
+    // REMOVED: /billdesk/config-check — exposed server configuration,
+    // egress IP, key metadata, and environment variables publicly.
+    // See diagnostic.js for the original handler (preserved for local dev use only).
   ],
 };

@@ -2,8 +2,9 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import SubpageTemplate from "../components/SubpageTemplate";
+import DownloadReceiptButton from "../components/DownloadReceiptButton";
 import { STRAPI_URL } from "../config/api";
-import { generateReceiptPDF } from "../utils/generateReceipt";
+import { extractBillDeskToken, deriveBillDeskOutcome } from "../utils/billdesk";
 import { getLocations } from "../services/strapiApi";
 
 /* ═══════════════════════════════════════════════════════
@@ -114,7 +115,7 @@ const paymentOptions = [
         half: true,
       },
       {
-        id: "feeType",
+        id: "feeTypeDetail",
         label: "Type of Fee",
         type: "text",
         placeholder: "e.g. License Renewal",
@@ -179,102 +180,10 @@ const paymentOptions = [
 ];
 
 /* ═══════════════════════════════════════════════════════
-   BillDesk SDK helpers
+   BillDesk SDK helpers — imported from ../utils/billdesk.js
+   (Token extraction and status derivation are now shared
+    between PayOnline and PaymentStatus pages)
    ═══════════════════════════════════════════════════════ */
-const BILLDESK_TOKEN_KEYS = [
-  "transaction_response",
-  "transactionResponse",
-  "txnResponse",
-  "response",
-  "jws",
-  "payload",
-];
-
-const normalizeStatusValue = (value) => {
-  if (value === null || value === undefined) return "";
-  return String(value).trim();
-};
-
-const extractBillDeskToken = (payload) => {
-  if (!payload) return "";
-  if (typeof payload === "string") return payload;
-
-  for (const key of BILLDESK_TOKEN_KEYS) {
-    const value = payload[key];
-    if (typeof value === "string" && value.length > 0) {
-      return value;
-    }
-  }
-
-  return "";
-};
-
-const deriveBillDeskOutcome = (payload, fallback = {}) => {
-  if (!payload) {
-    return {
-      isSuccess: false,
-      statusMessage: fallback.statusMessage || "Payment was not completed.",
-      transactionId: fallback.transactionId || "",
-      orderId: fallback.orderId || "",
-      gatewayStatus: fallback.gatewayStatus || "",
-    };
-  }
-
-  const statusCodeRaw =
-    payload.status || payload.auth_status || payload.authStatus || "";
-  const statusTextRaw =
-    payload.statusMessage ||
-    payload.transaction_error_type ||
-    payload.transaction_error_desc ||
-    payload.message ||
-    "";
-
-  const statusCode = normalizeStatusValue(statusCodeRaw).toUpperCase();
-  const statusText = normalizeStatusValue(statusTextRaw).toUpperCase();
-  const statusValue = normalizeStatusValue(payload.status).toLowerCase();
-  const errorType = normalizeStatusValue(
-    payload.transaction_error_type,
-  ).toLowerCase();
-
-  const isSuccess =
-    payload.verified === true ||
-    statusCode === "0300" ||
-    statusCode === "SUCCESS" ||
-    statusText === "SUCCESS" ||
-    statusText === "SUCCESSFUL" ||
-    statusValue === "success" ||
-    errorType === "success";
-
-  const isPending = statusCode === "0002" || statusText === "PENDING";
-
-  const statusMessage =
-    payload.statusMessage ||
-    (isPending
-      ? "Payment pending"
-      : isSuccess
-        ? "Payment successful"
-        : payload.transaction_error_desc ||
-          payload.message ||
-          "Payment was not completed.");
-
-  return {
-    isSuccess,
-    statusMessage,
-    transactionId:
-      payload.transactionId ||
-      payload.transactionid ||
-      fallback.transactionId ||
-      "",
-    orderId: payload.orderId || payload.orderid || fallback.orderId || "",
-    gatewayStatus:
-      payload.status ||
-      payload.auth_status ||
-      payload.authStatus ||
-      payload.transaction_error_type ||
-      fallback.gatewayStatus ||
-      "",
-  };
-};
 
 /* ═══════════════════════════════════════════════════════
    Input Component — Clean, minimal
@@ -350,7 +259,7 @@ export default function PayOnline() {
   const [msg, setMsg] = useState("");
   const [receipt, setReceipt] = useState(null);
   const [formSnapshot, setFormSnapshot] = useState({}); // frozen copy of form at submit time
-  const [downloading, setDownloading] = useState(false);
+  // Note: `downloading` state removed — DownloadReceiptButton manages its own loading state
   const [locationOptions, setLocationOptions] = useState(["Select Location"]);
   const panelRef = useRef(null);
 
@@ -897,6 +806,7 @@ export default function PayOnline() {
             <div className="flex gap-3 justify-center mt-6">
               <button
                 onClick={() => {
+                  // B4 fix: Keep form data and selected category on retry
                   setStatus(STATUS.IDLE);
                   setMsg("");
                 }}
@@ -972,68 +882,10 @@ export default function PayOnline() {
               </div>
 
               {/* ── Download Receipt button ── */}
-              <button
-                type="button"
-                disabled={downloading}
-                onClick={async () => {
-                  setDownloading(true);
-                  try {
-                    await generateReceiptPDF(receipt, formSnapshot);
-                  } catch (err) {
-                    console.error("Receipt generation failed:", err);
-                    alert("Could not generate receipt. Please try again.");
-                  } finally {
-                    setDownloading(false);
-                  }
-                }}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm ${
-                  downloading
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-[#003366] text-white hover:bg-[#004080] active:scale-[0.97]"
-                }`}
-              >
-                {downloading ? (
-                  <>
-                    <svg
-                      className="w-3.5 h-3.5 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8H4z"
-                      />
-                    </svg>
-                    Generating…
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-3.5 h-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                    Download Receipt
-                  </>
-                )}
-              </button>
+              <DownloadReceiptButton
+                receiptData={receipt}
+                formData={formSnapshot}
+              />
             </div>
 
             {/* Receipt detail grid */}

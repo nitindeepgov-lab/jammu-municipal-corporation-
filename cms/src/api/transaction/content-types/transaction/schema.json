@@ -4,8 +4,8 @@
   "info": {
     "singularName": "transaction",
     "pluralName": "transactions",
-    "displayName": "Transaction",
-    "description": "BillDesk Transactions"
+    "displayName": "💳 Transaction",
+    "description": "BillDesk payment transactions with admin management fields"
   },
   "options": {
     "draftAndPublish": false
@@ -28,7 +28,7 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["PENDING", "SUCCESS", "FAILED", "INITIATED"],
+      "enum": ["INITIATED", "PENDING", "SUCCESS", "FAILED", "REVERSED", "REFUNDED"],
       "default": "PENDING"
     },
     "customerName": {
@@ -48,6 +48,39 @@
     },
     "rawResponse": {
       "type": "json"
+    },
+    "previousStatus": {
+      "type": "string"
+    },
+    "statusChangedBy": {
+      "type": "string"
+    },
+    "statusChangedAt": {
+      "type": "datetime"
+    },
+    "adminNotes": {
+      "type": "text"
+    },
+    "refundId": {
+      "type": "string"
+    },
+    "refundAmount": {
+      "type": "decimal"
+    },
+    "refundedAt": {
+      "type": "datetime"
+    },
+    "syncStatus": {
+      "type": "enumeration",
+      "enum": ["SYNCED", "PENDING", "FAILED"],
+      "default": "SYNCED"
+    },
+    "retryCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "lastSyncAttempt": {
+      "type": "datetime"
     }
   }
 }
