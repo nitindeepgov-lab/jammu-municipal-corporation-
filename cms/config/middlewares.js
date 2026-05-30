@@ -67,13 +67,18 @@ module.exports = [
   {
     name: "strapi::cors",
     config: {
-      // CORS is enabled by default when this middleware is in the array
+      // Environment-aware CORS — localhost only in development
       origin: [
-        "https://jammu-municipal-corporation.vercel.app", //todo_change_it_to_actual_url
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
+        "https://jammu-municipal-corporation.vercel.app",
+        // Include localhost origins only in non-production environments
+        ...(process.env.NODE_ENV !== "production"
+          ? [
+              "http://localhost:3000",
+              "http://localhost:5173",
+              "http://localhost:5174",
+              "http://localhost:5175",
+            ]
+          : []),
       ],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
       headers: ["Content-Type", "Authorization"],

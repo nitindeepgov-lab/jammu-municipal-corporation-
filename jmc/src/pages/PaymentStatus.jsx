@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
+import DownloadReceiptButton from "../components/DownloadReceiptButton";
 import { STRAPI_URL } from "../config/api";
-import { generateReceiptPDF } from "../utils/generateReceipt";
+import { BILLDESK_TOKEN_KEYS, deriveBillDeskOutcome } from "../utils/billdesk";
 
 const STATUS = {
   IDLE: "idle",
@@ -14,24 +15,16 @@ const STATUS = {
   ERROR: "error",
 };
 
-const TOKEN_KEYS = [
-  "transaction_response",
-  "transactionResponse",
-  "txnResponse",
-  "response",
-  "jws",
-  "payload",
-];
+// TOKEN_KEYS imported from shared utils
 
 export default function PaymentStatus() {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState(STATUS.IDLE);
   const [message, setMessage] = useState("");
   const [details, setDetails] = useState(null);
-  const [downloading, setDownloading] = useState(false);
 
   const token = useMemo(() => {
-    for (const key of TOKEN_KEYS) {
+    for (const key of BILLDESK_TOKEN_KEYS) {
       const value = searchParams.get(key);
       if (value) return value;
     }
@@ -40,8 +33,12 @@ export default function PaymentStatus() {
 
   useEffect(() => {
     if (!token) {
-      setStatus(STATUS.IDLE);
-      setMessage("No payment response token was found in the return URL.");
+      // B3 fix: Show a clear error state instead of silent IDLE
+      setStatus(STATUS.ERROR);
+      setMessage(
+        "No payment response token was found in the URL. " +
+        "If you just completed a payment, please check your email or try again from the Pay Online page."
+      );
       return;
     }
 
@@ -62,20 +59,16 @@ export default function PaymentStatus() {
         }
 
         const result = data.data || {};
-        const statusMessage =
-          result.statusMessage ||
-          (result.status === "0300"
-            ? "SUCCESS"
-            : result.status === "0002"
-              ? "PENDING"
-              : "FAILED");
+
+        // Use shared deriveBillDeskOutcome for consistent status mapping
+        const outcome = deriveBillDeskOutcome(result);
 
         let mappedStatus;
-        if (result.verified && statusMessage === "SUCCESS") {
+        if (outcome.isSuccess) {
           mappedStatus = STATUS.SUCCESS;
         } else if (result.cancelled) {
           mappedStatus = STATUS.CANCELLED;
-        } else if (statusMessage === "PENDING") {
+        } else if (outcome.isPending) {
           mappedStatus = STATUS.PENDING;
         } else {
           mappedStatus = STATUS.FAILED;
@@ -85,14 +78,14 @@ export default function PaymentStatus() {
         setMessage(
           result.cancelled
             ? "Payment was cancelled. No amount has been charged."
-            : statusMessage
+            : outcome.statusMessage
         );
         setDetails({
-          orderId:        result.orderId || "",
-          transactionId:  result.transactionId || "",
+          orderId:        result.orderId || outcome.orderId || "",
+          transactionId:  result.transactionId || outcome.transactionId || "",
           amount:         result.amount || "",
-          authStatus:     result.status || "",
-          statusMessage,
+          authStatus:     result.status || outcome.gatewayStatus || "",
+          statusMessage:  outcome.statusMessage,
           paymentMethod:  result.paymentMethod || "",
           customerName:   result.customerName || "",
           customerMobile: result.customerMobile || "",
@@ -123,30 +116,20 @@ export default function PaymentStatus() {
             ? "Verification Error"
             : "Payment Status";
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!details) return;
-    setDownloading(true);
-    try {
-      const receiptData = {
-        orderId: details.orderId,
-        receiptId: details.orderId,
-        transactionId: details.transactionId,
-        amount: details.amount,
-        status: details.statusMessage,
-        feeType: details.feeType,
-        customerName: details.customerName,
-        customerMobile: details.customerMobile,
-        createdAt: new Date().toISOString(),
-      };
-      // additionalInfo contains parentage, address, nitTenderNo, etc.
-      const formData = details.additionalInfo || {};
-      await generateReceiptPDF(receiptData, formData);
-    } catch (err) {
-      console.error("Receipt generation failed:", err);
-      alert("Could not generate receipt. Please try again.");
-    } finally {
-      setDownloading(false);
-    }
+    const receiptData = {
+      orderId: details.orderId,
+      receiptId: details.orderId,
+      transactionId: details.transactionId,
+      amount: details.amount,
+      status: details.statusMessage,
+      feeType: details.feeType,
+      customerName: details.customerName,
+      customerMobile: details.customerMobile,
+      createdAt: new Date().toISOString(),
+    };
+    return { receiptData, formData: details.additionalInfo || {} };
   };
 
   return (
@@ -344,58 +327,11 @@ export default function PaymentStatus() {
                   <p className="text-[11px] text-gray-500 max-w-sm">
                     Your payment was successful. Download your official JMC receipt below.
                   </p>
-                  <button
-                    type="button"
-                    disabled={downloading}
-                    onClick={handleDownload}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm shrink-0 ${
-                      downloading
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-[#003366] text-white hover:bg-[#004080] active:scale-[0.97]"
-                    }`}
-                  >
-                    {downloading ? (
-                      <>
-                        <svg
-                          className="w-3.5 h-3.5 animate-spin"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v8H4z"
-                          />
-                        </svg>
-                        Generating…
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                          />
-                        </svg>
-                        Download Receipt (PDF)
-                      </>
-                    )}
-                  </button>
+                  <DownloadReceiptButton
+                    receiptData={handleDownload()?.receiptData}
+                    formData={handleDownload()?.formData}
+                    label="Download Receipt (PDF)"
+                  />
                 </div>
               )}
             </div>

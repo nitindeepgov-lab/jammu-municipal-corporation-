@@ -6,14 +6,13 @@
  * Authentication: Symmetric JOSE (JWE + JWS)
  * Environment: UAT (ready for production)
  *
- * Key changes from earlier revision:
- * - Strict public IPv4 validation for device.ip
- * - Structured diagnostic logs with traceId, timestamp, deviceIp on every failure
- * - No secrets logged (signing/encryption keys never appear in output)
- * - Deterministic error propagation — no silent fallbacks
+ * Key changes from v2.1:
+ * - Uses shared utility modules (ip-validation, datetime, validation)
+ * - No duplicate IP/timestamp logic
+ * - Consistent orderId lookup (B2 fix)
  *
- * @version 2.1.0
- * @date 2026-04-16
+ * @version 2.2.0
+ * @date 2026-05-30
  */
 
 "use strict";
@@ -25,7 +24,8 @@ const {
   compactDecrypt,
 } = require("jose");
 const crypto = require("crypto");
-const net = require("net");
+const { isPublicIPv4 } = require("../../../utils/ip-validation");
+const { generateTimestamp, generateOrderDate } = require("../../../utils/datetime");
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURATION
@@ -199,6 +199,11 @@ async function verifyJoseToken(token, config) {
 // UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
+// NOTE: generateTimestamp and generateOrderDate are now imported from
+// ../../../utils/datetime.js — removed ~50 lines of duplicate IST logic.
+// NOTE: isPublicIPv4 is now imported from ../../../utils/ip-validation.js
+// — removed ~25 lines of duplicate IP validation.
+
 /**
  * Generate unique order ID
  * Format: JMC<timestamp><random>
@@ -219,47 +224,6 @@ function generateTraceId() {
 }
 
 /**
- * Generate BD-Timestamp (YYYYMMDDHHmmss format)
- * @param {Date} date - Date object (defaults to now)
- * @returns {string} Timestamp in YYYYMMDDHHmmss format
- */
-function generateTimestamp(date = new Date()) {
-  // BillDesk expects IST (UTC+5:30). Render servers run in UTC,
-  // so we must shift explicitly — getHours() would give UTC on Render.
-  const istOffset = 330; // minutes
-  const istDate = new Date(date.getTime() + istOffset * 60 * 1000);
-
-  const year = istDate.getUTCFullYear();
-  const month = String(istDate.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(istDate.getUTCDate()).padStart(2, "0");
-  const hours = String(istDate.getUTCHours()).padStart(2, "0");
-  const minutes = String(istDate.getUTCMinutes()).padStart(2, "0");
-  const seconds = String(istDate.getUTCSeconds()).padStart(2, "0");
-
-  return `${year}${month}${day}${hours}${minutes}${seconds}`;
-}
-
-/**
- * Generate order_date in ISO format with IST timezone
- * Format: YYYY-MM-DDTHH:mm:ss+05:30
- * @param {Date} date - Date object (defaults to now)
- * @returns {string} ISO timestamp with IST offset
- */
-function generateOrderDate(date = new Date()) {
-  const istOffset = 330; // IST is UTC+5:30 (330 minutes)
-  const istDate = new Date(date.getTime() + istOffset * 60 * 1000);
-
-  const year = istDate.getUTCFullYear();
-  const month = String(istDate.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(istDate.getUTCDate()).padStart(2, "0");
-  const hours = String(istDate.getUTCHours()).padStart(2, "0");
-  const minutes = String(istDate.getUTCMinutes()).padStart(2, "0");
-  const seconds = String(istDate.getUTCSeconds()).padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+05:30`;
-}
-
-/**
  * Sanitize additional_info values
  * @param {*} value - Value to sanitize
  * @returns {string} Sanitized string
@@ -273,36 +237,6 @@ function sanitizeValue(value) {
     .trim();
 
   return normalized || "NA";
-}
-
-/**
- * Validate that an IP is a public IPv4 suitable for BillDesk device.ip.
- * BillDesk rejects: IPv6, 0.0.0.0, 127.x, 10.x, 172.16-31.x, 192.168.x, 169.254.x
- *
- * @param {string | null | undefined} ip
- * @returns {boolean}
- */
-function isValidBillDeskIp(ip) {
-  if (typeof ip !== "string" || net.isIP(ip) !== 4) {
-    return false;
-  }
-
-  if (ip === "0.0.0.0" || ip.startsWith("127.")) {
-    return false;
-  }
-
-  // RFC-1918 private ranges
-  if (ip.startsWith("10.")) return false;
-  if (ip.startsWith("172.")) {
-    const second = parseInt(ip.split(".")[1], 10);
-    if (second >= 16 && second <= 31) return false;
-  }
-  if (ip.startsWith("192.168.")) return false;
-
-  // Link-local
-  if (ip.startsWith("169.254.")) return false;
-
-  return true;
 }
 
 /**
@@ -424,7 +358,7 @@ module.exports = () => ({
 
     // ── Final device IP validation ────────────────────────
     // The controller already validates, but defense-in-depth here.
-    if (!isValidBillDeskIp(deviceIp)) {
+    if (!isPublicIPv4(deviceIp)) {
       throw new Error(
         `Invalid device IP for BillDesk: "${deviceIp || "null"}". ` +
           "Must be a public IPv4 address. Set BILLDESK_FALLBACK_DEVICE_IP.",
@@ -658,32 +592,21 @@ module.exports = () => ({
       // We find by orderId string then update by numeric id — reliable in Strapi v5.
       let storedTxn = null;
       try {
-        // Try exact match on orderId attribute
+        // B2 fix: Use Strapi's document service for consistent attribute resolution.
+        // strapi.db.query uses the schema attribute name (camelCase in our schema).
         storedTxn = await strapi.db
           .query("api::transaction.transaction")
           .findOne({ where: { orderId: incomingOrderId } });
 
-        // Strapi v5 db.query uses snake_case column names at the ORM level;
-        // if the above returns null, try the snake_case variant
-        if (!storedTxn) {
-          storedTxn = await strapi.db
-            .query("api::transaction.transaction")
-            .findOne({ where: { order_id: incomingOrderId } });
-        }
-
         console.log("BILLDESK_STORED_TXN:", {
           found: !!storedTxn,
           id: storedTxn?.id,
-          orderId: storedTxn?.orderId || storedTxn?.order_id,
-          customerName: storedTxn?.customerName || storedTxn?.customer_name,
-          feeType: storedTxn?.feeType || storedTxn?.fee_type,
-          hasAdditionalInfo: !!(
-            storedTxn?.additionalInfo || storedTxn?.additional_info
-          ),
+          orderId: storedTxn?.orderId,
+          customerName: storedTxn?.customerName,
+          feeType: storedTxn?.feeType,
+          hasAdditionalInfo: !!storedTxn?.additionalInfo,
           additionalInfoKeys: storedTxn
-            ? Object.keys(
-                storedTxn.additionalInfo || storedTxn.additional_info || {},
-              )
+            ? Object.keys(storedTxn.additionalInfo || {})
             : [],
         });
       } catch (fetchError) {
@@ -749,16 +672,12 @@ module.exports = () => ({
       }
 
       // ── Extract customer data from stored record ────────────────────────
-      // Handle both camelCase (Strapi attribute) and snake_case (DB column) variants
-      const customerName =
-        storedTxn?.customerName || storedTxn?.customer_name || "";
-      const customerMobile =
-        storedTxn?.customerMobile || storedTxn?.customer_mobile || "";
-      const customerEmail =
-        storedTxn?.customerEmail || storedTxn?.customer_email || "";
-      const feeType = storedTxn?.feeType || storedTxn?.fee_type || "";
-      const additionalInfo =
-        storedTxn?.additionalInfo || storedTxn?.additional_info || {};
+      // B2 fix: strapi.db.query returns attributes using schema-defined names (camelCase)
+      const customerName = storedTxn?.customerName || "";
+      const customerMobile = storedTxn?.customerMobile || "";
+      const customerEmail = storedTxn?.customerEmail || "";
+      const feeType = storedTxn?.feeType || "";
+      const additionalInfo = storedTxn?.additionalInfo || {};
 
       return {
         verified: statusMessage === "SUCCESS",
