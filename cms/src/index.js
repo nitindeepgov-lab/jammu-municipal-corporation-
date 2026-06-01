@@ -5,6 +5,43 @@ module.exports = {
 
   async bootstrap({ strapi }) {
     try {
+      // 1) Programmatically auto-configure the transaction admin list view configuration if present
+      const store = strapi.db.query("strapi::core-store");
+      const config = await store.findOne({
+        where: {
+          key: "plugin_content_manager_configuration_content_types::api::transaction.transaction",
+        },
+      });
+
+      if (config && config.value) {
+        const value = JSON.parse(config.value);
+        if (value.layouts && value.layouts.list) {
+          const list = value.layouts.list;
+          if (!list.includes("customerName")) {
+            const idIdx = list.indexOf("id");
+            if (idIdx !== -1) {
+              list.splice(idIdx + 1, 0, "customerName");
+            } else {
+              list.unshift("customerName");
+            }
+            value.layouts.list = list;
+            await store.update({
+              where: { id: config.id },
+              data: { value: JSON.stringify(value) },
+            });
+            strapi.log.info(
+              "Successfully updated Transaction collection view to display customerName column in CMS."
+            );
+          }
+        }
+      }
+    } catch (e) {
+      strapi.log.warn(
+        `Soft skip auto-configuring transaction table layouts: ${e.message}`
+      );
+    }
+
+    try {
       // Auto-grant Public role read access to all content types exposed to the frontend.
       // This must not block Strapi startup if the database is slow or temporarily unreachable.
       const publicRole = await strapi
