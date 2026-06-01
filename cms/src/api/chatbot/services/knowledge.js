@@ -469,6 +469,104 @@ const knowledgeBase = [
     a: "I can take you to any page on the JMC website! Just tell me where you'd like to go. Here are the available pages:",
     followUps: [],
   },
+
+  // ── PROPERTY TAX ────────────────────────────────────────────
+  {
+    id: "property-tax",
+    cat: "payments",
+    kw: ["property tax", "house tax", "tax payment", "ghar ka tax", "property", "self assessment"],
+    q: "How do I pay property tax?",
+    a: "To pay property tax online:\n\n1. Go to the **E-Governance** page\n2. Click on **\"Online Property Tax Payment\"**\n3. You'll be redirected to the JMC property tax portal\n4. Enter your property details / ID\n5. Review the assessed amount\n6. Pay via card, net banking, or UPI\n\nFor property tax queries, contact the **Revenue & Taxation Department**.\n\n📞 **Helpline:** 18001807207",
+    followUps: ["pay-online-how", "egov-services", "contact-helpline"],
+  },
+
+  // ── PANJTIRTHI BOOKING ──────────────────────────────────────
+  {
+    id: "panjtirthi",
+    cat: "services",
+    kw: ["panjtirthi", "slot", "booking", "cremation", "last rites", "antim sanskar"],
+    q: "How do I book a Panjtirthi slot?",
+    a: "Book a Panjtirthi (cremation ground) slot online through the JMC portal:\n\n1. Go to the **E-Governance** page\n2. Click **\"Panjtirthi Slot Booking\"**\n3. Fill your details and select a date/time slot\n4. Confirm the booking\n\nFor urgent requirements, call the **Toll-Free Helpline: 18001807207**.",
+    followUps: ["egov-services", "contact-helpline"],
+  },
+
+  // ── E-NEWSLETTER ────────────────────────────────────────────
+  {
+    id: "newsletter",
+    cat: "misc",
+    kw: ["newsletter", "bulletin", "e-newsletter", "monthly report", "update"],
+    q: "Where can I find the JMC newsletter?",
+    a: "The JMC e-Newsletter provides monthly updates on projects, achievements, and civic initiatives. Access it through the **E-Governance** page or download past issues from the website.\n\nNewsletter PDFs are available for months like February, March, and April 2025.",
+    followUps: ["egov-services", "what-can-do"],
+  },
+
+  // ── STRAY ANIMALS ───────────────────────────────────────────
+  {
+    id: "stray-animals",
+    cat: "complaints",
+    kw: ["stray", "dog bite", "stray dog", "stray cattle", "cow", "animal menace", "monkey"],
+    q: "How to report stray animal issues?",
+    a: "To report stray animal issues (dogs, cattle, monkeys):\n\n1. **File a complaint** on the Contact Us page selecting **\"Veterinary\"** as the department\n2. Or call the JMC helpline: **18001807207**\n\n**Veterinary contacts:**\n• Dr. Jaswant Singh (Municipal Veterinary Officer) — 9797682216\n• Dr. Gaurav Chowdhary (Animal Welfare Officer) — 9797371677\n\nFor dog bite emergencies, visit the nearest government hospital immediately.",
+    followUps: ["file-complaint", "pet-registration", "contact-helpline"],
+  },
+
+  // ── STREET LIGHTING ─────────────────────────────────────────
+  {
+    id: "street-light",
+    cat: "complaints",
+    kw: ["street light", "light", "lamp", "bulb", "dark", "no light", "pole", "broken light"],
+    q: "How to report a broken street light?",
+    a: "To report a broken or missing street light:\n\n1. Go to **Contact Us** page\n2. Select **\"Street Lighting\"** as the department\n3. Mention your **ward number** and exact location\n4. Submit the complaint\n\nAlternatively, call **18001807207** (Toll-Free).\n\n**Electrical Engineer:** S.P. Singh — 9149767538",
+    followUps: ["file-complaint", "contact-helpline"],
+  },
+
+  // ── POTHOLE / ROAD ──────────────────────────────────────────
+  {
+    id: "pothole",
+    cat: "complaints",
+    kw: ["pothole", "road damage", "bad road", "broken road", "road repair", "gaddha"],
+    q: "How to report a pothole or damaged road?",
+    a: "To report road damage or potholes:\n\n1. Go to **Contact Us** page\n2. Select **\"Roads & Infrastructure\"** department\n3. Provide your **ward number** and road location\n4. Describe the damage\n5. Submit\n\nOr call **18001807207** (Toll-Free).\n\nThe Engineering Department handles all road repairs.",
+    followUps: ["file-complaint", "engineering-dept"],
+  },
+
+  // ── GARBAGE / WASTE ─────────────────────────────────────────
+  {
+    id: "garbage-issue",
+    cat: "complaints",
+    kw: ["garbage", "kachra", "dirty", "waste dump", "no collection", "missed pickup", "garbage not collected"],
+    q: "Garbage not being collected in my area?",
+    a: "If garbage is not being collected:\n\n1. **File a complaint** on the Contact Us page selecting **\"Sanitation\"**\n2. Mention your **ward number** and area\n3. Or call **18001807207** (Toll-Free)\n\nJMC provides daily door-to-door garbage collection in all 75 wards. If collection is missed, the Sanitation Department will address it promptly.",
+    followUps: ["file-complaint", "sanitation-dept", "contact-helpline"],
+  },
+
+  // ── WATER PROBLEM ───────────────────────────────────────────
+  {
+    id: "water-problem",
+    cat: "complaints",
+    kw: ["no water", "water problem", "dirty water", "low pressure", "pipeline leak", "burst pipe", "pani nahi"],
+    q: "No water supply in my area?",
+    a: "For water supply issues:\n\n1. **File a complaint** on Contact Us page selecting **\"Water Supply / PHE\"**\n2. Mention your **ward number** and area\n3. For emergencies, call **18001807207**\n\n**SE, PHE (Water):** Sunil Gandotra — 9419147521\n\nYou can also **book a water tanker** via the MyJammu portal.",
+    followUps: ["water-tanker", "file-complaint", "contact-helpline"],
+  },
+
+  // ── HINDI QUERIES ───────────────────────────────────────────
+  {
+    id: "hindi-payment",
+    cat: "payments",
+    kw: ["paisa", "bhugtan", "kaise pay", "payment kaise", "kaise bhare", "online kaise"],
+    q: "Online payment kaise kare?",
+    a: "Online payment karne ke liye:\n\n1. **Pay Online** page par jaayein\n2. Payment category chunein (Tender Fee ya Other Fee)\n3. Apni details bharein\n4. **Pay Now** par click karein\n5. BillDesk se payment karein (Card, Net Banking, UPI)\n\n📞 Madad ke liye Helpline: **18001807207** (Toll-Free)",
+    followUps: ["pay-online-how", "contact-helpline"],
+  },
+  {
+    id: "hindi-complaint",
+    cat: "complaints",
+    kw: ["shikayat", "problem hai", "complaint kaise", "kaise kare complaint", "pareshan"],
+    q: "Shikayat kaise kare?",
+    a: "Shikayat (complaint) karne ke liye:\n\n1. **Contact Us** page par jaayein\n2. Form bharein — apna naam, mobile, ward number\n3. **Department** chunein (Pani, Safai, Sadak, etc.)\n4. Submit karein\n\nYa seedha call karein: **18001807207** (Toll-Free)\n\n**MyJammu portal** par bhi online shikayat kar sakte hain.",
+    followUps: ["file-complaint", "contact-helpline"],
+  },
 ];
 
 // ── Greetings & Conversational Responses ───────────────────────
@@ -825,41 +923,83 @@ Tone & Persona:
 - Professional, empathetic, and highly helpful.
 - Speak in a clear, accessible manner (avoid excessive bureaucratic jargon).
 - Always ensure the citizen feels supported. Examples: "I would be glad to help you with that." or "Here is the exact page you need."
+- You may respond in Hindi if the user writes in Hindi.
+
+Key Officers & Contact Numbers:
+- Commissioner: Devansh Yadav, IAS — 9797999495
+- Jt. Commissioner (Adm.): Rajeev Khajuria — 9906069409
+- Jt. Commissioner (R&E): Subah Mehta — 9419145837
+- Jt. Commissioner (H&S): Abdul Star — 9419027458
+- Jt. Commissioner (Works): Firdous Ahmed Qazi — 7006129804
+- Secretary / PIO: Chand Singh — 7006046450
+- Health Officer: Dr. Vinod Sharma — 9419182088
+- SE, PHE (Water): Sunil Gandotra — 9419147521
+- Senior Town Planner: Manoj Kumar — 9419162344
+- Toll-Free Helpline: 1800-180-7207
+- Office Address: Town Hall Jammu, J&K 180001
+- Working Hours: 10:00 AM – 05:00 PM (Mon–Sat)
 
 Website Structure & Comprehensive Link Guide:
 - Home [/]: The main landing page for all JMC updates.
-- About JMC [/about]: Information about our history, mission, and vision.
-- Governing Bodies [/governing-bodies]: Details on the Mayor, Deputy Mayor, and Committees.
-- Commissioner [/commissioner]: Message and details of the Municipal Commissioner.
-- Officials [/officials]: Directory of key JMC officers and administrative staff.
-- Ex-Municipal Councillors [/councillor-details]: Find ward-wise details and contacts of past councillors.
-- Citizen Services [/services]: A complete directory of all services offered to residents.
-- E-Governance Services [/egov]: Access digital services (Birth/Death Certificates, Building Permissions, Trade Licenses, Pet Registration, Water Tanker Booking, etc.).
-- Pay Online [/pay-online]: Secure portal to pay Property Tax, Tender Fees, License Fees, and other Municipal Dues.
-- Notices, Circulars, & Tenders [/notices]: Official announcements, public notices, and general procurement tenders.
-- Smart City Tenders [/smart-city-tenders]: Specialized tenders exclusively for Smart City Mission projects.
-- Smart City [/smart-city]: Information on Jammu's Smart City initiatives and progress.
-- Swachh Mission [/swachh-mission]: Updates on the Clean India mission, waste management, and sanitation efforts.
-- Development Works [/development-works]: Information on ongoing and completed civic infrastructure projects.
-- Departments [/departments]: Overview of all JMC departments.
-  - Engineering [/departments/engineering]: Roads, drainage, civil works, and bridges.
-  - Health [/departments/health]: Public health, sanitation inspection, food safety.
-  - Sanitation [/departments/sanitation]: Waste management, street sweeping, garbage collection.
-  - Revenue & Taxation [/departments/revenue-taxation]: Tax assessment, fee collection, trade licenses.
-  - Urban Planning [/departments/urban-planning]: Master plan, zoning, building permissions.
-  - Water Supply [/departments/water-supply]: PHE operations, water distribution, tankers.
-  - Horticulture [/departments/horticulture]: Maintenance of parks, gardens, and green spaces.
-- RTI [/rti]: Right to Information (RTI) disclosures, Act details, and PIO contacts.
-- Photo Gallery [/gallery]: Visuals of JMC events, drives, and projects.
-- Contact Us [/contact]: Helplines, office addresses, and the official grievance/complaint registration form.
-- Feedback [/feedback]: Form to rate and share experiences regarding JMC services.
+- About JMC [/about]: History, mission, and vision of JMC.
+- Governing Bodies [/governing-bodies]: Mayor, Deputy Mayor, Committees.
+- Commissioner [/commissioner]: Commissioner's message and profile.
+- Officials [/officials]: Directory of all key JMC officers.
+- Ex-Municipal Councillors [/councillor-details]: Ward-wise councillor details (75 wards).
+- Citizen Services [/services]: Complete directory of services for residents.
+- E-Governance Services [/egov]: 15+ digital services including:
+  • Online Property Tax Payment
+  • Online Grievance Redressal (MyJammu portal)
+  • Water Tanker Booking (MyJammu portal)
+  • Building Plan Permission (HUDD BPS — jkhuddobps.in)
+  • Birth & Death Certificate (JAKSMAC — serviceonline.gov.in/jammu)
+  • Online NOC / Trade License (JanSugam — jansugam.jk.gov.in)
+  • Rehri License (JAKSMAC)
+  • Pet Dog Registration (JAKSMAC)
+  • Pay Rent – Municipal Shop/Flat
+  • Online User Charges
+  • Sewerage Connection Verification
+  • Panjtirthi Slot Booking
+  • E-Tendering (jktenders.gov.in)
+  • E-Newsletter
+  • Feedback & Suggestions
+- Pay Online [/pay-online]: Secure BillDesk portal for Tender Fees, License Fees, Other Fees. Supports Card, Net Banking, UPI.
+- Notices & Tenders [/notices]: Public notices, council notices, procurement tenders.
+- Smart City Tenders [/smart-city-tenders]: Smart City Mission project tenders.
+- Smart City [/smart-city]: Jammu Smart City initiatives.
+- Swachh Mission [/swachh-mission]: Clean India mission, waste management.
+- Development Works [/development-works]: Ongoing/completed infrastructure projects.
+- Departments [/departments]: All 7 JMC departments.
+  - Engineering [/departments/engineering]: Roads, drainage, bridges.
+  - Health [/departments/health]: Public health, epidemic control.
+  - Sanitation [/departments/sanitation]: Waste management, garbage collection.
+  - Revenue & Taxation [/departments/revenue-taxation]: Property tax, trade licenses.
+  - Urban Planning [/departments/urban-planning]: Master plan, building permissions.
+  - Water Supply [/departments/water-supply]: Drinking water, tankers, pipelines.
+  - Horticulture [/departments/horticulture]: Parks, gardens, green spaces.
+- RTI [/rti]: Right to Information disclosures, PIO contacts.
+- Photo Gallery [/gallery]: Event photos and project visuals.
+- Contact Us [/contact]: Helplines, office addresses, grievance form.
+- Feedback [/feedback]: Rate and review JMC services.
+
+Common Citizen Scenarios — Answer these directly:
+1. "I need to pay property tax" → Direct to [E-Governance](/egov) > Online Property Tax Payment.
+2. "Garbage not collected" → File complaint at [Contact Us](/contact) selecting Sanitation dept.
+3. "Need water tanker" → Book via MyJammu portal, link on [E-Governance](/egov).
+4. "Building permission" → Apply via HUDD BPS (jkhuddobps.in), link on [E-Governance](/egov).
+5. "Birth/Death certificate" → Apply via JAKSMAC portal, link on [E-Governance](/egov).
+6. "Street light broken" → Complaint at [Contact Us](/contact) > Street Lighting dept.
+7. "Pothole on road" → Complaint at [Contact Us](/contact) > Roads & Infrastructure.
+8. "Trade license" → Apply via JanSugam portal, link on [E-Governance](/egov).
 
 Rules:
-1. ONLY answer questions related to JMC or Jammu city civic services. Polite redirect: "I apologize, but I can only assist with Jammu Municipal Corporation services. How can I help you with JMC today?"
-2. When a user asks how to do something, provide a clear, step-by-step answer and ALWAYS provide the exact relative link. Format links like this: [Page Name](/page-path).
-3. Anticipate user needs. If they ask about property tax, provide the link to pay but also mention the relevant department.
-4. For complaints or grievances, politely route the user to [Contact Us](/contact) or the MyJammu portal.
-5. If you do not have the specific answer, kindly provide the JMC Toll-Free Helpline: 1800-180-7207.`;
+1. ONLY answer JMC-related questions. For unrelated topics: "I apologize, but I can only assist with Jammu Municipal Corporation services. How can I help you with JMC today?"
+2. ALWAYS provide the exact page link using format: [Page Name](/page-path).
+3. Anticipate needs. If they ask about property tax, also mention the Revenue & Taxation department.
+4. For complaints, direct to [Contact Us](/contact) or MyJammu portal.
+5. If unsure, provide the JMC Toll-Free Helpline: 1800-180-7207.
+6. Keep responses concise and use bullet points for steps.
+7. Use **bold** for key terms and important info.`;
 
 /**
  * AI fallback for queries not matched by the local knowledge base.
