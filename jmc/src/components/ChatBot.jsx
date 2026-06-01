@@ -16,17 +16,7 @@ import {
   Mic,
   MicOff,
 } from "lucide-react";
-import {
-  findAnswer,
-  getEntryById,
-  getFollowUps,
-  quickActions,
-  detectNavigation,
-  getPopularPages,
-  findRelatedRoute,
-  detectGreeting,
-  aiAnswer,
-} from "../data/chatKnowledge";
+
 
 /* ═══════════════════════════════════════════════════════════════
    Helpers
@@ -58,12 +48,12 @@ function MiniMarkdown({ text, isUser }) {
         if (!line.trim()) return <div key={i} className="h-1" />;
         const rendered = line.replace(
           /\*\*(.+?)\*\*/g,
-          `<strong class="font-semibold ${isUser ? "text-white" : "text-[#002B5E]"}">$1</strong>`,
+          `<strong class="font-semibold text-gray-900">$1</strong>`,
         );
         return (
           <p
             key={i}
-            className="text-[13px] leading-[1.65]"
+            className={`text-[14px] leading-relaxed ${isUser ? "text-gray-800" : "text-gray-800"}`}
             dangerouslySetInnerHTML={{ __html: rendered }}
           />
         );
@@ -77,16 +67,14 @@ function MiniMarkdown({ text, isUser }) {
    ═══════════════════════════════════════════════════════════════ */
 function TypingIndicator() {
   return (
-    <div className="flex items-end gap-2 mb-5 animate-msgIn">
-      <div className="w-8 h-8 rounded-2xl bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-[0_2px_8px_rgba(0,43,94,0.12)] overflow-hidden">
-        <img src="/logo.jpeg" alt="JMC" className="w-6 h-6 object-contain" />
+    <div className="flex gap-4 mb-6 animate-msgIn">
+      <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center flex-shrink-0">
+        <Bot size={18} className="text-gray-800" />
       </div>
-      <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
-        <div className="flex gap-1.5 items-center">
-          <span className="w-2 h-2 rounded-full bg-[#002B5E]/30 animate-bounce [animation-delay:0ms]" />
-          <span className="w-2 h-2 rounded-full bg-[#002B5E]/30 animate-bounce [animation-delay:160ms]" />
-          <span className="w-2 h-2 rounded-full bg-[#002B5E]/30 animate-bounce [animation-delay:320ms]" />
-        </div>
+      <div className="flex gap-1.5 items-center px-2 py-3">
+        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:0ms]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:160ms]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:320ms]" />
       </div>
     </div>
   );
@@ -99,21 +87,13 @@ function NavButton({ nav, onNavigate }) {
   return (
     <button
       onClick={() => onNavigate(nav.path)}
-      className="group flex items-center gap-3 w-full mt-3 px-4 py-3.5 bg-gradient-to-r from-[#FF6600] to-[#ff7a1a] text-white rounded-2xl shadow-[0_4px_14px_rgba(255,102,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,102,0,0.5)] transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+      className="group flex items-center gap-3 w-full mt-3 px-4 py-3 bg-white text-gray-800 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
     >
-      <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-        <MapPin size={15} className="text-white" />
-      </div>
       <div className="flex-1 text-left">
-        <p className="text-[13px] font-bold leading-tight">Visit {nav.label}</p>
-        <p className="text-[10.5px] text-white/70 mt-0.5 font-medium">
-          jmc.gov.in{nav.path}
-        </p>
+        <p className="text-[13px] font-semibold">Visit {nav.label}</p>
+        <p className="text-[11px] text-gray-500 mt-0.5">jmc.gov.in{nav.path}</p>
       </div>
-      <ArrowRight
-        size={16}
-        className="flex-shrink-0 opacity-80 group-hover:translate-x-0.5 transition-transform"
-      />
+      <ArrowRight size={16} className="text-gray-400 group-hover:text-gray-800 transition-colors" />
     </button>
   );
 }
@@ -125,12 +105,9 @@ function PageGrid({ pages, onNavigate }) {
         <button
           key={p.path}
           onClick={() => onNavigate(p.path)}
-          className="group flex items-center gap-2 px-3 py-2.5 bg-gray-50 hover:bg-[#002B5E]/[0.06] border border-gray-200/80 hover:border-[#002B5E]/20 rounded-xl text-left transition-all duration-200 hover:-translate-y-0.5"
+          className="group flex items-center px-3 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl text-left transition-colors"
         >
-          <div className="w-5 h-5 rounded-md bg-[#FF6600]/10 flex items-center justify-center flex-shrink-0">
-            <MapPin size={10} className="text-[#FF6600]" />
-          </div>
-          <span className="text-[11px] font-semibold text-gray-600 group-hover:text-[#002B5E] truncate leading-snug">
+          <span className="text-[12px] font-medium text-gray-700 truncate">
             {p.label}
           </span>
         </button>
@@ -145,75 +122,38 @@ function PageGrid({ pages, onNavigate }) {
 function Bubble({ msg, onFollowUp, onNavigate }) {
   const isUser = msg.role === "user";
   return (
-    <div
-      className={`flex items-end gap-2 mb-5 animate-msgIn ${isUser ? "flex-row-reverse" : ""}`}
-    >
+    <div className={`flex gap-4 mb-6 animate-msgIn ${isUser ? "flex-row-reverse" : ""}`}>
       {/* Avatar */}
-      <div
-        className={`w-8 h-8 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden ${
-          isUser
-            ? "bg-gradient-to-br from-[#FF6600] to-[#ff8533] shadow-[0_2px_8px_rgba(255,102,0,0.4)]"
-            : "bg-white border border-gray-200 shadow-[0_2px_8px_rgba(0,43,94,0.15)]"
-        }`}
-      >
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border border-gray-200 ${isUser ? "bg-gray-100" : "bg-white"}`}>
         {isUser ? (
-          <User size={14} className="text-white" />
+          <User size={16} className="text-gray-600" />
         ) : (
-          <img
-            src="/logo.jpeg"
-            alt="JMC"
-            className="w-6 h-6 object-contain"
-            onError={(e) => {
-              e.target.style.display = "none";
-              e.target.nextSibling.style.display = "block";
-            }}
-          />
+          <Bot size={18} className="text-gray-800" />
         )}
-        {!isUser && <Bot size={14} className="text-[#002B5E] hidden" />}
       </div>
 
-      {/* Bubble + extras */}
-      <div
-        className={`flex flex-col gap-1.5 max-w-[80%] ${isUser ? "items-end" : "items-start"}`}
-      >
-        <div
-          className={`px-4 py-3 ${
-            isUser
-              ? "bg-gradient-to-br from-[#002B5E] to-[#0a3d7a] text-white rounded-[20px] rounded-br-[6px] shadow-[0_4px_16px_rgba(0,43,94,0.28)]"
-              : "bg-white text-gray-700 rounded-[20px] rounded-bl-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-gray-100"
-          }`}
-        >
+      {/* Content */}
+      <div className={`flex flex-col gap-2 flex-1 max-w-[85%] ${isUser ? "items-end" : "items-start"}`}>
+        <div className={`px-4 py-3 ${isUser ? "bg-[#f4f4f4] rounded-3xl rounded-tr-sm" : ""}`}>
           <MiniMarkdown text={msg.text} isUser={isUser} />
           {msg.nav && <NavButton nav={msg.nav} onNavigate={onNavigate} />}
-          {msg.pageGrid && (
-            <PageGrid pages={msg.pageGrid} onNavigate={onNavigate} />
-          )}
+          {msg.pageGrid && <PageGrid pages={msg.pageGrid} onNavigate={onNavigate} />}
         </div>
 
         {/* Follow-up pills */}
         {msg.followUps?.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 mt-1">
             {msg.followUps.map((f) => (
               <button
                 key={f.id}
                 onClick={() => onFollowUp(f)}
-                className="group flex items-center gap-1 text-[11px] font-semibold text-[#002B5E]/80 hover:text-[#002B5E] bg-white hover:bg-[#002B5E]/[0.05] border border-[#002B5E]/10 hover:border-[#002B5E]/25 px-3 py-1.5 rounded-full shadow-sm transition-all duration-200"
+                className="text-[12px] text-gray-600 bg-white hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full transition-colors"
               >
                 {f.label}
-                <ArrowRight
-                  size={9}
-                  className="opacity-0 -ml-0.5 group-hover:opacity-100 group-hover:ml-0.5 transition-all duration-200"
-                />
               </button>
             ))}
           </div>
         )}
-
-        <span
-          className={`text-[10px] text-gray-400 px-1 ${isUser ? "text-right" : ""}`}
-        >
-          {msg.time}
-        </span>
       </div>
     </div>
   );
@@ -224,12 +164,8 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
    ═══════════════════════════════════════════════════════════════ */
 function DateDivider() {
   return (
-    <div className="flex items-center gap-3 my-4">
-      <div className="flex-1 h-px bg-gray-100" />
-      <span className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
-        Today
-      </span>
-      <div className="flex-1 h-px bg-gray-100" />
+    <div className="flex items-center gap-3 my-4 opacity-0 h-0 m-0 p-0 hidden">
+      {/* Intentionally hidden for a cleaner GPT aesthetic */}
     </div>
   );
 }
@@ -289,110 +225,41 @@ export default function ChatBot() {
   }, []);
 
   const processQuery = useCallback(
-    (queryText, displayText) => {
+    async (queryText, displayText) => {
       setMsgs((prev) => [
         ...prev,
         { role: "user", text: displayText || queryText, time: fmtTime() },
       ]);
       setTyping(true);
 
-      const delay = 350 + Math.random() * 400;
-
-      setTimeout(async () => {
-        // 0) Greetings & conversational
-        const greeting = detectGreeting(queryText);
-        if (greeting) {
-          addBotMsg({
-            role: "bot",
-            text: greeting,
-            time: fmtTime(),
-            followUps: [],
-          });
-          if (!open) setUnread((n) => n + 1);
-          return;
-        }
-
-        // 1) Navigation detection
-        const navTarget = detectNavigation(queryText);
-        if (navTarget) {
-          addBotMsg({
-            role: "bot",
-            text: `Sure! I'll take you to **${navTarget.label}**. Tap the button below:`,
-            time: fmtTime(),
-            nav: navTarget,
-            followUps: [],
-          });
-          if (!open) setUnread((n) => n + 1);
-          return;
-        }
-
-        // 2) Generic "take me" / "which pages"
-        const q = queryText.toLowerCase();
-        const isGenericNav = [
-          "take me",
-          "go to",
-          "navigate",
-          "open page",
-          "show me page",
-          "which pages",
-          "all pages",
-          "list pages",
-          "what pages",
-          "show pages",
-        ].some((t) => q.includes(t));
-        if (isGenericNav) {
-          addBotMsg({
-            role: "bot",
-            text: "Here are the popular pages \u2014 tap any to navigate:",
-            time: fmtTime(),
-            pageGrid: getPopularPages(),
-            followUps: [],
-          });
-          if (!open) setUnread((n) => n + 1);
-          return;
-        }
-
-        // 3) Knowledge base lookup
-        const entry = findAnswer(queryText);
-        if (entry) {
-          const followUps = getFollowUps(entry);
-          const relatedRoute = findRelatedRoute(entry);
-          addBotMsg({
-            role: "bot",
-            text: entry.a,
-            time: fmtTime(),
-            followUps,
-            nav: relatedRoute || undefined,
-          });
-          if (!open) setUnread((n) => n + 1);
-          return;
-        }
-
-        // 4) AI fallback (only if API key is set)
-        const aiReply = await aiAnswer(queryText);
-        if (aiReply) {
-          addBotMsg({
-            role: "bot",
-            text: aiReply,
-            time: fmtTime(),
-            followUps: [],
-          });
-          if (!open) setUnread((n) => n + 1);
-          return;
-        }
-
-        // 5) Fallback
+      try {
+        const apiUrl = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+        const res = await fetch(`${apiUrl}/api/chatbot/query`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: queryText })
+        });
+        
+        if (!res.ok) throw new Error("Failed to fetch");
+        
+        const data = await res.json();
+        
         addBotMsg({
           role: "bot",
-          text: FALLBACK,
+          text: data.text,
           time: fmtTime(),
-          followUps: quickActions.map((a) => ({
-            id: a.id,
-            label: getEntryById(a.id)?.q || a.label,
-          })),
+          followUps: data.followUps || [],
+          nav: data.nav,
+          pageGrid: data.pageGrid
         });
         if (!open) setUnread((n) => n + 1);
-      }, delay);
+      } catch (e) {
+        addBotMsg({
+          role: "bot",
+          text: "I'm having trouble connecting right now. Please try again later.",
+          time: fmtTime(),
+        });
+      }
     },
     [open, addBotMsg],
   );
@@ -406,16 +273,14 @@ export default function ChatBot() {
 
   const handleQuickAction = useCallback(
     (action) => {
-      const entry = getEntryById(action.id);
-      if (entry) processQuery(entry.q, action.label);
+      processQuery(action.label, action.label);
     },
     [processQuery],
   );
 
   const handleFollowUp = useCallback(
     (f) => {
-      const entry = getEntryById(f.id);
-      if (entry) processQuery(entry.q, f.label);
+      processQuery(f.label, f.label);
     },
     [processQuery],
   );
@@ -511,68 +376,30 @@ export default function ChatBot() {
         }`}
       >
         {/* Card */}
-        <div className="rounded-[24px] overflow-hidden flex flex-col shadow-[0_24px_80px_-8px_rgba(0,0,0,0.22),0_0_0_1px_rgba(0,0,0,0.06)] h-[580px] max-h-[calc(100dvh-7rem)] bg-[#f8f9fc]">
+        <div className="rounded-[16px] overflow-hidden flex flex-col shadow-2xl border border-gray-200 h-[600px] max-h-[calc(100dvh-7rem)] bg-white">
           {/* ── Header ── */}
-          <div className="relative bg-gradient-to-br from-[#001e45] via-[#002B5E] to-[#003d82] px-5 py-4 flex-shrink-0">
-            {/* Decorative circles */}
-            <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/[0.04] pointer-events-none" />
-            <div className="absolute -bottom-10 -left-6 w-28 h-28 rounded-full bg-[#FF6600]/[0.07] pointer-events-none" />
-
-            <div className="relative flex items-center gap-3">
-              {/* JMC Logo avatar */}
-              <div className="relative flex-shrink-0">
-                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.25)] overflow-hidden border-2 border-white/30">
-                  <img
-                    src="/logo.jpeg"
-                    alt="JMC Logo"
-                    className="w-10 h-10 object-contain"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "flex";
-                    }}
-                  />
-                  <div className="w-full h-full hidden items-center justify-center bg-gradient-to-br from-[#FF6600] to-[#ff8533]">
-                    <Bot size={22} className="text-white" />
-                  </div>
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#002B5E]" />
-              </div>
-
-              {/* Title */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-white font-bold text-[15px] tracking-tight">
-                    JMC Assistant
-                  </h3>
-                  <div className="flex items-center gap-1 bg-emerald-400/20 border border-emerald-400/30 px-2 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-emerald-300 text-[9.5px] font-bold uppercase tracking-wide">
-                      Live
-                    </span>
-                  </div>
-                </div>
-                <p className="text-white/50 text-[11px] mt-0.5">
-                  Jammu Municipal Corporation
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={handleReset}
-                  title="Reset chat"
-                  className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors duration-200 text-white/60 hover:text-white"
-                >
-                  <RotateCcw size={13} />
-                </button>
-                <button
-                  onClick={() => setOpen(false)}
-                  className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors duration-200 text-white/60 hover:text-white"
-                  aria-label="Close"
-                >
-                  <X size={15} />
-                </button>
-              </div>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white">
+            <div className="flex items-center gap-2">
+              <Bot size={20} className="text-gray-800" />
+              <h3 className="text-gray-800 font-semibold text-[14px]">
+                JMC Assistant
+              </h3>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleReset}
+                title="Reset chat"
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+              >
+                <RotateCcw size={14} />
+              </button>
+              <button
+                onClick={() => setOpen(false)}
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
             </div>
           </div>
 
@@ -580,7 +407,7 @@ export default function ChatBot() {
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto px-4 pt-4 pb-2"
+            className="flex-1 overflow-y-auto px-4 pt-6 pb-2 bg-white"
             style={{ scrollbarWidth: "none" }}
           >
             <DateDivider />
@@ -615,24 +442,24 @@ export default function ChatBot() {
             )}
 
             {typing && <TypingIndicator />}
-            <div className="h-2" />
+            <div className="h-4" />
           </div>
 
           {/* Scroll-to-bottom pill */}
           {showScroll && (
             <button
               onClick={() => scrollToBottom()}
-              className="absolute bottom-[84px] left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#002B5E] text-white text-[11px] font-semibold px-3.5 py-1.5 rounded-full shadow-lg hover:bg-[#003d7a] transition-colors duration-200 animate-msgIn z-10"
+              className="absolute bottom-[84px] left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white border border-gray-200 text-gray-600 text-[12px] font-medium px-3 py-1.5 rounded-full shadow-md hover:bg-gray-50 transition-colors z-10"
             >
-              <ChevronDown size={13} /> New messages
+              <ChevronDown size={14} />
             </button>
           )}
 
           {/* ── Input Bar ── */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-100 px-4 pt-3 pb-4">
+          <div className="flex-shrink-0 bg-white px-4 pt-2 pb-4">
             {/* Listening indicator */}
             {listening && (
-              <div className="flex items-center gap-2 mb-2.5 px-1 animate-msgIn">
+              <div className="flex items-center gap-2 mb-2 px-1 animate-msgIn">
                 <div className="flex gap-0.5 items-end h-4">
                   <span
                     className="w-1 rounded-full bg-red-500 animate-[voiceBar_0.8s_ease-in-out_infinite] [animation-delay:0ms]"
@@ -655,8 +482,8 @@ export default function ChatBot() {
                     style={{ height: "50%" }}
                   />
                 </div>
-                <span className="text-[11.5px] font-semibold text-red-500">
-                  Listening… speak now
+                <span className="text-[11.5px] font-medium text-red-500">
+                  Listening... speak now
                 </span>
                 <span className="ml-auto text-[10px] text-gray-400">
                   Tap mic to stop
@@ -665,12 +492,8 @@ export default function ChatBot() {
             )}
 
             <div
-              className={`flex items-center gap-2 bg-[#f4f5f8] rounded-2xl px-3.5 py-2 transition-all duration-250 ${
-                listening
-                  ? "ring-2 ring-red-400/40 bg-red-50/60"
-                  : input
-                    ? "ring-2 ring-[#002B5E]/15 bg-white shadow-sm"
-                    : ""
+              className={`flex items-center gap-2 bg-[#f4f4f4] rounded-3xl px-4 py-2 border border-transparent focus-within:border-gray-300 transition-all ${
+                listening ? "bg-red-50 focus-within:border-red-300" : ""
               }`}
             >
                <input
@@ -679,27 +502,27 @@ export default function ChatBot() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={
-                  listening ? "Listening…" : "Ask me anything about JMC…"
+                  listening ? "Listening..." : "Message JMC Assistant..."
                 }
                 disabled={typing}
                 className="flex-1 bg-transparent text-[13px] text-gray-800 placeholder-gray-400 outline-none py-1 disabled:opacity-60"
               /> 
 
               {/* Mic button */}
-              {/* {voiceSupported && !input.trim() && (
+              {voiceSupported && !input.trim() && (
                 <button
                   onClick={handleVoice}
                   disabled={typing}
                   title={listening ? "Stop listening" : "Speak your question"}
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                  className={`p-2 rounded-full transition-colors ${
                     listening
-                      ? "bg-red-500 text-white shadow-[0_3px_10px_rgba(239,68,68,0.45)] scale-105"
-                      : "bg-[#002B5E]/[0.07] text-[#002B5E]/60 hover:bg-[#002B5E]/[0.12] hover:text-[#002B5E] hover:scale-105 active:scale-95"
+                      ? "text-red-500 bg-red-100"
+                      : "text-gray-400 hover:text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  {listening ? <MicOff size={15} /> : <Mic size={15} />}
+                  {listening ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
-              )} */}
+              )}
 
               {/* Send button */}
               <button
@@ -714,8 +537,8 @@ export default function ChatBot() {
                 <Send size={14} />
               </button> 
             </div>
-            <p className="text-center text-[10px] text-gray-400 mt-2.5 font-medium tracking-wider">
-              JMC KNOWLEDGE BASE • OFFICIAL SERVICE BOT
+            <p className="text-center text-[10px] text-gray-400 mt-2">
+              AI can make mistakes. Check important info.
             </p>
           </div>
         </div>
@@ -726,53 +549,33 @@ export default function ChatBot() {
         {/* Tooltip */}
         {!tooltipDismissed && !open && (
           <div className="absolute bottom-full right-0 mb-4 animate-msgIn">
-            <div className="relative bg-gray-900 text-white text-[12px] font-semibold px-4 py-2.5 rounded-2xl shadow-xl whitespace-nowrap flex items-center gap-2">
-              <Sparkles size={13} className="text-[#FF6600]" />
+            <div className="relative bg-gray-900 text-white text-[12px] font-medium px-4 py-2.5 rounded-xl shadow-xl whitespace-nowrap flex items-center gap-2">
               Hi! Need help with JMC?
             </div>
             <div className="w-3 h-3 bg-gray-900 rotate-45 absolute -bottom-1.5 right-7" />
           </div>
         )}
 
-        {/* Pulse rings — only when closed */}
-        {!open && (
-          <>
-            <span className="absolute -inset-1 rounded-full bg-[#002B5E]/10 animate-ping [animation-duration:2s]" />
-            <span className="absolute -inset-3 rounded-full bg-[#FF6600]/10 animate-pulse [animation-duration:2.5s]" />
-          </>
-        )}
-
         {/* FAB Button */}
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Close assistant" : "Open JMC Assistant"}
-          className={`relative w-[62px] h-[62px] rounded-full flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`relative w-[54px] h-[54px] rounded-full flex items-center justify-center transition-all duration-300 shadow-xl border border-gray-200/50 ${
             open
-              ? "bg-[#1a1a2e] hover:bg-[#16213e] rotate-90 scale-90 shadow-[0_6px_20px_rgba(0,0,0,0.3)]"
-              : "bg-white shadow-[0_6px_28px_rgba(0,43,94,0.35),0_0_0_3px_rgba(255,102,0,0.25)] hover:scale-110 active:scale-95 hover:shadow-[0_8px_32px_rgba(0,43,94,0.45)]"
+              ? "bg-gray-100 hover:bg-gray-200 rotate-90 scale-90"
+              : "bg-black hover:bg-gray-800 hover:scale-105 active:scale-95"
           }`}
         >
           {open ? (
-            <X size={22} className="text-white" />
+            <X size={24} className="text-gray-800" />
           ) : (
-            <img
-              src="/logo.jpeg"
-              alt="JMC"
-              className="w-10 h-10 object-contain"
-              onError={(e) => {
-                e.target.style.display = "none";
-                e.target.nextSibling.style.display = "block";
-              }}
-            />
-          )}
-          {!open && (
-            <MessageCircle size={26} className="text-[#FF6600] hidden" />
+            <Bot size={24} className="text-white" />
           )}
         </button>
 
         {/* Unread dot */}
         {unread > 0 && !open && (
-          <span className="absolute -top-1.5 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center shadow-lg ring-2 ring-white animate-bounce">
+          <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center shadow-md ring-2 ring-white">
             {unread}
           </span>
         )}
