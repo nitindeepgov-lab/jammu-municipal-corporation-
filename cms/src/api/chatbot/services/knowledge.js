@@ -487,50 +487,52 @@ const knowledgeBase = [
     kw: ["panjtirthi", "slot", "booking", "cremation", "last rites", "antim sanskar"],
     q: "How do I book a Panjtirthi slot?",
     a: "Book a Panjtirthi (cremation ground) slot online through the JMC portal:\n\n1. Go to the **E-Governance** page\n2. Click **\"Panjtirthi Slot Booking\"**\n3. Fill your details and select a date/time slot\n4. Confirm the booking\n\nFor urgent requirements, call the **Toll-Free Helpline: 18001807207**.",
-    followUps: ["egov-services", "contact-helpline"],
-  },
-
-  // ── E-NEWSLETTER ────────────────────────────────────────────
-  {
-    id: "newsletter",
-    cat: "misc",
-    kw: ["newsletter", "bulletin", "e-newsletter", "monthly report", "update"],
-    q: "Where can I find the JMC newsletter?",
-    a: "The JMC e-Newsletter provides monthly updates on projects, achievements, and civic initiatives. Access it through the **E-Governance** page or download past issues from the website.\n\nNewsletter PDFs are available for months like February, March, and April 2025.",
-    followUps: ["egov-services", "what-can-do"],
-  },
-
-  // ── STRAY ANIMALS ───────────────────────────────────────────
-  {
-    id: "stray-animals",
-    cat: "complaints",
-    kw: ["stray", "dog bite", "stray dog", "stray cattle", "cow", "animal menace", "monkey"],
-    q: "How to report stray animal issues?",
-    a: "To report stray animal issues (dogs, cattle, monkeys):\n\n1. **File a complaint** on the Contact Us page selecting **\"Veterinary\"** as the department\n2. Or call the JMC helpline: **18001807207**\n\n**Veterinary contacts:**\n• Dr. Jaswant Singh (Municipal Veterinary Officer) — 9797682216\n• Dr. Gaurav Chowdhary (Animal Welfare Officer) — 9797371677\n\nFor dog bite emergencies, visit the nearest government hospital immediately.",
-    followUps: ["file-complaint", "pet-registration", "contact-helpline"],
-  },
-
-  // ── STREET LIGHTING ─────────────────────────────────────────
-  {
-    id: "street-light",
-    cat: "complaints",
-    kw: ["street light", "light", "lamp", "bulb", "dark", "no light", "pole", "broken light"],
-    q: "How to report a broken street light?",
-    a: "To report a broken or missing street light:\n\n1. Go to **Contact Us** page\n2. Select **\"Street Lighting\"** as the department\n3. Mention your **ward number** and exact location\n4. Submit the complaint\n\nAlternatively, call **18001807207** (Toll-Free).\n\n**Electrical Engineer:** S.P. Singh — 9149767538",
-    followUps: ["file-complaint", "contact-helpline"],
-  },
-
-  // ── POTHOLE / ROAD ──────────────────────────────────────────
-  {
+      {
     id: "pothole",
     cat: "complaints",
-    kw: ["pothole", "road damage", "bad road", "broken road", "road repair", "gaddha"],
+    kw: ["pothole", "road damage", "bad road", "broken road", "road repair", "gaddha", "sadak", "repair", "toota", "pathole", "engineering", "civil", "construction"],
     q: "How to report a pothole or damaged road?",
     a: "To report road damage or potholes:\n\n1. Go to **Contact Us** page\n2. Select **\"Roads & Infrastructure\"** department\n3. Provide your **ward number** and road location\n4. Describe the damage\n5. Submit\n\nOr call **18001807207** (Toll-Free).\n\nThe Engineering Department handles all road repairs.",
     followUps: ["file-complaint", "engineering-dept"],
   },
 
   // ── GARBAGE / WASTE ─────────────────────────────────────────
+  {
+    id: "garbage-issue",
+    cat: "complaints",
+    kw: ["garbage", "kachra", "dirty", "waste dump", "no collection", "missed pickup", "garbage not collected", "safai", "sanitation", "sweeping", "sweeper", "cleaning"],
+    q: "Garbage not being collected in my area?",
+    a: "If garbage is not being collected:\n\n1. **File a complaint** on the Contact Us page selecting **\"Sanitation\"**\n2. Mention your **ward number** and area\n3. Or call **18001807207** (Toll-Free)\n\nJMC provides daily door-to-door garbage collection in all 75 wards. If collection is missed, the Sanitation Department will address it promptly.",
+    followUps: ["file-complaint", "sanitation-dept", "contact-helpline"],
+  },
+
+  // ── WATER PROBLEM ───────────────────────────────────────────
+  {
+    id: "water-problem",
+    cat: "complaints",
+    kw: ["no water", "water problem", "dirty water", "low pressure", "pipeline leak", "burst pipe", "pani nahi", "pani", "paani", "water supply", "phe"],
+    q: "No water supply in my area?",
+    a: "For water supply issues:\n\n1. **File a complaint** on Contact Us page selecting **\"Water Supply / PHE\"**\n2. Mention your **ward number** and area\n3. For emergencies, call **18001807207**\n\n**SE, PHE (Water):** Sunil Gandotra — 9419147521\n\nYou can also **book a water tanker** via the MyJammu portal.",
+    followUps: ["water-tanker", "file-complaint", "contact-helpline"],
+  },
+
+  // ── HINDI QUERIES ───────────────────────────────────────────
+  {
+    id: "hindi-payment",
+    cat: "payments",
+    kw: ["paisa", "bhugtan", "kaise pay", "payment kaise", "kaise bhare", "online kaise"],
+    q: "Online payment kaise kare?",
+    a: "Online payment karne ke liye:\n\n1. **Pay Online** page par jaayein\n2. Payment category chunein (Tender Fee ya Other Fee)\n3. Apni details bharein\n4. **Pay Now** par click karein\n5. BillDesk se payment karein (Card, Net Banking, UPI)\n\n📞 Madad ke liye Helpline: **18001807207** (Toll-Free)",
+    followUps: ["pay-online-how", "contact-helpline"],
+  },
+  {
+    id: "hindi-complaint",
+    cat: "complaints",
+    kw: ["shikayat", "problem hai", "complaint kaise", "kaise kare complaint", "pareshan"],
+    q: "Shikayat kaise kare?",
+    a: "Shikayat (complaint) karne ke liye:\n\n1. **Contact Us** page par jaayein\n2. Form bharein — apna naam, mobile, ward number\n3. **Department** chunein (Pani, Safai, Sadak, etc.)\n4. Submit karein\n\nYa seedha call karein: **18001807207** (Toll-Free)\n\n**MyJammu portal** par bhi online shikayat kar sakte hain.",
+    followUps: ["file-complaint", "contact-helpline"],
+  },�──────────────────────────
   {
     id: "garbage-issue",
     cat: "complaints",
@@ -696,6 +698,171 @@ const stopWords = new Set([
   "me", "want", "know", "need", "like", "get", "go", "see", "find",
 ]);
 
+const synonymGroups = [
+  {
+    keys: ["property tax", "house tax", "ghar tax", "makan tax", "gharka tax", "assessment", "propertytax", "tax"],
+    canonical: "property-tax"
+  },
+  {
+    keys: ["complaint", "grievance", "issue", "problem", "shikayat", "shikayet", "pareshani", "report", "register"],
+    canonical: "file-complaint"
+  },
+  {
+    keys: ["water", "tanker", "pani", "paani", "pipe", "leak", "supply", "phe"],
+    canonical: "water-problem"
+  },
+  {
+    keys: ["sanitation", "garbage", "waste", "kachra", "safai", "sweeper", "cleaning", "dustbin", "cleanliness"],
+    canonical: "garbage-issue"
+  },
+  {
+    keys: ["light", "street light", "lamp", "pole", "dark", "bijli"],
+    canonical: "street-light"
+  },
+  {
+    keys: ["building", "permission", "construction", "map", "plan", "naksha", "bps"],
+    canonical: "building-permission"
+  },
+  {
+    keys: ["trade", "license", "business", "shop", "dukaan", "dukan", "registration", "noc"],
+    canonical: "trade-license"
+  },
+  {
+    keys: ["birth", "death", "certificate", "born", "died", "janam", "janm", "mrityu"],
+    canonical: "birth-death-cert"
+  },
+  {
+    keys: ["rti", "information", "right to info", "pio", "appeal"],
+    canonical: "rti-info"
+  },
+  {
+    keys: ["panjtirthi", "cremation", "slot", "antim sanskar", "crematorium"],
+    canonical: "panjtirthi"
+  },
+  {
+    keys: ["tender", "notice", "bid", "contractor", "nit"],
+    canonical: "tenders"
+  }
+];
+
+function diceCoefficient(str1, str2) {
+  if (str1 === str2) return 1.0;
+  if (str1.length < 2 || str2.length < 2) return 0.0;
+  
+  const getBigrams = (str) => {
+    const bigrams = new Set();
+    for (let i = 0; i < str.length - 1; i++) {
+      bigrams.add(str.substring(i, i + 2));
+    }
+    return bigrams;
+  };
+  
+  const bigrams1 = getBigrams(str1);
+  const bigrams2 = getBigrams(str2);
+  
+  let intersection = 0;
+  for (const bigram of bigrams1) {
+    if (bigrams2.has(bigram)) {
+      intersection++;
+    }
+  }
+  
+  return (2.0 * intersection) / (bigrams1.size + bigrams2.size);
+}
+
+function levenshteinDistance(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  
+  let prevRow = Array(a.length + 1);
+  let currRow = Array(a.length + 1);
+  
+  for (let i = 0; i <= a.length; i++) prevRow[i] = i;
+  
+  for (let j = 1; j <= b.length; j++) {
+    currRow[0] = j;
+    for (let i = 1; i <= a.length; i++) {
+      const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
+      currRow[i] = Math.min(
+        currRow[i - 1] + 1, // deletion
+        prevRow[i] + 1, // insertion
+        prevRow[i - 1] + indicator // substitution
+      );
+    }
+    const temp = prevRow;
+    prevRow = currRow;
+    currRow = temp;
+  }
+  return prevRow[a.length];
+}
+
+function areWordsFuzzyEqual(word1, word2) {
+  const w1 = word1.toLowerCase().trim();
+  const w2 = word2.toLowerCase().trim();
+  if (w1 === w2) return true;
+  
+  if (w1.length < 4 || w2.length < 4) {
+    return levenshteinDistance(w1, w2) <= 1;
+  }
+  
+  const dice = diceCoefficient(w1, w2);
+  if (dice >= 0.72) return true;
+  
+  const maxDistance = Math.floor(Math.min(w1.length, w2.length) / 3);
+  const dist = levenshteinDistance(w1, w2);
+  return dist <= maxDistance;
+}
+
+function linkifyText(text) {
+  if (!text) return text;
+  
+  let formatted = text;
+  
+  // Linkify emails
+  formatted = formatted.replace(
+    /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+    "[$1](mailto:$1)"
+  );
+  
+  const knownNumbers = [
+    { num: "18001807207", label: "1800-180-7207 (Toll Free)" },
+    { num: "1800-180-7207", label: "1800-180-7207 (Toll Free)" },
+    { num: "9797999495", label: "9797999495 (Commissioner)" },
+    { num: "9906069409", label: "9906069409 (Jt. Commissioner Adm.)" },
+    { num: "9419145837", label: "9419145837 (Jt. Commissioner R&E)" },
+    { num: "9419027458", label: "9419027458 (Jt. Commissioner H&S)" },
+    { num: "7006129804", label: "7006129804 (Jt. Commissioner Works)" },
+    { num: "7006046450", label: "7006046450 (Secretary)" },
+    { num: "9419182088", label: "9419182088 (Health Officer)" },
+    { num: "9419147521", label: "9419147521 (SE, PHE Water)" },
+    { num: "9419162344", label: "9419162344 (Senior Town Planner)" },
+    { num: "9419383788", label: "9419383788 (Financial Advisor / CAO)" },
+    { num: "9419137292", label: "9419137292 (DC North)" },
+    { num: "7889455797", label: "7889455797 (DC South)" },
+    { num: "8803274201", label: "8803274201 (EE Div-II)" },
+    { num: "7889856380", label: "7889856380 (EE Div-III)" },
+    { num: "9419184058", label: "9419184058 (EE Div-IV)" },
+    { num: "9419161201", label: "9419161201 (EE Projects)" },
+    { num: "9149767538", label: "9149767538 (EE Electrical)" },
+    { num: "9419211990", label: "9419211990 (EE Mechanical)" },
+    { num: "9797682216", label: "9797682216 (MVO Veterinary)" },
+    { num: "9797371677", label: "9797371677 (AWO Animal Welfare)" },
+    { num: "8492081239", label: "8492081239 (Building Officer)" },
+    { num: "9018896437", label: "9018896437 (Building Officer)" },
+    { num: "2542192", label: "0191-2542192 (Office)" },
+    { num: "2547846", label: "0191-2547846 (Office)" },
+    { num: "2546252", label: "0191-2546252 (Office)" }
+  ];
+  
+  for (const item of knownNumbers) {
+    const escapedNum = item.num.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp(`(?<!\\]\\()\\b${escapedNum}\\b(?!\\))`, 'g');
+    formatted = formatted.replace(regex, `[${item.label}](tel:${item.num.replace(/[^0-9]/g, "")})`);
+  }
+  
+  return formatted;
+}
+
 function tokenize(text) {
   return text
     .toLowerCase()
@@ -704,56 +871,82 @@ function tokenize(text) {
     .filter((w) => w.length > 1 && !stopWords.has(w));
 }
 
-function similarity(tokens, keywords) {
-  let score = 0;
-  const kwSet = new Set(keywords.map((k) => k.toLowerCase()));
-  const kwJoined = keywords.join(" ").toLowerCase();
+const answerCache = new Map();
 
-  for (const token of tokens) {
-    // Exact keyword match
-    if (kwSet.has(token)) {
-      score += 3;
-      continue;
-    }
-    // Partial match (token is part of a keyword or vice versa)
-    for (const kw of kwSet) {
-      if (kw.includes(token) || token.includes(kw)) {
-        score += 2;
+function findAnswer(query) {
+  if (!query) return null;
+  const normalizedQuery = query.trim().toLowerCase();
+  if (answerCache.has(normalizedQuery)) {
+    return answerCache.get(normalizedQuery);
+  }
+
+  const tokens = tokenize(query);
+  if (tokens.length === 0) return null;
+
+  const matchedCanonicalIds = new Set();
+  const queryLower = query.toLowerCase();
+  
+  for (const group of synonymGroups) {
+    for (const key of group.keys) {
+      if (queryLower.includes(key.toLowerCase())) {
+        matchedCanonicalIds.add(group.canonical);
         break;
+      }
+      for (const token of tokens) {
+        if (areWordsFuzzyEqual(token, key)) {
+          matchedCanonicalIds.add(group.canonical);
+          break;
+        }
       }
     }
   }
-
-  // Bonus for multi-word phrase matches
-  const queryJoined = tokens.join(" ");
-  for (const kw of keywords) {
-    if (kw.includes(" ") && queryJoined.includes(kw.toLowerCase())) {
-      score += 5;
-    }
-  }
-
-  return score;
-}
-
-function findAnswer(query) {
-  const tokens = tokenize(query);
-  if (tokens.length === 0) return null;
 
   let bestMatch = null;
   let bestScore = 0;
 
   for (const entry of knowledgeBase) {
-    const score = similarity(tokens, entry.kw);
+    let score = 0;
+    
+    if (matchedCanonicalIds.has(entry.id)) {
+      score += 12; // High synonym boost
+    }
+    
+    for (const token of tokens) {
+      for (const kw of entry.kw) {
+        if (areWordsFuzzyEqual(token, kw)) {
+          score += 3;
+          if (token.toLowerCase() === kw.toLowerCase()) {
+            score += 1.5;
+          }
+          break;
+        }
+      }
+      if (entry.q.toLowerCase().includes(token)) {
+        score += 1.5;
+      }
+    }
+    
+    for (const kw of entry.kw) {
+      if (kw.includes(" ") && queryLower.includes(kw.toLowerCase())) {
+        score += 6;
+      }
+    }
+
     if (score > bestScore) {
       bestScore = score;
       bestMatch = entry;
     }
   }
 
-  // Minimum threshold
-  if (bestScore < 2) return null;
+  if (bestScore < 3) {
+    answerCache.set(normalizedQuery, null);
+    return null;
+  }
 
-  return bestMatch;
+  const entryClone = { ...bestMatch };
+  entryClone.a = linkifyText(entryClone.a);
+  answerCache.set(normalizedQuery, entryClone);
+  return entryClone;
 }
 
 function getEntryById(id) {
@@ -1006,11 +1199,20 @@ Rules:
  * Only activated if VITE_AI_API_KEY is set in the environment.
  * Returns a promise that resolves to a string answer or null.
  */
-async function aiAnswer(query) {
+async function aiAnswer(query, history = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
   try {
+    const messages = [
+      { role: "system", content: AI_SYSTEM_PROMPT },
+      ...history.map((h) => ({
+        role: h.role === "bot" ? "assistant" : "user",
+        content: h.text || h.content,
+      })),
+      { role: "user", content: query },
+    ];
+
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -1019,10 +1221,7 @@ async function aiAnswer(query) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: AI_SYSTEM_PROMPT },
-          { role: "user", content: query },
-        ],
+        messages,
         max_tokens: 400,
         temperature: 0.4,
       }),
@@ -1030,7 +1229,8 @@ async function aiAnswer(query) {
 
     if (!res.ok) return null;
     const data = await res.json();
-    return data.choices?.[0]?.message?.content || null;
+    const replyText = data.choices?.[0]?.message?.content || null;
+    return replyText ? linkifyText(replyText) : null;
   } catch {
     return null;
   }
