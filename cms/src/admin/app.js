@@ -1,5 +1,5 @@
-import logo from './logo.jpeg';
-import favicon from './favicon.png';
+import logo from "./logo.jpeg";
+import favicon from "./favicon.png";
 
 /* ═══════════════════════════════════════════════════════════
    JMC Admin — Strapi 5 Complete UI Overhaul
@@ -19,20 +19,20 @@ const debounce = (fn, ms) => {
 };
 
 const injectAdminStyles = () => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
 
   // Force light theme — cover all known Strapi 5 localStorage keys
   try {
-    localStorage.setItem('strapi-theme', 'light');
-    localStorage.setItem('STRAPI_THEME', 'light');
-    localStorage.setItem('strapi-admin-theme', 'light');
-    localStorage.setItem('theme', 'light');
-  } catch (_) { }
-  document.documentElement.setAttribute('data-theme', 'light');
-  document.documentElement.classList.remove('dark');
-  document.documentElement.style.colorScheme = 'light';
+    localStorage.setItem("strapi-theme", "light");
+    localStorage.setItem("STRAPI_THEME", "light");
+    localStorage.setItem("strapi-admin-theme", "light");
+    localStorage.setItem("theme", "light");
+  } catch (_) {}
+  document.documentElement.setAttribute("data-theme", "light");
+  document.documentElement.classList.remove("dark");
+  document.documentElement.style.colorScheme = "light";
 
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
     /* Font loaded via JS <link> preload for non-blocking render — see below */
 
@@ -1474,68 +1474,78 @@ const injectAdminStyles = () => {
   document.head.appendChild(style);
 
   // Non-blocking font load via <link> preload
-  const fontLink = document.createElement('link');
-  fontLink.rel = 'preload';
-  fontLink.as = 'style';
-  fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap';
-  fontLink.onload = function () { this.rel = 'stylesheet'; };
+  const fontLink = document.createElement("link");
+  fontLink.rel = "preload";
+  fontLink.as = "style";
+  fontLink.href =
+    "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap";
+  fontLink.onload = function () {
+    this.rel = "stylesheet";
+  };
   document.head.appendChild(fontLink);
   // Noscript fallback (built via DOM to avoid Vite import analysis)
-  const noscript = document.createElement('noscript');
-  const noscriptLink = document.createElement('link');
-  noscriptLink.rel = 'stylesheet';
+  const noscript = document.createElement("noscript");
+  const noscriptLink = document.createElement("link");
+  noscriptLink.rel = "stylesheet";
   noscriptLink.href = fontLink.href;
   noscript.appendChild(noscriptLink);
   document.head.appendChild(noscript);
 
   // Theme guard — MutationObserver enforces light mode aggressively
   const forceLight = () => {
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.documentElement.classList.remove('dark');
-    document.documentElement.style.colorScheme = 'light';
+    document.documentElement.setAttribute("data-theme", "light");
+    document.documentElement.classList.remove("dark");
+    document.documentElement.style.colorScheme = "light";
     try {
-      localStorage.setItem('strapi-theme', 'light');
-      localStorage.setItem('STRAPI_THEME', 'light');
-      localStorage.setItem('strapi-admin-theme', 'light');
-      localStorage.setItem('theme', 'light');
+      localStorage.setItem("strapi-theme", "light");
+      localStorage.setItem("STRAPI_THEME", "light");
+      localStorage.setItem("strapi-admin-theme", "light");
+      localStorage.setItem("theme", "light");
     } catch (_) {}
   };
   const themeGuard = new MutationObserver(() => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    if (theme !== 'light') forceLight();
+    const theme = document.documentElement.getAttribute("data-theme");
+    if (theme !== "light") forceLight();
   });
   themeGuard.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['data-theme', 'class', 'style'],
+    attributeFilter: ["data-theme", "class", "style"],
   });
   // Periodically enforce + remove theme toggle buttons from DOM
   setInterval(() => {
     forceLight();
     // Actively remove theme toggle buttons
     const toggleSelectors = [
-      '[class*="ThemeToggle"]', '[class*="themeToggle"]',
-      '[data-strapi-theme-toggle]', '[aria-label="Change theme"]',
-      '[aria-label="Toggle theme"]', 'button[title*="theme" i]',
+      '[class*="ThemeToggle"]',
+      '[class*="themeToggle"]',
+      "[data-strapi-theme-toggle]",
+      '[aria-label="Change theme"]',
+      '[aria-label="Toggle theme"]',
+      'button[title*="theme" i]',
     ];
-    document.querySelectorAll(toggleSelectors.join(',')).forEach(el => {
-      el.style.display = 'none';
-      el.style.visibility = 'hidden';
-      el.setAttribute('aria-hidden', 'true');
+    document.querySelectorAll(toggleSelectors.join(",")).forEach((el) => {
+      el.style.display = "none";
+      el.style.visibility = "hidden";
+      el.setAttribute("aria-hidden", "true");
     });
   }, 2000);
 
   // Replace "Strapi" text globally (debounced 200ms)
   const replaceStapiText = debounce(() => {
-    document.querySelectorAll('span, p, h1, h2, h3, h4').forEach(el => {
+    document.querySelectorAll("span, p, h1, h2, h3, h4").forEach((el) => {
       if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
-        if (el.textContent.includes('Strapi')) {
-          el.textContent = el.textContent.replace(/Strapi/g, 'JMC Admin');
+        if (el.textContent.includes("Strapi")) {
+          el.textContent = el.textContent.replace(/Strapi/g, "JMC Admin");
         }
       }
     });
   }, 200);
   const textObserver = new MutationObserver(replaceStapiText);
-  textObserver.observe(document.body, { childList: true, subtree: true, characterData: false });
+  textObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: false,
+  });
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -1545,19 +1555,20 @@ const injectAdminStyles = () => {
    because Strapi uses dynamic hashed class names.
    ═══════════════════════════════════════════════════════════ */
 const injectLoginPageEnhancements = () => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
 
   let styled = false;
 
   const applyLoginStyles = () => {
-    const isLogin = window.location.pathname.includes('/admin/auth/login') ||
-      window.location.pathname.includes('/admin/auth/');
+    const isLogin =
+      window.location.pathname.includes("/admin/auth/login") ||
+      window.location.pathname.includes("/admin/auth/");
     if (!isLogin) {
       styled = false;
       return;
     }
 
-    const form = document.querySelector('form');
+    const form = document.querySelector("form");
     if (!form || styled) return;
     styled = true;
 
@@ -1565,15 +1576,18 @@ const injectLoginPageEnhancements = () => {
     // It's typically a <select> or a div with role="combobox" at the top-right.
     // Walk up the DOM from it and hide the entire top bar.
     const selects = document.querySelectorAll('select, [role="combobox"]');
-    selects.forEach(sel => {
+    selects.forEach((sel) => {
       // Check if this is the locale selector (contains 'English' or similar)
-      const text = sel.textContent || sel.value || '';
-      if (text.match(/english|français|deutsch|locale|español|हिन्दी/i) || sel.closest('[aria-label*="locale"]')) {
+      const text = sel.textContent || sel.value || "";
+      if (
+        text.match(/english|français|deutsch|locale|español|हिन्दी/i) ||
+        sel.closest('[aria-label*="locale"]')
+      ) {
         // Hide the entire header row containing it
         let parent = sel.parentElement;
         for (let i = 0; i < 5 && parent; i++) {
-          if (parent.tagName === 'HEADER' || parent.tagName === 'NAV') {
-            parent.classList.add('jmc-locale-hidden');
+          if (parent.tagName === "HEADER" || parent.tagName === "NAV") {
+            parent.classList.add("jmc-locale-hidden");
             break;
           }
           // If parent has only this child (or very few), keep going up
@@ -1581,7 +1595,7 @@ const injectLoginPageEnhancements = () => {
             parent = parent.parentElement;
           } else {
             // Just hide the select container
-            sel.closest('div')?.classList.add('jmc-locale-hidden');
+            sel.closest("div")?.classList.add("jmc-locale-hidden");
             break;
           }
         }
@@ -1589,17 +1603,17 @@ const injectLoginPageEnhancements = () => {
     });
 
     // Also try the Strapi v5 approach: find any element that says "English" in the top area
-    const allDivs = document.querySelectorAll('#app > div > div > div');
-    allDivs.forEach(div => {
+    const allDivs = document.querySelectorAll("#app > div > div > div");
+    allDivs.forEach((div) => {
       const txt = div.textContent?.trim();
-      if (txt === 'English' || txt?.match(/^(English|Français|Deutsch)\s*$/)) {
+      if (txt === "English" || txt?.match(/^(English|Français|Deutsch)\s*$/)) {
         let container = div;
         for (let i = 0; i < 4 && container.parentElement; i++) {
           container = container.parentElement;
           // If we find a container that's positioned at the top, hide it
           const rect = container.getBoundingClientRect();
           if (rect.height < 80 && rect.top < 100 && rect.width > 200) {
-            container.classList.add('jmc-locale-hidden');
+            container.classList.add("jmc-locale-hidden");
             break;
           }
         }
@@ -1607,7 +1621,7 @@ const injectLoginPageEnhancements = () => {
     });
 
     // ── 2. Style the outermost wrapper (page background) ────
-    const appRoot = document.querySelector('#app > div');
+    const appRoot = document.querySelector("#app > div");
     if (appRoot) {
       appRoot.style.cssText = `
         background: #f1f3f8 !important;
@@ -1616,7 +1630,7 @@ const injectLoginPageEnhancements = () => {
     }
 
     // ── 3. Find the main content area and center it ─────────
-    const main = document.querySelector('main');
+    const main = document.querySelector("main");
     if (main) {
       main.style.cssText = `
         background: transparent !important;
@@ -1649,9 +1663,9 @@ const injectLoginPageEnhancements = () => {
 
     // ── 4. Style the logo/branding section ──────────────────
     // The logo + title are usually in the first child div before the form
-    const logo = document.querySelector('main img');
+    const logo = document.querySelector("main img");
     if (logo) {
-      const brandingContainer = logo.closest('div');
+      const brandingContainer = logo.closest("div");
       if (brandingContainer && brandingContainer !== main) {
         brandingContainer.style.cssText = `
           display: flex !important;
@@ -1671,7 +1685,7 @@ const injectLoginPageEnhancements = () => {
     }
 
     // ── 5. Style the title ──────────────────────────────────
-    const h1 = document.querySelector('main h1');
+    const h1 = document.querySelector("main h1");
     if (h1) {
       h1.style.cssText = `
         font-size: 22px !important;
@@ -1683,7 +1697,7 @@ const injectLoginPageEnhancements = () => {
     }
 
     // ── 6. Style the subtitle ───────────────────────────────
-    const subtitle = document.querySelector('main h1 + p, main h1 ~ p');
+    const subtitle = document.querySelector("main h1 + p, main h1 ~ p");
     if (subtitle) {
       subtitle.style.cssText = `
         font-size: 13px !important;
@@ -1704,8 +1718,12 @@ const injectLoginPageEnhancements = () => {
     `;
 
     // ── 8. Style inputs ─────────────────────────────────────
-    form.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(input => {
-      input.style.cssText = `
+    form
+      .querySelectorAll(
+        'input[type="text"], input[type="email"], input[type="password"]',
+      )
+      .forEach((input) => {
+        input.style.cssText = `
         border-radius: 8px !important;
         padding: 11px 14px !important;
         font-size: 14px !important;
@@ -1716,17 +1734,17 @@ const injectLoginPageEnhancements = () => {
         box-sizing: border-box !important;
         transition: border-color 0.2s, box-shadow 0.2s !important;
       `;
-      input.addEventListener('focus', () => {
-        input.style.borderColor = '#003366';
-        input.style.boxShadow = '0 0 0 3px rgba(0,51,102,0.06)';
-        input.style.background = '#fff';
+        input.addEventListener("focus", () => {
+          input.style.borderColor = "#003366";
+          input.style.boxShadow = "0 0 0 3px rgba(0,51,102,0.06)";
+          input.style.background = "#fff";
+        });
+        input.addEventListener("blur", () => {
+          input.style.borderColor = "#d1d5db";
+          input.style.boxShadow = "none";
+          input.style.background = "#fafafa";
+        });
       });
-      input.addEventListener('blur', () => {
-        input.style.borderColor = '#d1d5db';
-        input.style.boxShadow = 'none';
-        input.style.background = '#fafafa';
-      });
-    });
 
     // ── 9. Style the submit button ──────────────────────────
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -1745,12 +1763,16 @@ const injectLoginPageEnhancements = () => {
         margin-top: 8px !important;
         transition: background 0.2s !important;
       `;
-      submitBtn.addEventListener('mouseenter', () => { submitBtn.style.background = '#002244'; });
-      submitBtn.addEventListener('mouseleave', () => { submitBtn.style.background = '#003366'; });
+      submitBtn.addEventListener("mouseenter", () => {
+        submitBtn.style.background = "#002244";
+      });
+      submitBtn.addEventListener("mouseleave", () => {
+        submitBtn.style.background = "#003366";
+      });
     }
 
     // ── 10. Style labels ────────────────────────────────────
-    form.querySelectorAll('label').forEach(label => {
+    form.querySelectorAll("label").forEach((label) => {
       label.style.cssText = `
         font-size: 12px !important;
         font-weight: 600 !important;
@@ -1758,12 +1780,14 @@ const injectLoginPageEnhancements = () => {
       `;
     });
 
-    form.classList.add('jmc-login-styled');
+    form.classList.add("jmc-login-styled");
   };
 
   // Run immediately and re-check periodically (SPA navigation)
   applyLoginStyles();
-  const loginObserver = new MutationObserver(debounce(() => applyLoginStyles(), 250));
+  const loginObserver = new MutationObserver(
+    debounce(() => applyLoginStyles(), 250),
+  );
   loginObserver.observe(document.body, { childList: true, subtree: true });
 };
 
@@ -1774,13 +1798,13 @@ const injectLoginPageEnhancements = () => {
    Intercepts the login API call to include the captcha token.
    ═══════════════════════════════════════════════════════════ */
 const injectHCaptchaOnLogin = () => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
 
   // hCaptcha Site Key (public — safe for frontend)
-  const SITE_KEY = 'd932c48a-f38a-48f0-8982-b32a793c653a';
+  const SITE_KEY = "d932c48a-f38a-48f0-8982-b32a793c653a";
 
   // Inject captcha CSS
-  const captchaStyle = document.createElement('style');
+  const captchaStyle = document.createElement("style");
   captchaStyle.textContent = `
     .jmc-hcaptcha-wrapper {
       display: flex;
@@ -1834,34 +1858,40 @@ const injectHCaptchaOnLogin = () => {
   // Listen for hCaptcha token via the global callback
   window.jmcHCaptchaCallback = (token) => {
     hcaptchaToken = token;
-    console.log('[hCaptcha] Token received');
-    const errEl = document.getElementById('jmc-captcha-error');
-    if (errEl) errEl.classList.remove('visible');
+    console.log("[hCaptcha] Token received");
+    const errEl = document.getElementById("jmc-captcha-error");
+    if (errEl) errEl.classList.remove("visible");
   };
   window.jmcHCaptchaExpired = () => {
     hcaptchaToken = null;
-    console.warn('[hCaptcha] Token expired');
+    console.warn("[hCaptcha] Token expired");
   };
   window.jmcHCaptchaError = () => {
     hcaptchaToken = null;
-    console.error('[hCaptcha] Error');
+    console.error("[hCaptcha] Error");
   };
 
   // Intercept fetch to inject hCaptcha token into login requests
   const originalFetch = window.fetch;
   window.fetch = function (...args) {
     const [url, options] = args;
-    const urlStr = typeof url === 'string' ? url : url?.url || '';
+    const urlStr = typeof url === "string" ? url : url?.url || "";
 
-    if (urlStr.includes('/admin/login') && options?.method?.toUpperCase() === 'POST') {
+    if (
+      urlStr.includes("/admin/login") &&
+      options?.method?.toUpperCase() === "POST"
+    ) {
       try {
-        const body = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
-        if (body && typeof body === 'object') {
-          body.hcaptchaToken = hcaptchaToken || '';
+        const body =
+          typeof options.body === "string"
+            ? JSON.parse(options.body)
+            : options.body;
+        if (body && typeof body === "object") {
+          body.hcaptchaToken = hcaptchaToken || "";
           options.body = JSON.stringify(body);
         }
       } catch (e) {
-        console.warn('[hCaptcha] Could not inject token:', e);
+        console.warn("[hCaptcha] Could not inject token:", e);
       }
     }
 
@@ -1884,27 +1914,31 @@ const injectHCaptchaOnLogin = () => {
           }
         }, 200);
         // Timeout after 15s
-        setTimeout(() => { clearInterval(check); resolve(); }, 15000);
+        setTimeout(() => {
+          clearInterval(check);
+          resolve();
+        }, 15000);
         return;
       }
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       // Use explicit render mode so auto-render doesn't fire before our div exists
-      script.src = 'https://js.hcaptcha.com/1/api.js?render=explicit&onload=jmcHCaptchaOnLoad';
+      script.src =
+        "https://js.hcaptcha.com/1/api.js?render=explicit&onload=jmcHCaptchaOnLoad";
       script.async = true;
       script.defer = true;
 
       window.jmcHCaptchaOnLoad = () => {
-        console.log('[hCaptcha] SDK loaded (explicit mode)');
+        console.log("[hCaptcha] SDK loaded (explicit mode)");
         resolve();
       };
 
       script.onerror = () => {
-        console.error('[hCaptcha] Failed to load SDK script');
+        console.error("[hCaptcha] Failed to load SDK script");
         resolve(); // Resolve anyway so login still works
       };
 
       document.head.appendChild(script);
-      console.log('[hCaptcha] SDK script injected (explicit render mode)');
+      console.log("[hCaptcha] SDK script injected (explicit render mode)");
     });
   };
 
@@ -1912,25 +1946,26 @@ const injectHCaptchaOnLogin = () => {
   const renderWidget = (container) => {
     if (!window.hcaptcha || !container) return;
     // Remove any previous content
-    container.innerHTML = '';
+    container.innerHTML = "";
     try {
       widgetId = window.hcaptcha.render(container, {
         sitekey: SITE_KEY,
-        callback: 'jmcHCaptchaCallback',
-        'expired-callback': 'jmcHCaptchaExpired',
-        'error-callback': 'jmcHCaptchaError',
-        theme: 'light',
+        callback: "jmcHCaptchaCallback",
+        "expired-callback": "jmcHCaptchaExpired",
+        "error-callback": "jmcHCaptchaError",
+        theme: "light",
       });
-      console.log('[hCaptcha] Widget rendered, widgetId:', widgetId);
+      console.log("[hCaptcha] Widget rendered, widgetId:", widgetId);
     } catch (err) {
-      console.error('[hCaptcha] Render error:', err);
+      console.error("[hCaptcha] Render error:", err);
     }
   };
 
   // Poll for the login button and inject the widget
   const tryInject = async () => {
-    const isLoginPage = window.location.pathname.includes('/admin/auth/login') ||
-      window.location.pathname.includes('/admin/auth/');
+    const isLoginPage =
+      window.location.pathname.includes("/admin/auth/login") ||
+      window.location.pathname.includes("/admin/auth/");
 
     if (!isLoginPage) {
       injected = false;
@@ -1942,11 +1977,11 @@ const injectHCaptchaOnLogin = () => {
     if (injected) return;
 
     // Find the Login button by text content
-    const allButtons = document.querySelectorAll('button');
+    const allButtons = document.querySelectorAll("button");
     let loginBtn = null;
     for (const btn of allButtons) {
       const text = btn.textContent?.trim();
-      if (text === 'Login' || text === 'Log in' || text === 'Sign in') {
+      if (text === "Login" || text === "Log in" || text === "Sign in") {
         loginBtn = btn;
         break;
       }
@@ -1955,31 +1990,31 @@ const injectHCaptchaOnLogin = () => {
     if (!loginBtn) return;
 
     injected = true;
-    console.log('[hCaptcha] Login button found, injecting captcha widget');
+    console.log("[hCaptcha] Login button found, injecting captcha widget");
 
     // Create wrapper
-    const wrapper = document.createElement('div');
-    wrapper.className = 'jmc-hcaptcha-wrapper';
-    wrapper.id = 'jmc-hcaptcha-wrapper';
+    const wrapper = document.createElement("div");
+    wrapper.className = "jmc-hcaptcha-wrapper";
+    wrapper.id = "jmc-hcaptcha-wrapper";
 
-    const label = document.createElement('div');
-    label.className = 'jmc-captcha-label';
-    label.textContent = 'Security Verification';
+    const label = document.createElement("div");
+    label.className = "jmc-captcha-label";
+    label.textContent = "Security Verification";
 
     // Container for explicit render
-    const captchaDiv = document.createElement('div');
-    captchaDiv.id = 'jmc-hcaptcha-container';
+    const captchaDiv = document.createElement("div");
+    captchaDiv.id = "jmc-hcaptcha-container";
 
     // Show loading state while SDK loads
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'jmc-captcha-loading';
-    loadingDiv.textContent = 'Loading security check...';
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "jmc-captcha-loading";
+    loadingDiv.textContent = "Loading security check...";
     captchaDiv.appendChild(loadingDiv);
 
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'jmc-captcha-error';
-    errorDiv.id = 'jmc-captcha-error';
-    errorDiv.textContent = 'Please complete the captcha';
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "jmc-captcha-error";
+    errorDiv.id = "jmc-captcha-error";
+    errorDiv.textContent = "Please complete the captcha";
 
     wrapper.appendChild(label);
     wrapper.appendChild(captchaDiv);
@@ -1993,17 +2028,21 @@ const injectHCaptchaOnLogin = () => {
     renderWidget(captchaDiv);
 
     // Validate on login click
-    loginBtn.addEventListener('click', (e) => {
-      if (!hcaptchaToken) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        const errEl = document.getElementById('jmc-captcha-error');
-        if (errEl) errEl.classList.add('visible');
-        wrapper.style.animation = 'none';
-        wrapper.offsetHeight;
-        wrapper.style.animation = 'shake 0.4s ease';
-      }
-    }, true);
+    loginBtn.addEventListener(
+      "click",
+      (e) => {
+        if (!hcaptchaToken) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const errEl = document.getElementById("jmc-captcha-error");
+          if (errEl) errEl.classList.add("visible");
+          wrapper.style.animation = "none";
+          wrapper.offsetHeight;
+          wrapper.style.animation = "shake 0.4s ease";
+        }
+      },
+      true,
+    );
   };
 
   // Poll every 500ms to detect the login page and inject
@@ -2012,22 +2051,37 @@ const injectHCaptchaOnLogin = () => {
 
 const injectDashboardWidgets = () => {
   const dashHandler = () => {
-    const isHomepage = window.location.pathname === '/' || window.location.pathname === '/admin/' || window.location.pathname === '/admin';
-    const mainContainer = document.querySelector('main');
-    const existingDash = document.getElementById('custom-jmc-dashboard');
+    const isHomepage =
+      window.location.pathname === "/" ||
+      window.location.pathname === "/admin/" ||
+      window.location.pathname === "/admin";
+    const mainContainer = document.querySelector("main");
+    const existingDash = document.getElementById("custom-jmc-dashboard");
 
     if (isHomepage && mainContainer && !existingDash) {
       // Wait for sidebar nav to be fully rendered before showing dashboard
-      const sidebarNav = document.querySelector('nav, [class*="LeftMenu"], [class*="leftMenu"]');
+      const sidebarNav = document.querySelector(
+        'nav, [class*="LeftMenu"], [class*="leftMenu"]',
+      );
       if (!sidebarNav) return; // Sidebar not ready yet — observer will retry
-      document.body.classList.add('dashboard-active');
+      document.body.classList.add("dashboard-active");
 
-      const dashboard = document.createElement('div');
-      dashboard.id = 'custom-jmc-dashboard';
+      const dashboard = document.createElement("div");
+      dashboard.id = "custom-jmc-dashboard";
 
       const now = new Date();
-      const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
-      const dateStr = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const greeting =
+        now.getHours() < 12
+          ? "Good morning"
+          : now.getHours() < 17
+            ? "Good afternoon"
+            : "Good evening";
+      const dateStr = now.toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
 
       dashboard.innerHTML = `
         <div class="jmc-dash-header">
@@ -2245,14 +2299,14 @@ const injectDashboardWidgets = () => {
       }
 
       // Add Widget modal logic
-      const trigger = document.getElementById('jmc-add-widget-trigger');
+      const trigger = document.getElementById("jmc-add-widget-trigger");
       if (trigger) {
-        trigger.addEventListener('click', () => {
-          if (document.getElementById('jmc-widget-modal-overlay')) return;
+        trigger.addEventListener("click", () => {
+          if (document.getElementById("jmc-widget-modal-overlay")) return;
 
-          const overlay = document.createElement('div');
-          overlay.className = 'jmc-widget-modal-overlay';
-          overlay.id = 'jmc-widget-modal-overlay';
+          const overlay = document.createElement("div");
+          overlay.className = "jmc-widget-modal-overlay";
+          overlay.id = "jmc-widget-modal-overlay";
           overlay.innerHTML = `
             <div class="jmc-widget-modal">
               <div class="jmc-widget-modal-header">
@@ -2313,22 +2367,29 @@ const injectDashboardWidgets = () => {
           document.body.appendChild(overlay);
 
           // Close handlers
-          document.getElementById('jmc-modal-close').addEventListener('click', () => overlay.remove());
-          overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-          document.addEventListener('keydown', function escHandler(e) {
-            if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); }
+          document
+            .getElementById("jmc-modal-close")
+            .addEventListener("click", () => overlay.remove());
+          overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) overlay.remove();
+          });
+          document.addEventListener("keydown", function escHandler(e) {
+            if (e.key === "Escape") {
+              overlay.remove();
+              document.removeEventListener("keydown", escHandler);
+            }
           });
         });
       }
 
-      const verifyBtn = document.getElementById('jmc-verify-payment');
+      const verifyBtn = document.getElementById("jmc-verify-payment");
       if (verifyBtn) {
-        verifyBtn.addEventListener('click', () => {
-          if (document.getElementById('jmc-verify-modal-overlay')) return;
+        verifyBtn.addEventListener("click", () => {
+          if (document.getElementById("jmc-verify-modal-overlay")) return;
 
-          const overlay = document.createElement('div');
-          overlay.className = 'jmc-widget-modal-overlay';
-          overlay.id = 'jmc-verify-modal-overlay';
+          const overlay = document.createElement("div");
+          overlay.className = "jmc-widget-modal-overlay";
+          overlay.id = "jmc-verify-modal-overlay";
           overlay.innerHTML = `
             <div class="jmc-widget-modal">
               <div class="jmc-widget-modal-header">
@@ -2356,58 +2417,67 @@ const injectDashboardWidgets = () => {
           document.body.appendChild(overlay);
 
           const close = () => overlay.remove();
-          const closeBtn = document.getElementById('jmc-verify-close');
-          if (closeBtn) closeBtn.addEventListener('click', close);
-          overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-          document.addEventListener('keydown', function escHandler(e) {
-            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+          const closeBtn = document.getElementById("jmc-verify-close");
+          if (closeBtn) closeBtn.addEventListener("click", close);
+          overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+          });
+          document.addEventListener("keydown", function escHandler(e) {
+            if (e.key === "Escape") {
+              close();
+              document.removeEventListener("keydown", escHandler);
+            }
           });
 
-          const txnInput = document.getElementById('jmc-verify-transaction');
-          const orderInput = document.getElementById('jmc-verify-order');
-          const submitBtn = document.getElementById('jmc-verify-submit');
-          const resetBtn = document.getElementById('jmc-verify-reset');
-          const resultEl = document.getElementById('jmc-verify-result');
+          const txnInput = document.getElementById("jmc-verify-transaction");
+          const orderInput = document.getElementById("jmc-verify-order");
+          const submitBtn = document.getElementById("jmc-verify-submit");
+          const resetBtn = document.getElementById("jmc-verify-reset");
+          const resultEl = document.getElementById("jmc-verify-result");
 
-          const setResult = (text) => { if (resultEl) resultEl.textContent = text; };
+          const setResult = (text) => {
+            if (resultEl) resultEl.textContent = text;
+          };
 
           if (submitBtn) {
-            submitBtn.addEventListener('click', async () => {
-              const transactionId = txnInput?.value?.trim() || '';
-              const orderId = orderInput?.value?.trim() || '';
+            submitBtn.addEventListener("click", async () => {
+              const transactionId = txnInput?.value?.trim() || "";
+              const orderId = orderInput?.value?.trim() || "";
 
               if (!transactionId && !orderId) {
-                setResult('Transaction ID or Order ID is required.');
+                setResult("Transaction ID or Order ID is required.");
                 return;
               }
 
               submitBtn.disabled = true;
-              setResult('Checking status...');
+              setResult("Checking status...");
 
               try {
-                const res = await fetch('/api/billdesk/transaction-status', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                const res = await fetch("/api/billdesk/transaction-status", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ transactionId, orderId }),
                 });
 
                 const data = await res.json().catch(() => ({}));
                 if (!res.ok) {
-                  throw new Error(data.error?.message || 'Unable to retrieve status.');
+                  throw new Error(
+                    data.error?.message || "Unable to retrieve status.",
+                  );
                 }
 
                 const result = data.data || {};
                 const lines = [
-                  `Status: ${result.status || 'UNKNOWN'}`,
-                  `Auth Status: ${result.authStatus || '-'}`,
-                  `Transaction ID: ${result.transactionId || '-'}`,
-                  `Order ID: ${result.orderId || '-'}`,
-                  `Amount: ${result.amount || '-'}`,
-                  `Message: ${result.message || '-'}`,
+                  `Status: ${result.status || "UNKNOWN"}`,
+                  `Auth Status: ${result.authStatus || "-"}`,
+                  `Transaction ID: ${result.transactionId || "-"}`,
+                  `Order ID: ${result.orderId || "-"}`,
+                  `Amount: ${result.amount || "-"}`,
+                  `Message: ${result.message || "-"}`,
                 ];
-                setResult(lines.join('\n'));
+                setResult(lines.join("\n"));
               } catch (error) {
-                setResult(error.message || 'Unable to retrieve status.');
+                setResult(error.message || "Unable to retrieve status.");
               } finally {
                 submitBtn.disabled = false;
               }
@@ -2415,23 +2485,23 @@ const injectDashboardWidgets = () => {
           }
 
           if (resetBtn) {
-            resetBtn.addEventListener('click', () => {
-              if (txnInput) txnInput.value = '';
-              if (orderInput) orderInput.value = '';
-              setResult('Awaiting input.');
+            resetBtn.addEventListener("click", () => {
+              if (txnInput) txnInput.value = "";
+              if (orderInput) orderInput.value = "";
+              setResult("Awaiting input.");
             });
           }
         });
       }
 
-      const reloadBtn = document.getElementById('jmc-reload-transactions');
+      const reloadBtn = document.getElementById("jmc-reload-transactions");
       if (reloadBtn) {
-        reloadBtn.addEventListener('click', () => {
-          if (document.getElementById('jmc-reload-modal-overlay')) return;
+        reloadBtn.addEventListener("click", () => {
+          if (document.getElementById("jmc-reload-modal-overlay")) return;
 
-          const overlay = document.createElement('div');
-          overlay.className = 'jmc-widget-modal-overlay';
-          overlay.id = 'jmc-reload-modal-overlay';
+          const overlay = document.createElement("div");
+          overlay.className = "jmc-widget-modal-overlay";
+          overlay.id = "jmc-reload-modal-overlay";
           overlay.innerHTML = `
             <div class="jmc-widget-modal">
               <div class="jmc-widget-modal-header">
@@ -2454,35 +2524,46 @@ const injectDashboardWidgets = () => {
           document.body.appendChild(overlay);
 
           const close = () => overlay.remove();
-          const closeBtn = document.getElementById('jmc-reload-close');
-          if (closeBtn) closeBtn.addEventListener('click', close);
-          overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-          document.addEventListener('keydown', function escHandler(e) {
-            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+          const closeBtn = document.getElementById("jmc-reload-close");
+          if (closeBtn) closeBtn.addEventListener("click", close);
+          overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+          });
+          document.addEventListener("keydown", function escHandler(e) {
+            if (e.key === "Escape") {
+              close();
+              document.removeEventListener("keydown", escHandler);
+            }
           });
 
-          const limitInput = document.getElementById('jmc-reload-limit');
-          const submitBtn = document.getElementById('jmc-reload-submit');
-          const resultEl = document.getElementById('jmc-reload-result');
+          const limitInput = document.getElementById("jmc-reload-limit");
+          const submitBtn = document.getElementById("jmc-reload-submit");
+          const resultEl = document.getElementById("jmc-reload-result");
 
-          const setResult = (text) => { if (resultEl) resultEl.textContent = text; };
+          const setResult = (text) => {
+            if (resultEl) resultEl.textContent = text;
+          };
 
           if (submitBtn) {
-            submitBtn.addEventListener('click', async () => {
-              const limitValue = limitInput?.value ? parseInt(limitInput.value, 10) : 50;
+            submitBtn.addEventListener("click", async () => {
+              const limitValue = limitInput?.value
+                ? parseInt(limitInput.value, 10)
+                : 50;
               submitBtn.disabled = true;
-              setResult('Reloading pending transactions...');
+              setResult("Reloading pending transactions...");
 
               try {
-                const res = await fetch('/api/billdesk/reload-transactions', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                const res = await fetch("/api/billdesk/reload-transactions", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ limit: limitValue || 50 }),
                 });
 
                 const data = await res.json().catch(() => ({}));
                 if (!res.ok) {
-                  throw new Error(data.error?.message || 'Unable to reload transactions.');
+                  throw new Error(
+                    data.error?.message || "Unable to reload transactions.",
+                  );
                 }
 
                 const summary = data.data || {};
@@ -2492,9 +2573,9 @@ const injectDashboardWidgets = () => {
                   `Failed: ${summary.failed ?? 0}`,
                   `Skipped: ${summary.skipped ?? 0}`,
                 ];
-                setResult(lines.join('\n'));
+                setResult(lines.join("\n"));
               } catch (error) {
-                setResult(error.message || 'Unable to reload transactions.');
+                setResult(error.message || "Unable to reload transactions.");
               } finally {
                 submitBtn.disabled = false;
               }
@@ -2503,14 +2584,14 @@ const injectDashboardWidgets = () => {
         });
       }
 
-      const updateStatusBtn = document.getElementById('jmc-update-status');
+      const updateStatusBtn = document.getElementById("jmc-update-status");
       if (updateStatusBtn) {
-        updateStatusBtn.addEventListener('click', () => {
-          if (document.getElementById('jmc-update-status-overlay')) return;
+        updateStatusBtn.addEventListener("click", () => {
+          if (document.getElementById("jmc-update-status-overlay")) return;
 
-          const overlay = document.createElement('div');
-          overlay.className = 'jmc-widget-modal-overlay';
-          overlay.id = 'jmc-update-status-overlay';
+          const overlay = document.createElement("div");
+          overlay.className = "jmc-widget-modal-overlay";
+          overlay.id = "jmc-update-status-overlay";
           overlay.innerHTML = `
             <div class="jmc-widget-modal">
               <div class="jmc-widget-modal-header">
@@ -2551,59 +2632,79 @@ const injectDashboardWidgets = () => {
           document.body.appendChild(overlay);
 
           const close = () => overlay.remove();
-          const closeBtn = document.getElementById('jmc-update-status-close');
-          if (closeBtn) closeBtn.addEventListener('click', close);
-          overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-          document.addEventListener('keydown', function escHandler(e) {
-            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+          const closeBtn = document.getElementById("jmc-update-status-close");
+          if (closeBtn) closeBtn.addEventListener("click", close);
+          overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+          });
+          document.addEventListener("keydown", function escHandler(e) {
+            if (e.key === "Escape") {
+              close();
+              document.removeEventListener("keydown", escHandler);
+            }
           });
 
-          const txnInput = document.getElementById('jmc-update-status-transaction');
-          const orderInput = document.getElementById('jmc-update-status-order');
-          const statusInput = document.getElementById('jmc-update-status-value');
-          const reasonInput = document.getElementById('jmc-update-status-reason');
-          const submitBtn = document.getElementById('jmc-update-status-submit');
-          const resetBtn = document.getElementById('jmc-update-status-reset');
-          const resultEl = document.getElementById('jmc-update-status-result');
+          const txnInput = document.getElementById(
+            "jmc-update-status-transaction",
+          );
+          const orderInput = document.getElementById("jmc-update-status-order");
+          const statusInput = document.getElementById(
+            "jmc-update-status-value",
+          );
+          const reasonInput = document.getElementById(
+            "jmc-update-status-reason",
+          );
+          const submitBtn = document.getElementById("jmc-update-status-submit");
+          const resetBtn = document.getElementById("jmc-update-status-reset");
+          const resultEl = document.getElementById("jmc-update-status-result");
 
-          const setResult = (text) => { if (resultEl) resultEl.textContent = text; };
+          const setResult = (text) => {
+            if (resultEl) resultEl.textContent = text;
+          };
 
           if (submitBtn) {
-            submitBtn.addEventListener('click', async () => {
-              const transactionId = txnInput?.value?.trim() || '';
-              const orderId = orderInput?.value?.trim() || '';
-              const status = statusInput?.value || '';
-              const reason = reasonInput?.value?.trim() || '';
+            submitBtn.addEventListener("click", async () => {
+              const transactionId = txnInput?.value?.trim() || "";
+              const orderId = orderInput?.value?.trim() || "";
+              const status = statusInput?.value || "";
+              const reason = reasonInput?.value?.trim() || "";
 
               if (!transactionId && !orderId) {
-                setResult('Transaction ID or Order ID is required.');
+                setResult("Transaction ID or Order ID is required.");
                 return;
               }
 
               submitBtn.disabled = true;
-              setResult('Updating status...');
+              setResult("Updating status...");
 
               try {
-                const res = await fetch('/api/billdesk/mark-status', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ transactionId, orderId, status, reason }),
+                const res = await fetch("/api/billdesk/mark-status", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    transactionId,
+                    orderId,
+                    status,
+                    reason,
+                  }),
                 });
 
                 const data = await res.json().catch(() => ({}));
                 if (!res.ok) {
-                  throw new Error(data.error?.message || 'Unable to update status.');
+                  throw new Error(
+                    data.error?.message || "Unable to update status.",
+                  );
                 }
 
                 const result = data.data || {};
                 const lines = [
-                  `Status: ${result.status || '-'}`,
-                  `Transaction ID: ${result.transactionId || '-'}`,
-                  `Order ID: ${result.orderId || '-'}`,
+                  `Status: ${result.status || "-"}`,
+                  `Transaction ID: ${result.transactionId || "-"}`,
+                  `Order ID: ${result.orderId || "-"}`,
                 ];
-                setResult(lines.join('\n'));
+                setResult(lines.join("\n"));
               } catch (error) {
-                setResult(error.message || 'Unable to update status.');
+                setResult(error.message || "Unable to update status.");
               } finally {
                 submitBtn.disabled = false;
               }
@@ -2611,29 +2712,31 @@ const injectDashboardWidgets = () => {
           }
 
           if (resetBtn) {
-            resetBtn.addEventListener('click', () => {
-              if (txnInput) txnInput.value = '';
-              if (orderInput) orderInput.value = '';
-              if (statusInput) statusInput.value = 'PENDING';
-              if (reasonInput) reasonInput.value = '';
-              setResult('Awaiting input.');
+            resetBtn.addEventListener("click", () => {
+              if (txnInput) txnInput.value = "";
+              if (orderInput) orderInput.value = "";
+              if (statusInput) statusInput.value = "PENDING";
+              if (reasonInput) reasonInput.value = "";
+              setResult("Awaiting input.");
             });
           }
         });
       }
-
     }
   };
 
   // Fast route detector — runs immediately (no debounce) to toggle class instantly
   const fastRouteCheck = () => {
-    const isHomepage = window.location.pathname === '/' || window.location.pathname === '/admin/' || window.location.pathname === '/admin';
+    const isHomepage =
+      window.location.pathname === "/" ||
+      window.location.pathname === "/admin/" ||
+      window.location.pathname === "/admin";
     if (isHomepage) {
-      document.body.classList.add('dashboard-active');
+      document.body.classList.add("dashboard-active");
     } else {
-      const existingDash = document.getElementById('custom-jmc-dashboard');
+      const existingDash = document.getElementById("custom-jmc-dashboard");
       if (existingDash) existingDash.remove();
-      document.body.classList.remove('dashboard-active');
+      document.body.classList.remove("dashboard-active");
     }
   };
 
@@ -2654,29 +2757,30 @@ const injectDashboardWidgets = () => {
    default with a styled toggle button.
    ═══════════════════════════════════════════════════════════ */
 const injectTransactionFieldEnhancements = () => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
 
   const handleTransactionFields = debounce(() => {
     const path = window.location.pathname;
     // Match both URL-encoded and plain content-type paths
-    const isTransactionEdit = path.includes('transaction.transaction/') ||
-      path.includes('transaction.transaction%2F');
+    const isTransactionEdit =
+      path.includes("transaction.transaction/") ||
+      path.includes("transaction.transaction%2F");
     if (!isTransactionEdit) return;
 
-    const fieldNames = ['rawResponse', 'additionalInfo'];
+    const fieldNames = ["rawResponse", "additionalInfo"];
 
-    fieldNames.forEach(fieldName => {
-      const labels = document.querySelectorAll('label');
-      labels.forEach(label => {
+    fieldNames.forEach((fieldName) => {
+      const labels = document.querySelectorAll("label");
+      labels.forEach((label) => {
         const labelText = label.textContent?.trim();
         if (!labelText) return;
 
         // Normalise both sides for comparison
-        const normalised = labelText.replace(/[\s_-]/g, '').toLowerCase();
-        const target = fieldName.replace(/[\s_-]/g, '').toLowerCase();
+        const normalised = labelText.replace(/[\s_-]/g, "").toLowerCase();
+        const target = fieldName.replace(/[\s_-]/g, "").toLowerCase();
 
         if (normalised === target && !label.dataset.jmcToggled) {
-          label.dataset.jmcToggled = 'true';
+          label.dataset.jmcToggled = "true";
 
           // Strategy: walk UP from the label to find the outermost field container.
           // In Strapi 5, the structure is typically:
@@ -2695,7 +2799,7 @@ const injectTransactionFieldEnhancements = () => {
             let candidate = label.parentElement;
             for (let i = 0; i < 4 && candidate; i++) {
               const hasEditor = candidate.querySelector(
-                'textarea, [class*="cm-editor"], [class*="CodeMirror"], [class*="JSONInput"], pre'
+                'textarea, [class*="cm-editor"], [class*="CodeMirror"], [class*="JSONInput"], pre',
               );
               if (hasEditor && candidate.contains(label)) {
                 fieldWrapper = candidate;
@@ -2707,7 +2811,7 @@ const injectTransactionFieldEnhancements = () => {
           if (!fieldWrapper) return;
 
           // Find ALL child divs in the field wrapper that are NOT the label row
-          const labelRow = label.closest('div');
+          const labelRow = label.closest("div");
           const editorContainers = [];
           for (const child of fieldWrapper.children) {
             if (child !== labelRow && child.nodeType === 1) {
@@ -2718,40 +2822,40 @@ const injectTransactionFieldEnhancements = () => {
           if (editorContainers.length === 0) return;
 
           // Collapse all editor containers by default
-          editorContainers.forEach(c => {
-            c.classList.add('jmc-field-collapsed');
+          editorContainers.forEach((c) => {
+            c.classList.add("jmc-field-collapsed");
             c.dataset.jmcFieldContent = fieldName;
           });
 
           // Create toggle button
-          const toggle = document.createElement('button');
-          toggle.className = 'jmc-field-toggle';
-          toggle.type = 'button';
-          toggle.innerHTML = '\u25B6 Show ' + fieldName;
+          const toggle = document.createElement("button");
+          toggle.className = "jmc-field-toggle";
+          toggle.type = "button";
+          toggle.innerHTML = "\u25B6 Show " + fieldName;
           let collapsed = true;
 
-          toggle.addEventListener('click', (e) => {
+          toggle.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             collapsed = !collapsed;
-            editorContainers.forEach(c => {
+            editorContainers.forEach((c) => {
               if (collapsed) {
-                c.classList.add('jmc-field-collapsed');
+                c.classList.add("jmc-field-collapsed");
               } else {
-                c.classList.remove('jmc-field-collapsed');
+                c.classList.remove("jmc-field-collapsed");
               }
             });
             toggle.innerHTML = collapsed
-              ? '\u25B6 Show ' + fieldName
-              : '\u25BC Hide ' + fieldName;
+              ? "\u25B6 Show " + fieldName
+              : "\u25BC Hide " + fieldName;
           });
 
           // Insert toggle right after the label
           if (labelRow && labelRow.parentElement) {
-            labelRow.style.display = 'flex';
-            labelRow.style.alignItems = 'center';
-            labelRow.style.gap = '8px';
-            labelRow.style.flexWrap = 'wrap';
+            labelRow.style.display = "flex";
+            labelRow.style.alignItems = "center";
+            labelRow.style.gap = "8px";
+            labelRow.style.flexWrap = "wrap";
             labelRow.appendChild(toggle);
           }
         }
@@ -2768,35 +2872,35 @@ const injectTransactionFieldEnhancements = () => {
 export default {
   config: {
     auth: { logo },
-    head: { title: 'JMC \u2014 Admin Portal', favicon },
+    head: { title: "JMC \u2014 Admin Portal", favicon },
     menu: { logo },
     theme: {
       light: {
         colors: {
-          primary100: '#eef2ff',
-          primary200: '#c7d2fe',
-          primary500: '#003366',
-          primary600: '#002855',
-          primary700: '#001f44',
-          buttonPrimary500: '#003366',
-          buttonPrimary600: '#002855',
-          secondary500: '#FF6600',
-          secondary700: '#cc5200',
-          neutral0: '#ffffff',
-          neutral100: '#f8f9fb',
-          neutral150: '#f1f5f9',
-          neutral200: '#e5e7eb',
+          primary100: "#eef2ff",
+          primary200: "#c7d2fe",
+          primary500: "#003366",
+          primary600: "#002855",
+          primary700: "#001f44",
+          buttonPrimary500: "#003366",
+          buttonPrimary600: "#002855",
+          secondary500: "#FF6600",
+          secondary700: "#cc5200",
+          neutral0: "#ffffff",
+          neutral100: "#f8f9fb",
+          neutral150: "#f1f5f9",
+          neutral200: "#e5e7eb",
         },
       },
     },
     translations: {
       en: {
-        'app.components.HomePage.welcome': 'Workspace Overview',
-        'app.components.HomePage.welcome.again':
-          'Quickly access content modules below or through the side navigation.',
-        'Auth.form.welcome.title': 'JMC Gateway',
-        'Auth.form.welcome.subtitle':
-          'Jammu Municipal Corporation \u2014 Master Control',
+        "app.components.HomePage.welcome": "Workspace Overview",
+        "app.components.HomePage.welcome.again":
+          "Quickly access content modules below or through the side navigation.",
+        "Auth.form.welcome.title": "JMC Gateway",
+        "Auth.form.welcome.subtitle":
+          "Jammu Municipal Corporation \u2014 Master Control",
       },
     },
     tutorials: false,

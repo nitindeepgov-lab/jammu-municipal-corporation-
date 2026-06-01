@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ministers",
+  "info": {
+    "singularName": "minister",
+    "pluralName": "ministers",
+    "displayName": "🏛️ Governing Body Member",
+    "description": "Members shown in the homepage governing bodies carousel."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": ["M", "F", "O"],
+      "default": "M"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "facebook": {
+      "type": "string",
+      "required": false
+    },
+    "twitter": {
+      "type": "string",
+      "required": false
+    },
+    "linkedin": {
+      "type": "string",
+      "required": false
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
