@@ -114,6 +114,7 @@ export default function MinistersCarousel() {
   const [currentPair, setCurrentPair] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const allSlides = useMemo(() => {
     if (ministerSlides.length === 0) return [];
@@ -133,12 +134,19 @@ export default function MinistersCarousel() {
           .filter((item) => item.name && item.title)
           .filter((item) => item.is_active !== false);
 
+        setLoadError(false);
         if (isMounted && cmsSlides.length > 0) {
           setMinisterSlides(cmsSlides);
+        } else if (isMounted) {
+          setMinisterSlides([]);
         }
       })
       .catch((err) => {
         logError("MinistersCarousel", err);
+        if (isMounted) {
+          setLoadError(true);
+          setMinisterSlides([]);
+        }
       });
 
     return () => {
@@ -252,44 +260,66 @@ export default function MinistersCarousel() {
       </div>
 
       <div className="p-1 rounded-lg bg-white overflow-hidden">
-        {/* Desktop: horizontal scroll for many ministers */}
-        <div className="hidden md:flex md:gap-7 md:overflow-x-auto md:pb-2 md:snap-x md:snap-mandatory [scrollbar-width:thin]">
-          {ministerSlides.map((minister, idx) => (
-            <div
-              key={idx}
-              className="min-w-[210px] max-w-[230px] flex-1 snap-start"
-            >
-              <MinisterCard minister={minister} />
+        {ministerSlides.length === 0 ? (
+          <div className="min-h-[240px] flex items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-10 text-center">
+            <div>
+              <p className="text-base font-semibold text-[#003366]">
+                Governing bodies will appear here once CMS content is published.
+              </p>
+              <p className="mt-2 text-sm text-gray-500 max-w-lg">
+                {loadError
+                  ? "The frontend could not load the minister records from the deployed CMS endpoint."
+                  : "Add active minister records in Strapi and publish the backend deployment to show them on the homepage."}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <>
+            {/* Desktop: horizontal scroll for many ministers */}
+            <div className="hidden md:flex md:gap-7 md:overflow-x-auto md:pb-2 md:snap-x md:snap-mandatory [scrollbar-width:thin]">
+              {ministerSlides.map((minister, idx) => (
+                <div
+                  key={idx}
+                  className="min-w-[210px] max-w-[230px] flex-1 snap-start"
+                >
+                  <MinisterCard minister={minister} />
+                </div>
+              ))}
+            </div>
 
-        {/* Mobile: 2-column slideshow with pairs */}
-        <div
-          className="grid grid-cols-2 gap-4 md:hidden transition-opacity duration-500"
-          style={{ opacity: isTransitioning ? 0 : 1 }}
-        >
-          {currentSlides.map((minister, idx) => (
-            <MinisterCard key={`${currentPair}-${idx}`} minister={minister} />
-          ))}
-        </div>
+            {/* Mobile: 2-column slideshow with pairs */}
+            <div
+              className="grid grid-cols-2 gap-4 md:hidden transition-opacity duration-500"
+              style={{ opacity: isTransitioning ? 0 : 1 }}
+            >
+              {currentSlides.map((minister, idx) => (
+                <MinisterCard
+                  key={`${currentPair}-${idx}`}
+                  minister={minister}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Dot indicators — mobile only */}
-      <div className="flex md:hidden justify-center gap-2 mt-4">
-        {Array.from({ length: totalPairs }).map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => goTo(idx)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === currentPair
-                ? "w-6 bg-[#003366]"
-                : "w-1.5 bg-gray-300 hover:bg-gray-400"
-            }`}
-            aria-label={`Go to slide ${idx + 1}`}
-          />
-        ))}
-      </div>
+      {ministerSlides.length > 0 && (
+        <div className="flex md:hidden justify-center gap-2 mt-4">
+          {Array.from({ length: totalPairs }).map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => goTo(idx)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === currentPair
+                  ? "w-6 bg-[#003366]"
+                  : "w-1.5 bg-gray-300 hover:bg-gray-400"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
