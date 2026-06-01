@@ -3,7 +3,7 @@
 const knowledge = require('./knowledge');
 
 module.exports = () => ({
-  async processQuery(queryText) {
+  async processQuery(queryText, history = []) {
     // 0) Greetings & conversational
     const greeting = knowledge.detectGreeting(queryText);
     if (greeting) {
@@ -49,7 +49,7 @@ module.exports = () => ({
     }
 
     // 4) AI fallback (only if API key is set)
-    const aiReply = await knowledge.aiAnswer(queryText);
+    const aiReply = await knowledge.aiAnswer(queryText, history);
     if (aiReply) {
       return { text: aiReply, followUps: [] };
     }

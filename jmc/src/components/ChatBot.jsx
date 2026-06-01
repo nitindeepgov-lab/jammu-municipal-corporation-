@@ -10,6 +10,10 @@ import {
   Mic,
   MicOff,
   Sparkles,
+  CreditCard,
+  FileText,
+  Building2,
+  PhoneCall,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -72,14 +76,19 @@ function MiniMarkdown({ text, isUser }) {
     <div className="space-y-1">
       {lines.map((line, i) => {
         if (!line.trim()) return <div key={i} className="h-1.5" />;
+        
         let rendered = line
           .replace(
             /\*\*(.+?)\*\*/g,
-            '<strong class="font-semibold text-gray-900">$1</strong>'
+            isUser
+              ? '<strong class="font-bold text-white">$1</strong>'
+              : '<strong class="font-bold text-[#002B5E]">$1</strong>'
           )
           .replace(
             /\[([^\]]+)\]\(([^)]+)\)/g,
-            '<a href="$2" class="text-[#002B5E] underline underline-offset-2 hover:text-[#004494] transition-colors">$1</a>'
+            isUser
+              ? '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-white underline underline-offset-2 font-semibold hover:text-white/80 transition-colors">$1</a>'
+              : '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#002B5E] font-semibold underline underline-offset-2 hover:text-[#004494] transition-colors">$1</a>'
           );
 
         const isBullet = line.trimStart().startsWith("•") || line.trimStart().startsWith("-");
@@ -87,10 +96,10 @@ function MiniMarkdown({ text, isUser }) {
         return (
           <p
             key={i}
-            className={`text-[13.5px] leading-[1.7] ${
-              isUser ? "text-white/95" : "text-gray-700"
-            } ${isBullet ? "pl-1" : ""}`}
-            dangerouslySetInnerHTML={{ __html: rendered }}
+            className={`text-[13px] leading-[1.65] ${
+              isUser ? "text-white/95" : "text-[#2d3748]"
+            } ${isBullet ? "pl-2.5 relative before:content-['•'] before:absolute before:left-0 before:text-[#002B5E]/60" : ""}`}
+            dangerouslySetInnerHTML={{ __html: isBullet ? rendered.replace(/^[•-]\s*/, "") : rendered }}
           />
         );
       })}
@@ -104,11 +113,133 @@ function MiniMarkdown({ text, isUser }) {
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-3 mb-5 animate-chatIn">
-      <LogoAvatar size={30} className="mt-0.5 ring-1 ring-gray-100 shadow-sm" />
-      <div className="flex gap-1 items-center pt-3 pb-2">
-        <span className="w-[5px] h-[5px] rounded-full bg-gray-400 animate-bounce [animation-delay:0ms]" />
-        <span className="w-[5px] h-[5px] rounded-full bg-gray-300 animate-bounce [animation-delay:150ms]" />
-        <span className="w-[5px] h-[5px] rounded-full bg-gray-200 animate-bounce [animation-delay:300ms]" />
+      <LogoAvatar size={30} className="mt-0.5 ring-1 ring-gray-150 shadow-sm" />
+      <div className="flex gap-1.5 items-center bg-[#f8f9fb] border border-gray-100/80 rounded-2xl rounded-tl-[4px] px-4 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0ms]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce [animation-delay:150ms]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-200 animate-bounce [animation-delay:300ms]" />
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Welcome Dashboard
+   ═══════════════════════════════════════════════════════════════ */
+function WelcomeDashboard({ onSelectAction }) {
+  const primaryActions = [
+    {
+      id: "property-tax",
+      label: "Property Tax",
+      desc: "Self-assessment & payments",
+      icon: CreditCard,
+      gradient: "from-blue-50/60 to-indigo-50/30 hover:from-blue-50 hover:to-indigo-50/60",
+      border: "border-blue-100/80 hover:border-blue-200",
+      iconBg: "bg-blue-500/10 text-blue-600",
+      query: "pay property tax"
+    },
+    {
+      id: "complaint",
+      label: "File Grievance",
+      desc: "Register and track civic complaints",
+      icon: FileText,
+      gradient: "from-emerald-50/60 to-teal-50/30 hover:from-emerald-50 hover:to-teal-50/60",
+      border: "border-emerald-100/80 hover:border-emerald-200",
+      iconBg: "bg-emerald-500/10 text-emerald-600",
+      query: "file a complaint"
+    },
+    {
+      id: "egov",
+      label: "E-Governance Hub",
+      desc: "Birth certificate, trade NOCs, etc.",
+      icon: Building2,
+      gradient: "from-indigo-50/60 to-purple-50/30 hover:from-indigo-50 hover:to-purple-50/60",
+      border: "border-indigo-100/80 hover:border-indigo-200",
+      iconBg: "bg-indigo-500/10 text-indigo-600",
+      query: "e-governance services"
+    },
+    {
+      id: "helpline",
+      label: "Official Helplines",
+      desc: "Direct contact numbers of key officers",
+      icon: PhoneCall,
+      gradient: "from-amber-50/60 to-orange-50/30 hover:from-amber-50 hover:to-orange-50/60",
+      border: "border-amber-100/80 hover:border-amber-200",
+      iconBg: "bg-amber-500/10 text-amber-600",
+      query: "officer contacts"
+    }
+  ];
+
+  const secondaryActions = [
+    { label: "💧 Water Tanker", query: "water tanker booking" },
+    { label: "📋 View Tenders", query: "view tenders" },
+    { label: "📄 RTI Info", query: "rti info" },
+    { label: "🧹 Sanitation safai", query: "sanitation safai" },
+    { label: "🏗️ Building plan", query: "building plan permission" },
+  ];
+
+  return (
+    <div className="flex flex-col items-center justify-center py-6 px-1.5 text-center animate-chatIn select-none">
+      {/* Sparkle icon at top */}
+      <div className="relative mb-5 flex items-center justify-center">
+        <span className="absolute w-14 h-14 rounded-2xl bg-[#002B5E]/5 animate-ping [animation-duration:2.5s]" />
+        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#002B5E] to-[#004a9f] flex items-center justify-center shadow-[0_8px_24px_rgba(0,43,94,0.2)]">
+          <Sparkles className="text-amber-300 w-5 h-5 animate-spin [animation-duration:8s]" />
+        </div>
+      </div>
+
+      <h2 className="text-[22px] font-extrabold tracking-tight flex items-center justify-center gap-2 select-none">
+        <span className="bg-gradient-to-r from-[#002B5E] to-[#004a9f] bg-clip-text text-transparent">
+          Namaste JMC!
+        </span>
+      </h2>
+      <h3 className="text-slate-800 text-[15px] font-extrabold mt-1 tracking-tight">
+        How can I help you today?
+      </h3>
+      <p className="text-slate-500 text-[11.5px] max-w-[310px] mt-2 leading-relaxed font-medium">
+        Ask me about municipal taxes, certificates, tenders, online payments, or file a complaint.
+      </p>
+
+      {/* Grid actions */}
+      <div className="grid grid-cols-2 gap-2.5 w-full mt-6">
+        {primaryActions.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onSelectAction(item.query, item.label)}
+              className={`group text-left p-3.5 rounded-2xl border bg-gradient-to-br transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-slate-100 active:scale-[0.97] ${item.gradient} ${item.border}`}
+            >
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${item.iconBg} transition-transform duration-300 group-hover:scale-105`}>
+                <IconComponent size={18} strokeWidth={2.2} />
+              </div>
+              <h4 className="text-[13px] font-extrabold text-slate-800 mt-3 group-hover:text-[#002B5E] transition-colors leading-tight">
+                {item.label}
+              </h4>
+              <p className="text-[10px] text-slate-400 mt-1 leading-normal font-semibold">
+                {item.desc}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Secondary Quick Action pills */}
+      <div className="w-full mt-6 text-left">
+        <p className="text-[10.5px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-1 select-none">
+          Popular Queries
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {secondaryActions.map((pill, idx) => (
+            <button
+              key={idx}
+              onClick={() => onSelectAction(pill.query, pill.label.replace(/^[^a-zA-Z\s]+/, "").trim())}
+              className="text-[11.5px] font-bold text-[#002B5E] bg-slate-50 hover:bg-[#e0ecfc] border border-slate-100 hover:border-[#002B5E]/15 px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-sm"
+            >
+              {pill.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -163,39 +294,39 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
   const isUser = msg.role === "user";
   return (
     <div
-      className={`flex items-start gap-3 mb-5 animate-chatIn ${
+      className={`flex items-start gap-2.5 mb-5 animate-chatIn ${
         isUser ? "flex-row-reverse" : ""
       }`}
     >
       {/* Avatar */}
       {isUser ? (
-        <div className="w-[30px] h-[30px] rounded-full bg-[#002B5E] flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
-          <User size={14} className="text-white" />
+        <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-tr from-[#002B5E] to-[#004494] flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+          <User size={13} className="text-white" />
         </div>
       ) : (
-        <LogoAvatar size={30} className="mt-0.5 ring-1 ring-gray-100 shadow-sm" />
+        <LogoAvatar size={30} className="mt-0.5 ring-1 ring-gray-150 shadow-sm" />
       )}
 
       {/* Content */}
       <div
-        className={`flex flex-col gap-1.5 max-w-[82%] ${
+        className={`flex flex-col gap-1 max-w-[82%] ${
           isUser ? "items-end" : "items-start"
         }`}
       >
         {/* Label */}
-        <span className="text-[10px] font-semibold text-gray-400 tracking-wide uppercase px-0.5">
+        <span className="text-[9.5px] font-bold text-gray-400 tracking-wider uppercase px-0.5 select-none">
           {isUser ? "You" : "JMC Assistant"}
         </span>
 
         <div
-          className={`px-4 py-3 ${
+          className={`px-3.5 py-2.5 ${
             isUser
-              ? "bg-[#002B5E] text-white rounded-2xl rounded-tr-md shadow-[0_2px_8px_rgba(0,43,94,0.2)]"
-              : "bg-[#f8f9fb] text-gray-700 rounded-2xl rounded-tl-md border border-gray-100"
+              ? "bg-gradient-to-br from-[#002B5E] to-[#004494] text-white rounded-2xl rounded-tr-[4px] shadow-[0_3px_12px_rgba(0,43,94,0.15)]"
+              : "bg-[#f8f9fb] text-[#2d3748] rounded-2xl rounded-tl-[4px] border border-gray-100 shadow-[0_2px_6px_rgba(0,0,0,0.01)]"
           }`}
         >
           <MiniMarkdown text={msg.text} isUser={isUser} />
-          {msg.nav && <NavButton nav={msg.nav} onNavigate={onNavigate} />}
+          {msg.nav && <NavButton nav={nav} onNavigate={onNavigate} />}
           {msg.pageGrid && (
             <PageGrid pages={msg.pageGrid} onNavigate={onNavigate} />
           )}
@@ -203,12 +334,12 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
 
         {/* Follow-up pills */}
         {msg.followUps?.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-0.5">
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
             {msg.followUps.map((f) => (
               <button
                 key={f.id}
                 onClick={() => onFollowUp(f)}
-                className="text-[11px] font-medium text-[#002B5E] bg-white hover:bg-[#f0f4fa] border border-[#002B5E]/12 hover:border-[#002B5E]/30 px-3 py-1.5 rounded-full transition-all duration-200"
+                className="text-[11px] font-semibold text-[#002B5E] bg-white hover:bg-[#f0f4fa] border border-[#002B5E]/15 hover:border-[#002B5E]/30 px-3 py-1.5 rounded-full transition-all duration-200 shadow-sm active:scale-95"
               >
                 {f.label}
               </button>
@@ -226,7 +357,7 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
 export default function ChatBot() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [msgs, setMsgs] = useState(() => [makeWelcome()]);
+  const [msgs, setMsgs] = useState([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [showScroll, setShowScroll] = useState(false);
@@ -239,6 +370,21 @@ export default function ChatBot() {
   const recognitionRef = useRef(null);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Persisted speech language selection (defaults to English "en-IN")
+  const [voiceLang, setVoiceLang] = useState(() => {
+    return localStorage.getItem("jmc_chat_voice_lang") || "en-IN";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("jmc_chat_voice_lang", voiceLang);
+  }, [voiceLang]);
+
+  // msgs reference to prevent stale closures in callbacks
+  const msgsRef = useRef([]);
+  useEffect(() => {
+    msgsRef.current = msgs;
+  }, [msgs]);
 
   /* Auto-scroll */
   const scrollToBottom = useCallback((smooth = true) => {
@@ -281,13 +427,20 @@ export default function ChatBot() {
       ]);
       setTyping(true);
 
+      // Build history from msgsRef
+      const recentMsgs = msgsRef.current.slice(-10);
+      const historyData = recentMsgs.map((m) => ({
+        role: m.role,
+        text: m.text,
+      }));
+
       try {
         const apiUrl =
           import.meta.env.VITE_STRAPI_URL || "http://localhost:1337";
         const res = await fetch(`${apiUrl}/api/chatbot/query`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: queryText }),
+          body: JSON.stringify({ text: queryText, history: historyData }),
         });
 
         if (!res.ok) throw new Error("Failed to fetch");
@@ -321,6 +474,13 @@ export default function ChatBot() {
     processQuery(q, q);
   }, [input, processQuery]);
 
+  const handleWelcomeDashboardAction = useCallback(
+    (query, displayText) => {
+      processQuery(query, displayText);
+    },
+    [processQuery]
+  );
+
   const handleQuickAction = useCallback(
     (action) => {
       processQuery(action.label, action.label);
@@ -344,13 +504,14 @@ export default function ChatBot() {
   );
 
   const handleReset = useCallback(() => {
-    setMsgs([makeWelcome()]);
+    setMsgs([]);
     setInput("");
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
-  /* ── Voice input ─────────────────────────────────────────── */
+  /* ── Voice input with Bilingual support & Auto-Close/Auto-Search ── */
   const [voiceTranscript, setVoiceTranscript] = useState("");
+  const transcriptRef = useRef("");
 
   const handleVoice = useCallback(() => {
     if (!voiceSupported) return;
@@ -362,47 +523,50 @@ export default function ChatBot() {
     }
 
     setVoiceTranscript("");
+    transcriptRef.current = "";
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SR();
     recognitionRef.current = recognition;
-    recognition.lang = "hi-IN";
+    recognition.lang = voiceLang;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     recognition.continuous = false;
 
-    recognition.onstart = () => setListening(true);
+    recognition.onstart = () => {
+      setListening(true);
+    };
 
     recognition.onresult = (e) => {
       const transcript = Array.from(e.results)
         .map((r) => r[0].transcript)
         .join("");
-      setInput(transcript);
+      transcriptRef.current = transcript;
       setVoiceTranscript(transcript);
+      setInput(transcript);
     };
 
     recognition.onend = () => {
       setListening(false);
-      setInput((current) => {
-        if (current.trim()) {
-          setTimeout(() => {
-            processQuery(current.trim(), current.trim());
-            setInput("");
-            setVoiceTranscript("");
-          }, 400);
-        }
-        return current;
-      });
+      const text = transcriptRef.current.trim();
+      if (text) {
+        processQuery(text, text);
+        setInput("");
+      }
+      transcriptRef.current = "";
+      setVoiceTranscript("");
     };
 
     recognition.onerror = () => {
       setListening(false);
       setVoiceTranscript("");
+      transcriptRef.current = "";
     };
     recognition.start();
-  }, [voiceSupported, listening, processQuery]);
+  }, [voiceSupported, listening, voiceLang, processQuery]);
 
   const handleVoiceCancel = useCallback(() => {
-    recognitionRef.current?.stop();
+    transcriptRef.current = "";
+    recognitionRef.current?.abort();
     setListening(false);
     setVoiceTranscript("");
     setInput("");
@@ -438,23 +602,50 @@ export default function ChatBot() {
             : "scale-[0.7] opacity-0 translate-y-8 pointer-events-none"
         }`}
       >
-        <div className="rounded-2xl overflow-hidden flex flex-col shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.06)] h-[620px] max-h-[calc(100dvh-7rem)] bg-white">
+        <div className="rounded-3xl overflow-hidden flex flex-col shadow-[0_32px_64px_-16px_rgba(0,43,94,0.28),0_0_0_1px_rgba(0,43,94,0.05)] h-[650px] max-h-[calc(100dvh-7rem)] bg-white/95 backdrop-blur-md border border-white/20 transition-all duration-300">
           {/* ── Header ── */}
-          <div className="relative bg-gradient-to-r from-[#001e3d] to-[#002B5E] px-4 py-3.5 flex-shrink-0">
+          <div className="relative bg-gradient-to-r from-[#00152b] via-[#002B5E] to-[#00418c] px-4 py-4 flex-shrink-0 border-b border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
             <div className="flex items-center gap-3">
               <LogoAvatar size={36} className="ring-2 ring-white/20 shadow-md" />
               <div className="flex-1 min-w-0">
-                <h3 className="text-white font-semibold text-[14px] tracking-[-0.01em]">
+                <h3 className="text-white font-bold text-[14px] tracking-[-0.01em]">
                   JMC Assistant
                 </h3>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-white/50 text-[10.5px] font-medium">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-white/60 text-[10.5px] font-medium">
                     Online — Jammu Municipal Corporation
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                {/* Universal Language Toggle inside Header */}
+                <div className="flex items-center bg-white/10 p-0.5 rounded-full relative select-none border border-white/5 mr-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+                  <button
+                    onClick={() => setVoiceLang("en-IN")}
+                    className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider transition-all duration-200 ${
+                      voiceLang === "en-IN"
+                        ? "bg-white text-[#002B5E] shadow-sm"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    EN
+                  </button>
+                  <button
+                    onClick={() => setVoiceLang("hi-IN")}
+                    className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider transition-all duration-200 ${
+                      voiceLang === "hi-IN"
+                        ? "bg-white text-[#002B5E] shadow-sm"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    हिंदी
+                  </button>
+                </div>
+
                 <button
                   onClick={handleReset}
                   title="New conversation"
@@ -480,94 +671,102 @@ export default function ChatBot() {
             className="flex-1 overflow-y-auto px-4 pt-5 pb-2 bg-white"
             style={{ scrollbarWidth: "none" }}
           >
-            {msgs.map((msg, i) => (
-              <Bubble
-                key={i}
-                msg={msg}
-                onFollowUp={handleFollowUp}
-                onNavigate={handleNavigate}
-              />
-            ))}
-
-            {/* Quick action chips after welcome */}
-            {showQuickActions && (
-              <div className="ml-[42px] mb-4 animate-chatIn">
-                <div className="flex flex-wrap gap-1.5">
-                  {quickActions.map((a) => (
-                    <button
-                      key={a.id}
-                      onClick={() => handleQuickAction(a)}
-                      className="text-[11.5px] font-medium text-gray-600 bg-white hover:bg-[#f0f4fa] hover:text-[#002B5E] border border-gray-200 hover:border-[#002B5E]/25 px-3 py-[7px] rounded-full transition-all duration-200"
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {msgs.length === 0 && !typing ? (
+              <WelcomeDashboard onSelectAction={handleWelcomeDashboardAction} />
+            ) : (
+              msgs.map((msg, i) => (
+                <Bubble
+                  key={i}
+                  msg={msg}
+                  onFollowUp={handleFollowUp}
+                  onNavigate={handleNavigate}
+                />
+              ))
             )}
 
             {typing && <TypingIndicator />}
             <div className="h-3" />
           </div>
 
-          {/* Scroll-to-bottom pill */}
+          {/* Scroll-to-bottom pill raised cleanly above input bar */}
           {showScroll && (
             <button
               onClick={() => scrollToBottom()}
-              className="absolute bottom-[76px] left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200 text-gray-500 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-white transition-all z-10"
+              className="absolute bottom-[92px] left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/95 backdrop-blur-md border border-slate-200 text-slate-600 text-[11px] font-bold px-4 py-2 rounded-full shadow-xl hover:bg-white active:scale-95 transition-all z-10"
             >
-              <ChevronDown size={13} /> New messages
+              <ChevronDown size={14} className="animate-bounce" /> New messages
             </button>
           )}
 
           {/* ── Voice Overlay ── */}
           {listening && (
-            <div className="absolute inset-0 z-20 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center gap-5 animate-chatIn rounded-2xl">
-              {/* Animated rings */}
-              <div className="relative w-28 h-28 flex items-center justify-center">
-                <span className="absolute inset-0 rounded-full bg-red-500/10 animate-ping [animation-duration:2s]" />
-                <span className="absolute inset-3 rounded-full bg-red-500/15 animate-ping [animation-duration:1.5s] [animation-delay:0.3s]" />
+            <div className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 animate-chatIn rounded-3xl p-6">
+              {/* Active Speaking Language indicator */}
+              <div className="flex items-center gap-2 bg-[#f0f4fa] px-4 py-2 rounded-full border border-[#002B5E]/10 shadow-[0_2px_10px_rgba(0,43,94,0.04)]">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                </span>
+                <span className="text-[11.5px] font-extrabold text-[#002B5E] tracking-wide">
+                  Listening in {voiceLang === "hi-IN" ? "Hindi (हिंदी)" : "English (India)"}
+                </span>
+              </div>
+
+              {/* Animated voice wave rings */}
+              <div className="relative w-32 h-32 flex items-center justify-center mt-2">
+                <span className="absolute inset-0 rounded-full bg-red-500/10 animate-ping [animation-duration:2.5s]" />
+                <span className="absolute inset-4 rounded-full bg-red-500/15 animate-ping [animation-duration:2s] [animation-delay:0.3s]" />
                 <button
                   onClick={handleVoiceCancel}
-                  className="relative w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(239,68,68,0.4)] hover:bg-red-600 active:scale-95 transition-all"
+                  className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-red-500 to-rose-600 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(239,68,68,0.4)] hover:scale-105 active:scale-95 transition-all duration-300"
                 >
-                  <MicOff size={26} />
+                  <MicOff size={30} />
                 </button>
               </div>
 
               {/* Waveform bars */}
-              <div className="flex gap-1 items-end h-8">
-                {[30, 60, 45, 80, 55, 90, 40, 70, 50, 85, 35, 65].map((h, i) => (
+              <div className="flex gap-1.5 items-end h-8 mt-2">
+                {[35, 65, 45, 85, 55, 95, 40, 75, 50, 90, 30, 60, 45, 80].map((h, i) => (
                   <span
                     key={i}
-                    className="w-[3px] rounded-full bg-red-400 animate-[voiceBar_0.6s_ease-in-out_infinite]"
+                    className="w-[3px] rounded-full bg-gradient-to-t from-red-400 to-rose-500 animate-[voiceBar_0.6s_ease-in-out_infinite]"
                     style={{
                       height: `${h}%`,
-                      animationDelay: `${i * 60}ms`,
+                      animationDelay: `${i * 50}ms`,
                     }}
                   />
                 ))}
               </div>
 
-              {/* Transcript preview */}
-              <div className="text-center px-6 max-w-full">
+              {/* Live transcript container */}
+              <div className="text-center px-4 max-w-full min-h-[40px] flex items-center justify-center">
                 {voiceTranscript ? (
-                  <p className="text-[14px] text-gray-800 font-medium truncate">
+                  <p className="text-[14.5px] text-gray-800 font-bold leading-relaxed italic">
                     "{voiceTranscript}"
                   </p>
                 ) : (
-                  <p className="text-[13px] text-gray-400">
-                    Listening… speak now
+                  <p className="text-[13px] text-gray-400 font-medium">
+                    Speak now, I'm listening...
                   </p>
                 )}
               </div>
 
-              <button
-                onClick={handleVoiceCancel}
-                className="text-[12px] text-gray-400 hover:text-gray-600 font-medium transition-colors"
-              >
-                Cancel
-              </button>
+              <div className="flex items-center gap-4 mt-2">
+                <button
+                  onClick={handleVoiceCancel}
+                  className="text-[12px] text-gray-500 hover:text-gray-800 font-bold px-3.5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    recognitionRef.current?.stop();
+                  }}
+                  className="text-[12px] text-white bg-[#002B5E] hover:bg-[#003d82] font-bold px-4 py-2 rounded-xl shadow-sm active:scale-95 transition-all duration-200"
+                >
+                  Done
+                </button>
+              </div>
             </div>
           )}
 
@@ -623,11 +822,11 @@ export default function ChatBot() {
         {/* Tooltip */}
         {!tooltipDismissed && !open && (
           <div className="absolute bottom-full right-0 mb-3 animate-chatIn">
-            <div className="relative bg-[#002B5E] text-white text-[12px] font-medium px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap flex items-center gap-2">
-              <Sparkles size={12} className="text-amber-300" />
+            <div className="relative bg-gradient-to-br from-[#002B5E] to-[#004494] text-white text-[12px] font-semibold px-4 py-2.5 rounded-xl shadow-[0_8px_24px_rgba(0,43,94,0.25)] whitespace-nowrap flex items-center gap-2 select-none border border-white/5">
+              <Sparkles size={12} className="text-amber-350" />
               Need help? Ask JMC Assistant
             </div>
-            <div className="w-2.5 h-2.5 bg-[#002B5E] rotate-45 absolute -bottom-1 right-7" />
+            <div className="w-2.5 h-2.5 bg-[#002B5E] rotate-45 absolute -bottom-1 right-7 border-r border-b border-white/5" />
           </div>
         )}
 
@@ -640,16 +839,16 @@ export default function ChatBot() {
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Close assistant" : "Open JMC Assistant"}
-          className={`relative w-[56px] h-[56px] rounded-full flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`relative w-[58px] h-[58px] rounded-full flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             open
-              ? "bg-gray-200 hover:bg-gray-300 scale-90 shadow-lg"
-              : "bg-white shadow-[0_4px_20px_rgba(0,43,94,0.3),0_0_0_2px_rgba(0,43,94,0.08)] hover:shadow-[0_6px_28px_rgba(0,43,94,0.4)] hover:scale-105 active:scale-95"
+              ? "bg-gray-100 hover:bg-gray-200 text-gray-500 border border-gray-200 scale-90 shadow-lg"
+              : "bg-white border border-gray-100/60 shadow-[0_8px_32px_rgba(0,43,94,0.18),0_0_0_2px_rgba(0,43,94,0.03)] hover:shadow-[0_12px_40px_rgba(0,43,94,0.28)] hover:scale-105 active:scale-95 text-[#002B5E]"
           }`}
         >
           {open ? (
-            <X size={22} className="text-gray-600" />
+            <X size={22} className="text-gray-650" />
           ) : (
-            <LogoAvatar size={40} />
+            <LogoAvatar size={42} className="ring-1 ring-[#002B5E]/5 shadow-sm" />
           )}
         </button>
 
@@ -675,6 +874,18 @@ export default function ChatBot() {
         @keyframes voicePulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
           50%      { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+        }
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(0deg); }
+          20%      { transform: rotate(-8deg); }
+          40%      { transform: rotate(6deg); }
+          60%      { transform: rotate(-4deg); }
+          80%      { transform: rotate(2deg); }
+        }
+        .animate-wiggle {
+          animation: wiggle 3s ease-in-out infinite;
+          display: inline-block;
+          transform-origin: bottom center;
         }
       `}</style>
     </>
