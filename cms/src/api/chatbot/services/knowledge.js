@@ -1204,6 +1204,370 @@ async function aiAnswer(query, history = []) {
   }
 }
 
+function normalizeQuery(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function includesAny(text, terms) {
+  return terms.some((term) => text.includes(term));
+}
+
+function getTextScore(text, queryTokens) {
+  if (!text) return 0;
+
+  const normalized = normalizeQuery(text);
+  let score = 0;
+
+  for (const token of queryTokens) {
+    if (normalized.includes(token)) {
+      score += token.length >= 5 ? 3 : 1;
+    }
+  }
+
+  return score;
+}
+
+function formatTitle(value, fallback) {
+  const text = String(value || "").trim();
+  return text || fallback;
+}
+
+function formatDateLabel(dateValue) {
+  if (!dateValue) return "";
+
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+async function getDatabaseAnswer(queryText) {
+  const cms = global.strapi;
+  if (!cms?.db?.query) {
+    return null;
+  }
+
+  const q = normalizeQuery(queryText);
+  if (!q) return null;
+
+  const queryTokens = q.split(" ").filter(Boolean);
+
+  const fetchMany = async (uid, params = {}) => {
+    try {
+      return await cms.db.query(uid).findMany(params);
+    } catch {
+      return [];
+    }
+  };
+
+  const summarizeList = (heading, items, options = {}) => {
+    if (!items.length) return null;
+
+    const lines = items.slice(0, options.limit || 5).map((item, index) => {
+      const title = formatTitle(item.title || item.text || item.name, `${heading} ${index + 1}`);
+      const dateLabel = formatDateLabel(item.updatedAt || item.notice_date || item.tender_date || item.release_date || item.event_date);
+      const extra = item.description || item.caption || item.designation || item.party_name || item.category || "";
+      const suffix = [dateLabel, extra].filter(Boolean).join(" — ");
+      return `${index + 1}. **${title}**${suffix ? ` — ${suffix}` : ""}`;
+    });
+
+    return {
+      text: `${heading}\n\n${lines.join("\n")}`,
+      followUps: options.followUps || [],
+      nav: options.nav || undefined,
+    };
+  };
+
+  const isHomepageQuery = includesAny(q, [
+    "latest",
+    "recent",
+    "updates",
+    "what is new",
+    "what's new",
+    "homepage",
+    "home page",
+    "recent activity",
+    "what is on home",
+    "show updates",
+    "latest updates",
+  ]);
+
+  if (isHomepageQuery) {
+    const [newsTickers, notices, tenders, smartCityTenders, bulletins, events, galleries, officials, ministers] = await Promise.all([
+      fetchMany("api::news-ticker.news-ticker", { where: { is_active: true }, orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::notice.notice", { orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::tender.tender", { orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::smart-city-tender.smart-city-tender", { orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::bulletin-board.bulletin-board", { orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::event-activity.event-activity", { where: { is_active: true }, orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::photo-gallery.photo-gallery", { where: { is_active: true }, orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::official.official", { orderBy: { updatedAt: "desc" }, limit: 3 }),
+      fetchMany("api::minister.minister", { where: { is_active: true }, orderBy: { updatedAt: "desc" }, limit: 3 }),
+    ]);
+
+    const combined = [
+      ...newsTickers.map((item) => ({
+        kind: "News",
+        title: formatTitle(item.text, "News update"),
+        time: item.updatedAt,
+      })),
+      ...notices.map((item) => ({
+        kind: item.notice_type === "council" ? "Council notice" : "Public notice",
+        title: formatTitle(item.title, "Notice"),
+        time: item.updatedAt,
+      })),
+      ...tenders.map((item) => ({
+        kind: "Tender",
+        title: formatTitle(item.title, "Tender"),
+        time: item.updatedAt,
+      })),
+      ...smartCityTenders.map((item) => ({
+        kind: "Smart City tender",
+        title: formatTitle(item.title, "Smart City tender"),
+        time: item.updatedAt,
+      })),
+      ...bulletins.map((item) => ({
+        kind: "Bulletin",
+        title: formatTitle(item.title, "Bulletin board item"),
+        time: item.updatedAt,
+      })),
+      ...events.map((item) => ({
+        kind: "Event",
+        title: formatTitle(item.title, "Event"),
+        time: item.updatedAt,
+      })),
+      ...galleries.map((item) => ({
+        kind: "Gallery",
+        title: formatTitle(item.title, "Photo gallery"),
+        time: item.updatedAt,
+      })),
+      ...officials.map((item) => ({
+        kind: "Officer",
+        title: formatTitle(item.name, "Official"),
+        time: item.updatedAt,
+      })),
+      ...ministers.map((item) => ({
+        kind: "Governing body",
+        title: formatTitle(item.name, "Governing body member"),
+        time: item.updatedAt,
+      })),
+    ]
+      .filter((item) => item.title)
+      .sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+
+    if (combined.length === 0) {
+      return null;
+    }
+
+    return {
+      text: `Here are the latest live updates from the CMS database:\n\n${combined
+        .slice(0, 6)
+        .map((item, index) => `${index + 1}. **${item.kind}** — ${item.title}`)
+        .join("\n")}\n\nIf you want, I can narrow this down to notices, tenders, officers, councillors, gallery, or homepage news.`,
+      followUps: [
+        { id: "notices", label: "View Notices" },
+        { id: "tenders", label: "View Tenders" },
+        { id: "officer-contacts", label: "Officer Contacts" },
+      ],
+      nav: pageRoutes.home,
+    };
+  }
+
+  const wardMatch = q.match(/ward\s*(\d{1,3})/);
+  const wantsCouncillor = includesAny(q, ["councillor", "councilor", "ward member", "ward detail", "council member"]);
+  if (wardMatch || wantsCouncillor) {
+    const councillors = await fetchMany("api::councillor-detail.councillor-detail", {
+      orderBy: { ward_no: "asc" },
+      limit: 20,
+    });
+
+    const wardNo = wardMatch ? Number(wardMatch[1]) : null;
+    const matched = wardNo
+      ? councillors.filter((item) => Number(item.ward_no) === wardNo)
+      : councillors
+          .map((item) => ({ item, score: getTextScore(`${item.name} ${item.party_name || ""} ${item.address || ""}`, queryTokens) }))
+          .filter((entry) => entry.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((entry) => entry.item);
+
+    const list = matched.length ? matched : councillors.slice(0, 5);
+    if (list.length === 0) return null;
+
+    return summarizeList(
+      wardNo ? `Ward ${wardNo} councillor details` : "Councillor details from the CMS database",
+      list,
+      {
+        limit: 5,
+        nav: pageRoutes["councillor-details"],
+        followUps: [{ id: "find-councillor", label: "Find Councillor" }],
+      }
+    );
+  }
+
+  const wantsOfficials = includesAny(q, ["commissioner", "officer", "official", "secretary", "mayor", "deputy mayor", "health officer", "engineer"]);
+  if (wantsOfficials) {
+    const officials = await fetchMany("api::official.official", {
+      orderBy: { order: "asc" },
+      limit: 25,
+    });
+
+    const ministers = await fetchMany("api::minister.minister", {
+      where: { is_active: true },
+      orderBy: { order: "asc" },
+      limit: 10,
+    });
+
+    const matchedOfficials = officials
+      .map((item) => ({ item, score: getTextScore(`${item.name} ${item.designation}`, queryTokens) }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.item);
+
+    const matchedMinisters = ministers
+      .map((item) => ({ item, score: getTextScore(`${item.name} ${item.title}`, queryTokens) }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.item);
+
+    const items = [...matchedOfficials, ...matchedMinisters].slice(0, 5);
+    if (items.length === 0) return null;
+
+    return summarizeList("Here are the live people and offices currently published on the website:", items, {
+      limit: 5,
+      nav: pageRoutes.officials,
+      followUps: [{ id: "contact-helpline", label: "Contact JMC" }],
+    });
+  }
+
+  const wantsNotices = includesAny(q, ["notice", "notices", "circular", "order", "announcement", "public notice"]);
+  const wantsTenders = includesAny(q, ["tender", "tenders", "bid", "procurement", "smart city tender", "e-tender"]);
+  const wantsGallery = includesAny(q, ["gallery", "photo", "photos", "album", "images"]);
+  const wantsHomepage = includesAny(q, ["home", "homepage", "front page", "latest update", "updates"]);
+
+  if (wantsNotices || wantsTenders || wantsGallery || wantsHomepage) {
+    const sourceConfigs = [
+      wantsNotices && {
+        uid: "api::notice.notice",
+        label: "Latest notices from the CMS database",
+        nav: pageRoutes.notices,
+        titleField: "title",
+        dateField: "notice_date",
+        limit: 5,
+      },
+      wantsTenders && {
+        uid: "api::tender.tender",
+        label: "Latest tenders from the CMS database",
+        nav: pageRoutes.notices,
+        titleField: "title",
+        dateField: "tender_date",
+        limit: 5,
+      },
+      wantsTenders && {
+        uid: "api::smart-city-tender.smart-city-tender",
+        label: "Latest Smart City tenders from the CMS database",
+        nav: pageRoutes["smart-city-tenders"],
+        titleField: "title",
+        dateField: "tender_date",
+        limit: 5,
+      },
+      wantsGallery && {
+        uid: "api::photo-gallery.photo-gallery",
+        label: "Latest photo gallery albums from the CMS database",
+        nav: pageRoutes.gallery,
+        titleField: "title",
+        dateField: "updatedAt",
+        limit: 5,
+      },
+      wantsHomepage && {
+        uid: "api::news-ticker.news-ticker",
+        label: "Latest headline updates from the CMS database",
+        nav: pageRoutes.home,
+        titleField: "text",
+        dateField: "updatedAt",
+        limit: 5,
+        where: { is_active: true },
+      },
+      wantsHomepage && {
+        uid: "api::bulletin-board.bulletin-board",
+        label: "Latest bulletin board items from the CMS database",
+        nav: pageRoutes.home,
+        titleField: "title",
+        dateField: "release_date",
+        limit: 5,
+      },
+      wantsHomepage && {
+        uid: "api::event-activity.event-activity",
+        label: "Latest events and activities from the CMS database",
+        nav: pageRoutes.home,
+        titleField: "title",
+        dateField: "event_date",
+        limit: 5,
+        where: { is_active: true },
+      },
+    ].filter(Boolean);
+
+    for (const source of sourceConfigs) {
+      const items = await fetchMany(source.uid, {
+        where: source.where || {},
+        orderBy: { updatedAt: "desc" },
+        limit: source.limit || 5,
+      });
+
+      const matched = items
+        .map((item) => ({ item, score: getTextScore(`${item[source.titleField]} ${item.description || ""}`, queryTokens) }))
+        .filter((entry) => entry.score > 0 || wantsHomepage)
+        .sort((a, b) => b.score - a.score || new Date(b.item.updatedAt || 0) - new Date(a.item.updatedAt || 0))
+        .map((entry) => entry.item);
+
+      if (matched.length > 0) {
+        return summarizeList(source.label, matched, {
+          limit: 5,
+          nav: source.nav,
+          followUps: [],
+        });
+      }
+    }
+  }
+
+  const locationMatch = q.match(/ward\s*(\d{1,3})/);
+  const wantsLocation = includesAny(q, ["location", "payment location", "ward area", "ward", "zone"]);
+  if (locationMatch || wantsLocation) {
+    const locations = await fetchMany("api::location.location", {
+      where: { is_active: true },
+      orderBy: { ward_no: "asc" },
+      limit: 20,
+    });
+
+    const wardNo = locationMatch ? Number(locationMatch[1]) : null;
+    const matched = wardNo
+      ? locations.filter((item) => Number(item.ward_no) === wardNo)
+      : locations
+          .map((item) => ({ item, score: getTextScore(`${item.name} ward ${item.ward_no}`, queryTokens) }))
+          .filter((entry) => entry.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((entry) => entry.item);
+
+    const list = matched.length ? matched : locations.slice(0, 5);
+    if (list.length === 0) return null;
+
+    return summarizeList("Here are the live payment locations currently stored in the CMS database:", list, {
+      limit: 5,
+      nav: pageRoutes.egov,
+      followUps: [{ id: "egov-services", label: "E-Governance Services" }],
+    });
+  }
+
+  return null;
+}
+
 
 module.exports = {
   pageRoutes,
@@ -1212,6 +1576,7 @@ module.exports = {
   detectGreeting,
   detectNavigation,
   findAnswer,
+  getDatabaseAnswer,
   getPopularPages,
   findRelatedRoute,
   getEntryById,
