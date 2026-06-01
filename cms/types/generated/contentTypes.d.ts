@@ -630,6 +630,44 @@ export interface ApiLocationLocation extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiMinisterMinister extends Struct.CollectionTypeSchema {
+  collectionName: 'ministers';
+  info: {
+    description: 'Members shown in the homepage governing bodies carousel.';
+    displayName: '\uD83C\uDFDB\uFE0F Governing Body Member';
+    pluralName: 'ministers';
+    singularName: 'minister';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    facebook: Schema.Attribute.String;
+    gender: Schema.Attribute.Enumeration<['M', 'F', 'O']> &
+      Schema.Attribute.DefaultTo<'M'>;
+    image: Schema.Attribute.Media<'images'>;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    linkedin: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::minister.minister'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    twitter: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsTickerNewsTicker extends Struct.CollectionTypeSchema {
   collectionName: 'news_tickers';
   info: {
@@ -1446,6 +1484,7 @@ declare module '@strapi/strapi' {
       'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
       'api::event-activity.event-activity': ApiEventActivityEventActivity;
       'api::location.location': ApiLocationLocation;
+      'api::minister.minister': ApiMinisterMinister;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
       'api::notice.notice': ApiNoticeNotice;
       'api::official.official': ApiOfficialOfficial;

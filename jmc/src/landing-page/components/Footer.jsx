@@ -393,32 +393,6 @@ export default function Footer() {
                 </strong>
                 . All Rights Reserved.
               </p>
-              <p className="text-gray-600 text-[11px] mb-3">
-                Developed & hosted by{" "}
-                <a
-                  href="http://www.nic.in/"
-                  className="text-gray-400 hover:text-[#FF6600] transition-colors font-medium"
-                >
-                  National Informatics Centre
-                </a>
-                {" · "}
-                <a
-                  href="http://meity.gov.in/"
-                  className="text-gray-400 hover:text-[#FF6600] transition-colors font-medium"
-                >
-                  MeitY
-                </a>
-                , Government of India
-                {" · "}
-                Last updated:{" "}
-                <span className="text-gray-500">
-                  {new Date().toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
-              </p>
             </div>
 
             <div className="w-full lg:w-auto flex flex-wrap items-center justify-center lg:justify-end gap-4 lg:ml-auto">

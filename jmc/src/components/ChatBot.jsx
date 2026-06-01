@@ -421,6 +421,26 @@ export default function ChatBot() {
               />
             ))}
 
+            {/* Quick action chips */}
+            {showQuickActions && (
+              <div className="ml-10 mb-4 animate-msgIn">
+                <p className="text-[10.5px] font-semibold text-gray-400 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+                  <Zap size={10} className="text-[#FF6600]" /> Quick Topics
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {quickActions.map((a) => (
+                    <button
+                      key={a.id}
+                      onClick={() => handleQuickAction(a)}
+                      className="text-[11.5px] font-semibold text-[#002B5E] bg-white hover:bg-[#002B5E] hover:text-white border border-[#002B5E]/15 hover:border-[#002B5E] px-3.5 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-250 hover:-translate-y-0.5"
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {typing && <TypingIndicator />}
             <div className="h-4" />
           </div>
@@ -476,7 +496,7 @@ export default function ChatBot() {
                 listening ? "bg-red-50 focus-within:border-red-300" : ""
               }`}
             >
-              <input
+               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -485,8 +505,8 @@ export default function ChatBot() {
                   listening ? "Listening..." : "Message JMC Assistant..."
                 }
                 disabled={typing}
-                className="flex-1 bg-transparent text-[14px] text-gray-800 placeholder-gray-500 outline-none py-1.5 disabled:opacity-60"
-              />
+                className="flex-1 bg-transparent text-[13px] text-gray-800 placeholder-gray-400 outline-none py-1 disabled:opacity-60"
+              /> 
 
               {/* Mic button */}
               {voiceSupported && !input.trim() && (
@@ -505,15 +525,17 @@ export default function ChatBot() {
               )}
 
               {/* Send button */}
-              {input.trim() && !typing && (
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || typing}
-                  className="p-1.5 bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
-                >
-                  <ArrowRight size={18} />
-                </button>
-              )}
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || typing}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                  input.trim() && !typing
+                    ? "bg-gradient-to-br from-[#002B5E] to-[#004494] text-white shadow-[0_3px_10px_rgba(0,43,94,0.4)] hover:shadow-[0_4px_14px_rgba(0,43,94,0.5)] scale-100 hover:scale-105 active:scale-95"
+                    : "bg-gray-200 text-gray-400 scale-90 cursor-not-allowed"
+                }`}
+              >
+                <Send size={14} />
+              </button> 
             </div>
             <p className="text-center text-[10px] text-gray-400 mt-2">
               AI can make mistakes. Check important info.
