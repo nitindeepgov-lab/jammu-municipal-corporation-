@@ -4,44 +4,6 @@ import { STRAPI_URL } from "../../config/api";
 import { getMinisters } from "../../services/strapiApi";
 import { logError } from "../../utils/errorLogger";
 
-const staticMinisterSlides = [
-  {
-    image: "/officials/Lg.webp",
-    title: "Hon'ble Lt. Governor",
-    name: "Manoj Sinha",
-    gender: "M",
-    social: { facebook: "#", twitter: "#", linkedin: "#" },
-  },
-  {
-    image: "/officials/cm.jpeg",
-    title: "Hon'ble Chief Minister",
-    name: "Omar Abdullah",
-    gender: "M",
-    social: { facebook: "#", twitter: "#", linkedin: "#" },
-  },
-  {
-    image: "/officials/cs.jpg",
-    title: "Chief Secretary",
-    name: "Atul Dulloo, IAS",
-    gender: "M",
-    social: { facebook: "#", twitter: "#", linkedin: "#" },
-  },
-  {
-    image: "/officials/comSec.png",
-    title: "Commissioner Secretary",
-    name: "Mandeep Kaur, IAS",
-    gender: "F",
-    social: { facebook: "#", twitter: "#", linkedin: "#" },
-  },
-  {
-    image: "/officials/com.jpg",
-    title: "Commissioner JMC",
-    name: "Devansh Yadav, IAS",
-    gender: "M",
-    social: { facebook: "#", twitter: "#", linkedin: "#" },
-  },
-];
-
 function getMediaUrl(path) {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
@@ -50,15 +12,16 @@ function getMediaUrl(path) {
 
 function normaliseCmsMinister(item) {
   const entry = item?.attributes || item;
-  const imageUrl = getMediaUrl(
-    entry?.image?.url || entry?.image?.formats?.thumbnail?.url,
-  );
+  const media =
+    entry?.image?.data?.attributes || entry?.image?.data || entry?.image;
+  const imageUrl = getMediaUrl(media?.url || media?.formats?.thumbnail?.url);
 
   return {
     image: imageUrl,
     title: entry?.title || "",
     name: entry?.name || "",
     gender: entry?.gender || "M",
+    is_active: entry?.is_active,
     social: {
       facebook: entry?.facebook || "#",
       twitter: entry?.twitter || "#",
@@ -125,18 +88,21 @@ function MinisterCard({ minister }) {
       </div>
       {socialLinks.length > 0 && (
         <div className="w-full flex items-center justify-center gap-2">
-          {socialLinks.map(({ key, url, icon: Icon, label }) => (
-            <a
-              key={key}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${minister.name} on ${label}`}
-              className="w-8 h-8 rounded-full border border-gray-200 text-gray-500 hover:text-[#003366] hover:border-[#003366]/40 hover:bg-[#003366]/5 transition-colors duration-200 flex items-center justify-center"
-            >
-              <Icon className="w-3.5 h-3.5" />
-            </a>
-          ))}
+          {socialLinks.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <a
+                key={item.key}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${minister.name} on ${item.label}`}
+                className="w-8 h-8 rounded-full border border-gray-200 text-gray-500 hover:text-[#003366] hover:border-[#003366]/40 hover:bg-[#003366]/5 transition-colors duration-200 flex items-center justify-center"
+              >
+                <IconComponent className="w-3.5 h-3.5" />
+              </a>
+            );
+          })}
         </div>
       )}
     </div>
@@ -144,7 +110,7 @@ function MinisterCard({ minister }) {
 }
 
 export default function MinistersCarousel() {
-  const [ministerSlides, setMinisterSlides] = useState(staticMinisterSlides);
+  const [ministerSlides, setMinisterSlides] = useState([]);
   const [currentPair, setCurrentPair] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -164,7 +130,8 @@ export default function MinistersCarousel() {
         const data = res?.data?.data || [];
         const cmsSlides = data
           .map(normaliseCmsMinister)
-          .filter((item) => item.name && item.title);
+          .filter((item) => item.name && item.title)
+          .filter((item) => item.is_active !== false);
 
         if (isMounted && cmsSlides.length > 0) {
           setMinisterSlides(cmsSlides);
@@ -285,10 +252,15 @@ export default function MinistersCarousel() {
       </div>
 
       <div className="p-1 rounded-lg bg-white overflow-hidden">
-        {/* Desktop: original 5-column grid showing all ministers */}
-        <div className="hidden md:grid md:grid-cols-5 gap-7">
+        {/* Desktop: horizontal scroll for many ministers */}
+        <div className="hidden md:flex md:gap-7 md:overflow-x-auto md:pb-2 md:snap-x md:snap-mandatory [scrollbar-width:thin]">
           {ministerSlides.map((minister, idx) => (
-            <MinisterCard key={idx} minister={minister} />
+            <div
+              key={idx}
+              className="min-w-[210px] max-w-[230px] flex-1 snap-start"
+            >
+              <MinisterCard minister={minister} />
+            </div>
           ))}
         </div>
 

@@ -92,9 +92,7 @@ export const getOfficials = () =>
 
 /** Fetch all active governing body members ordered by the 'order' field */
 export const getMinisters = () =>
-  api.get(
-    "/ministers?populate=image&sort=order:asc&filters[is_active][$eq]=true",
-  );
+  api.get("/ministers?populate=image&sort=order:asc");
 
 // ── Photo Gallery ─────────────────────────────────────────────
 
