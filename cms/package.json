@@ -17,6 +17,7 @@
     "keep-alive": "node ./scripts/keep-alive.js",
     "grant:councillors": "node ./scripts/grant-councillors-permissions.js",
     "grant:officials": "node ./scripts/grant-officials-permissions.js",
+    "grant:ministers": "node ./scripts/grant-ministers-permissions.js",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
