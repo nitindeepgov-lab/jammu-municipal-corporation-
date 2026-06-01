@@ -326,7 +326,7 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
           }`}
         >
           <MiniMarkdown text={msg.text} isUser={isUser} />
-          {msg.nav && <NavButton nav={nav} onNavigate={onNavigate} />}
+          {msg.nav && <NavButton nav={msg.nav} onNavigate={onNavigate} />}
           {msg.pageGrid && (
             <PageGrid pages={msg.pageGrid} onNavigate={onNavigate} />
           )}
