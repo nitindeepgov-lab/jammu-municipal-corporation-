@@ -487,7 +487,11 @@ const knowledgeBase = [
     kw: ["panjtirthi", "slot", "booking", "cremation", "last rites", "antim sanskar"],
     q: "How do I book a Panjtirthi slot?",
     a: "Book a Panjtirthi (cremation ground) slot online through the JMC portal:\n\n1. Go to the **E-Governance** page\n2. Click **\"Panjtirthi Slot Booking\"**\n3. Fill your details and select a date/time slot\n4. Confirm the booking\n\nFor urgent requirements, call the **Toll-Free Helpline: 18001807207**.",
-      {
+    followUps: ["contact-helpline"],
+  },
+
+  // ── ROAD DAMAGE ─────────────────────────────────────────────
+  {
     id: "pothole",
     cat: "complaints",
     kw: ["pothole", "road damage", "bad road", "broken road", "road repair", "gaddha", "sadak", "repair", "toota", "pathole", "engineering", "civil", "construction"],
@@ -511,42 +515,6 @@ const knowledgeBase = [
     id: "water-problem",
     cat: "complaints",
     kw: ["no water", "water problem", "dirty water", "low pressure", "pipeline leak", "burst pipe", "pani nahi", "pani", "paani", "water supply", "phe"],
-    q: "No water supply in my area?",
-    a: "For water supply issues:\n\n1. **File a complaint** on Contact Us page selecting **\"Water Supply / PHE\"**\n2. Mention your **ward number** and area\n3. For emergencies, call **18001807207**\n\n**SE, PHE (Water):** Sunil Gandotra — 9419147521\n\nYou can also **book a water tanker** via the MyJammu portal.",
-    followUps: ["water-tanker", "file-complaint", "contact-helpline"],
-  },
-
-  // ── HINDI QUERIES ───────────────────────────────────────────
-  {
-    id: "hindi-payment",
-    cat: "payments",
-    kw: ["paisa", "bhugtan", "kaise pay", "payment kaise", "kaise bhare", "online kaise"],
-    q: "Online payment kaise kare?",
-    a: "Online payment karne ke liye:\n\n1. **Pay Online** page par jaayein\n2. Payment category chunein (Tender Fee ya Other Fee)\n3. Apni details bharein\n4. **Pay Now** par click karein\n5. BillDesk se payment karein (Card, Net Banking, UPI)\n\n📞 Madad ke liye Helpline: **18001807207** (Toll-Free)",
-    followUps: ["pay-online-how", "contact-helpline"],
-  },
-  {
-    id: "hindi-complaint",
-    cat: "complaints",
-    kw: ["shikayat", "problem hai", "complaint kaise", "kaise kare complaint", "pareshan"],
-    q: "Shikayat kaise kare?",
-    a: "Shikayat (complaint) karne ke liye:\n\n1. **Contact Us** page par jaayein\n2. Form bharein — apna naam, mobile, ward number\n3. **Department** chunein (Pani, Safai, Sadak, etc.)\n4. Submit karein\n\nYa seedha call karein: **18001807207** (Toll-Free)\n\n**MyJammu portal** par bhi online shikayat kar sakte hain.",
-    followUps: ["file-complaint", "contact-helpline"],
-  },�──────────────────────────
-  {
-    id: "garbage-issue",
-    cat: "complaints",
-    kw: ["garbage", "kachra", "dirty", "waste dump", "no collection", "missed pickup", "garbage not collected"],
-    q: "Garbage not being collected in my area?",
-    a: "If garbage is not being collected:\n\n1. **File a complaint** on the Contact Us page selecting **\"Sanitation\"**\n2. Mention your **ward number** and area\n3. Or call **18001807207** (Toll-Free)\n\nJMC provides daily door-to-door garbage collection in all 75 wards. If collection is missed, the Sanitation Department will address it promptly.",
-    followUps: ["file-complaint", "sanitation-dept", "contact-helpline"],
-  },
-
-  // ── WATER PROBLEM ───────────────────────────────────────────
-  {
-    id: "water-problem",
-    cat: "complaints",
-    kw: ["no water", "water problem", "dirty water", "low pressure", "pipeline leak", "burst pipe", "pani nahi"],
     q: "No water supply in my area?",
     a: "For water supply issues:\n\n1. **File a complaint** on Contact Us page selecting **\"Water Supply / PHE\"**\n2. Mention your **ward number** and area\n3. For emergencies, call **18001807207**\n\n**SE, PHE (Water):** Sunil Gandotra — 9419147521\n\nYou can also **book a water tanker** via the MyJammu portal.",
     followUps: ["water-tanker", "file-complaint", "contact-helpline"],
