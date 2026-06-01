@@ -12,26 +12,25 @@ const { ValidationError } = require("@strapi/utils").errors;
  */
 module.exports = {
   async beforeUpdate(event) {
-    const { data, where } = event.params;
+    const { data } = event.params;
 
-    // Intercept when the payment status attribute is modified
-    if (data.status) {
-      // Retrieve the current record from the database to compare
-      const current = await strapi.db
-        .query("api::transaction.transaction")
-        .findOne({ where });
+    // Enforce that the update must contain system authentication or syncing flags
+    const isSystemRetry =
+      data.statusChangedBy === "SYSTEM_RETRY" ||
+      data.statusChangedBy === "CRON_RECONCILE" ||
+      data.statusChangedBy === "CRON_SYNC_RETRY";
+    const isDirectVerification = !!data.rawResponse;
+    const isCronMetadataUpdate =
+      data.retryCount !== undefined ||
+      data.lastSyncAttempt !== undefined ||
+      data.syncStatus !== undefined;
+    const isInitialOrderCreation =
+      data.bdOrderId !== undefined && data.rawResponse !== undefined;
 
-      if (current && current.status !== data.status) {
-        // Enforce that the update must contain system authentication flags
-        const isSystemRetry = data.statusChangedBy === "SYSTEM_RETRY";
-        const isDirectVerification = !!data.rawResponse;
-
-        if (!isSystemRetry && !isDirectVerification) {
-          throw new ValidationError(
-            "Manual status overrides are disabled. Transactions can only be updated automatically by syncing with BillDesk."
-          );
-        }
-      }
+    if (!isSystemRetry && !isDirectVerification && !isCronMetadataUpdate && !isInitialOrderCreation) {
+      throw new ValidationError(
+        "Transaction updates are restricted. The transaction records are read-only and automatically managed by the system."
+      );
     }
   },
 };

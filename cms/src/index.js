@@ -5,36 +5,124 @@ module.exports = {
 
   async bootstrap({ strapi }) {
     try {
-      // 1) Programmatically auto-configure the transaction admin list view configuration if present
+      // 1) Programmatically auto-configure the transaction admin list and edit configurations
       const store = strapi.db.query("strapi::core-store");
-      const config = await store.findOne({
+      let config = await store.findOne({
         where: {
           key: "plugin_content_manager_configuration_content_types::api::transaction.transaction",
         },
       });
 
+      let value;
       if (config && config.value) {
-        const value = JSON.parse(config.value);
-        if (value.layouts && value.layouts.list) {
-          const list = value.layouts.list;
-          if (!list.includes("customerName")) {
-            const idIdx = list.indexOf("id");
-            if (idIdx !== -1) {
-              list.splice(idIdx + 1, 0, "customerName");
-            } else {
-              list.unshift("customerName");
+        value = JSON.parse(config.value);
+      } else {
+        // If the configuration does not exist, let's clone basic settings from another content type
+        const templateConfig = await store.findOne({
+          where: {
+            key: {
+              $containsi: "plugin_content_manager_configuration_content_types::api::"
             }
-            value.layouts.list = list;
-            await store.update({
-              where: { id: config.id },
-              data: { value: JSON.stringify(value) },
-            });
-            strapi.log.info(
-              "Successfully updated Transaction collection view to display customerName column in CMS."
-            );
           }
+        });
+
+        if (templateConfig && templateConfig.value) {
+          value = JSON.parse(templateConfig.value);
+        } else {
+          value = {
+            settings: {
+              bulkable: true,
+              filterable: true,
+              searchable: true,
+              pageSize: 10,
+              mainField: "id",
+              defaultSortBy: "id",
+              defaultSortOrder: "DESC"
+            },
+            layouts: {},
+            metadatas: {}
+          };
         }
       }
+
+      // Force list view columns to be exactly: id, customerName, orderId, transactionId
+      value.layouts = value.layouts || {};
+      value.layouts.list = ["id", "customerName", "orderId", "transactionId"];
+
+      // Force Edit View layout to show only the 8 core readable fields
+      value.layouts.edit = [
+        [
+          { name: "customerName", size: 6 },
+          { name: "amount", size: 6 }
+        ],
+        [
+          { name: "status", size: 6 },
+          { name: "feeType", size: 6 }
+        ],
+        [
+          { name: "customerMobile", size: 6 },
+          { name: "customerEmail", size: 6 }
+        ],
+        [
+          { name: "orderId", size: 6 },
+          { name: "transactionId", size: 6 }
+        ]
+      ];
+
+      // Define standard attributes metadata to hide technical fields and make all fields read-only
+      const attributes = [
+        "id", "orderId", "bdOrderId", "transactionId", "amount", "status",
+        "customerName", "customerMobile", "customerEmail", "feeType",
+        "additionalInfo", "rawResponse", "previousStatus", "statusChangedBy",
+        "statusChangedAt", "adminNotes", "refundId", "refundAmount",
+        "refundedAt", "syncStatus", "retryCount", "lastSyncAttempt"
+      ];
+
+      value.metadatas = value.metadatas || {};
+      const coreFields = [
+        "id", "orderId", "transactionId", "amount", "status",
+        "customerName", "customerMobile", "customerEmail", "feeType"
+      ];
+
+      for (const attr of attributes) {
+        value.metadatas[attr] = value.metadatas[attr] || { edit: {}, list: {} };
+        const label = attr
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, str => str.toUpperCase());
+
+        value.metadatas[attr].edit = {
+          label: value.metadatas[attr].edit?.label || label,
+          description: value.metadatas[attr].edit?.description || "",
+          placeholder: value.metadatas[attr].edit?.placeholder || "",
+          visible: coreFields.includes(attr),
+          editable: false
+        };
+
+        value.metadatas[attr].list = {
+          label: value.metadatas[attr].list?.label || label,
+          searchable: true,
+          sortable: true
+        };
+      }
+
+      if (config) {
+        await store.update({
+          where: { id: config.id },
+          data: { value: JSON.stringify(value) },
+        });
+      } else {
+        await store.create({
+          data: {
+            key: "plugin_content_manager_configuration_content_types::api::transaction.transaction",
+            value: JSON.stringify(value),
+            type: "object"
+          }
+        });
+      }
+
+      strapi.log.info(
+        "Successfully simplified Transaction CMS edit/list layouts and disabled manual status edits."
+      );
     } catch (e) {
       strapi.log.warn(
         `Soft skip auto-configuring transaction table layouts: ${e.message}`
