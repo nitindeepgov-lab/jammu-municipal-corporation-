@@ -88,6 +88,14 @@ export const getOfficials = () =>
     "/officials?populate=picture&sort=order:asc&filters[publishedAt][$notNull]=true",
   );
 
+// ── Governing Bodies (Ministers) ─────────────────────────────
+
+/** Fetch all active governing body members ordered by the 'order' field */
+export const getMinisters = () =>
+  api.get(
+    "/ministers?populate=image&sort=order:asc&filters[is_active][$eq]=true",
+  );
+
 // ── Photo Gallery ─────────────────────────────────────────────
 
 /** Fetch all published photo gallery items ordered by 'order' */

@@ -31,6 +31,7 @@ export const STRAPI_URL = getStrapiUrl();
 export const API_ENDPOINTS = {
   BULLETIN_BOARD: "/bulletin-boards",
   OFFICIALS: "/officials",
+  MINISTERS: "/ministers",
   COUNCILLORS: "/councillor-details",
   NEWS_TICKER: "/news-tickers",
   EVENT_ACTIVITIES: "/event-activities",
