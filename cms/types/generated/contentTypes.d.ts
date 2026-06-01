@@ -430,6 +430,53 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAuditLogAuditLog extends Struct.CollectionTypeSchema {
+  collectionName: 'audit_logs';
+  info: {
+    description: 'Immutable audit trail for all admin actions on transactions';
+    displayName: '\uD83D\uDCCB Audit Log';
+    pluralName: 'audit-logs';
+    singularName: 'audit-log';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    action: Schema.Attribute.Enumeration<
+      [
+        'STATUS_CHANGE',
+        'REFUND',
+        'REVERSAL',
+        'BALANCE_ADJUSTMENT',
+        'RETRY',
+        'MANUAL_OVERRIDE',
+        'SYNC_ATTEMPT',
+      ]
+    > &
+      Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ipAddress: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::audit-log.audit-log'
+    > &
+      Schema.Attribute.Private;
+    newValue: Schema.Attribute.JSON;
+    orderId: Schema.Attribute.String & Schema.Attribute.Required;
+    performedBy: Schema.Attribute.String & Schema.Attribute.Required;
+    previousValue: Schema.Attribute.JSON;
+    publishedAt: Schema.Attribute.DateTime;
+    reason: Schema.Attribute.Text;
+    transactionId: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiBulletinBoardBulletinBoard
   extends Struct.CollectionTypeSchema {
   collectionName: 'bulletin_boards';
@@ -800,8 +847,8 @@ export interface ApiTenderTender extends Struct.CollectionTypeSchema {
 export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
   collectionName: 'transactions';
   info: {
-    description: 'BillDesk Transactions';
-    displayName: 'Transaction';
+    description: 'BillDesk payment transactions with admin management fields';
+    displayName: '\uD83D\uDCB3 Transaction';
     pluralName: 'transactions';
     singularName: 'transaction';
   };
@@ -810,6 +857,7 @@ export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
   };
   attributes: {
     additionalInfo: Schema.Attribute.JSON;
+    adminNotes: Schema.Attribute.Text;
     amount: Schema.Attribute.Decimal;
     bdOrderId: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
@@ -819,6 +867,7 @@ export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
     customerMobile: Schema.Attribute.String;
     customerName: Schema.Attribute.String;
     feeType: Schema.Attribute.String;
+    lastSyncAttempt: Schema.Attribute.DateTime;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -828,12 +877,21 @@ export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
     orderId: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
+    previousStatus: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     rawResponse: Schema.Attribute.JSON;
+    refundAmount: Schema.Attribute.Decimal;
+    refundedAt: Schema.Attribute.DateTime;
+    refundId: Schema.Attribute.String;
+    retryCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     status: Schema.Attribute.Enumeration<
-      ['PENDING', 'SUCCESS', 'FAILED', 'INITIATED']
+      ['INITIATED', 'PENDING', 'SUCCESS', 'FAILED', 'REVERSED', 'REFUNDED']
     > &
       Schema.Attribute.DefaultTo<'PENDING'>;
+    statusChangedAt: Schema.Attribute.DateTime;
+    statusChangedBy: Schema.Attribute.String;
+    syncStatus: Schema.Attribute.Enumeration<['SYNCED', 'PENDING', 'FAILED']> &
+      Schema.Attribute.DefaultTo<'SYNCED'>;
     transactionId: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1383,6 +1441,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::audit-log.audit-log': ApiAuditLogAuditLog;
       'api::bulletin-board.bulletin-board': ApiBulletinBoardBulletinBoard;
       'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
       'api::event-activity.event-activity': ApiEventActivityEventActivity;

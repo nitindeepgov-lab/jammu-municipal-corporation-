@@ -4,7 +4,7 @@
  */
 
 // ── Page Route Map (for "take me to" navigation) ─────────────────
-export const pageRoutes = {
+const pageRoutes = {
   home:               { path: "/",                        label: "Home" },
   about:              { path: "/about",                   label: "About JMC" },
   officials:          { path: "/officials",               label: "JMC Officials" },
@@ -81,7 +81,7 @@ const navAliases = [
 // ── Knowledge Entries ────────────────────────────────────────────
 // Each entry: { id, cat, kw[], q, a, followUps[], route? }
 
-export const knowledgeBase = [
+const knowledgeBase = [
   // ── GENERAL ──────────────────────────────────────────────────
   {
     id: "what-is-jmc",
@@ -560,7 +560,7 @@ const greetings = [
  * Check if the query is a greeting/conversational message.
  * Returns a random response string or null.
  */
-export function detectGreeting(query) {
+function detectGreeting(query) {
   const q = query.toLowerCase().trim().replace(/[!?.,:;]+/g, "");
   for (const g of greetings) {
     for (const t of g.triggers) {
@@ -577,7 +577,7 @@ export function detectGreeting(query) {
 }
 
 // ── Quick Action Chips (shown on first open) ────────────────────
-export const quickActions = [
+const quickActions = [
   { label: "💳 Pay Online", id: "pay-online-how" },
   { label: "📞 Contact JMC", id: "contact-helpline" },
   { label: "📢 File Complaint", id: "file-complaint" },
@@ -637,7 +637,7 @@ function similarity(tokens, keywords) {
   return score;
 }
 
-export function findAnswer(query) {
+function findAnswer(query) {
   const tokens = tokenize(query);
   if (tokens.length === 0) return null;
 
@@ -658,11 +658,11 @@ export function findAnswer(query) {
   return bestMatch;
 }
 
-export function getEntryById(id) {
+function getEntryById(id) {
   return knowledgeBase.find((e) => e.id === id) || null;
 }
 
-export function getFollowUps(entry) {
+function getFollowUps(entry) {
   if (!entry?.followUps) return [];
   return entry.followUps
     .map((id) => knowledgeBase.find((e) => e.id === id))
@@ -746,7 +746,7 @@ function matchDestination(dest) {
  *   "open gallery"          → /gallery
  * Returns { path, label } or null.
  */
-export function detectNavigation(query) {
+function detectNavigation(query) {
   const q = query.toLowerCase().trim();
 
   // Tier 1: Explicit nav — strip trigger, match rest
@@ -790,7 +790,7 @@ export function detectNavigation(query) {
  * For knowledge-base answers about specific pages,
  * try to find a matching route to auto-attach a "Go to page" button.
  */
-export function findRelatedRoute(entry) {
+function findRelatedRoute(entry) {
   if (!entry) return null;
   // Try matching based on keywords
   const testStr = entry.kw.join(" ");
@@ -800,7 +800,7 @@ export function findRelatedRoute(entry) {
 /**
  * Returns popular page links for the "take me to" quick menu.
  */
-export function getPopularPages() {
+function getPopularPages() {
   return [
     pageRoutes["home"],
     pageRoutes["pay-online"],
@@ -819,28 +819,55 @@ export function getPopularPages() {
 
 // ── AI Fallback (Optional — set VITE_AI_API_KEY in .env) ──────────
 
-const AI_SYSTEM_PROMPT = `You are JMC Assistant, the official chatbot for the Jammu Municipal Corporation (JMC) website. You ONLY answer questions related to:
-- Jammu Municipal Corporation services, departments, officials, contacts
-- Online payments, complaints, feedback, RTI, tenders, notices
-- E-governance services, certificates, licenses, building permissions
-- Smart City Mission, Swachh Bharat Mission, development works
-- JMC website navigation and features
+const AI_SYSTEM_PROMPT = `You are the official JMC Assistant, the digital concierge for the Jammu Municipal Corporation (JMC) website. Your role is to provide extremely professional, welcoming, and precise guidance to citizens who may be completely unfamiliar with navigating government websites.
+
+Tone & Persona:
+- Professional, empathetic, and highly helpful.
+- Speak in a clear, accessible manner (avoid excessive bureaucratic jargon).
+- Always ensure the citizen feels supported. Examples: "I would be glad to help you with that." or "Here is the exact page you need."
+
+Website Structure & Comprehensive Link Guide:
+- Home [/]: The main landing page for all JMC updates.
+- About JMC [/about]: Information about our history, mission, and vision.
+- Governing Bodies [/governing-bodies]: Details on the Mayor, Deputy Mayor, and Committees.
+- Commissioner [/commissioner]: Message and details of the Municipal Commissioner.
+- Officials [/officials]: Directory of key JMC officers and administrative staff.
+- Ex-Municipal Councillors [/councillor-details]: Find ward-wise details and contacts of past councillors.
+- Citizen Services [/services]: A complete directory of all services offered to residents.
+- E-Governance Services [/egov]: Access digital services (Birth/Death Certificates, Building Permissions, Trade Licenses, Pet Registration, Water Tanker Booking, etc.).
+- Pay Online [/pay-online]: Secure portal to pay Property Tax, Tender Fees, License Fees, and other Municipal Dues.
+- Notices, Circulars, & Tenders [/notices]: Official announcements, public notices, and general procurement tenders.
+- Smart City Tenders [/smart-city-tenders]: Specialized tenders exclusively for Smart City Mission projects.
+- Smart City [/smart-city]: Information on Jammu's Smart City initiatives and progress.
+- Swachh Mission [/swachh-mission]: Updates on the Clean India mission, waste management, and sanitation efforts.
+- Development Works [/development-works]: Information on ongoing and completed civic infrastructure projects.
+- Departments [/departments]: Overview of all JMC departments.
+  - Engineering [/departments/engineering]: Roads, drainage, civil works, and bridges.
+  - Health [/departments/health]: Public health, sanitation inspection, food safety.
+  - Sanitation [/departments/sanitation]: Waste management, street sweeping, garbage collection.
+  - Revenue & Taxation [/departments/revenue-taxation]: Tax assessment, fee collection, trade licenses.
+  - Urban Planning [/departments/urban-planning]: Master plan, zoning, building permissions.
+  - Water Supply [/departments/water-supply]: PHE operations, water distribution, tankers.
+  - Horticulture [/departments/horticulture]: Maintenance of parks, gardens, and green spaces.
+- RTI [/rti]: Right to Information (RTI) disclosures, Act details, and PIO contacts.
+- Photo Gallery [/gallery]: Visuals of JMC events, drives, and projects.
+- Contact Us [/contact]: Helplines, office addresses, and the official grievance/complaint registration form.
+- Feedback [/feedback]: Form to rate and share experiences regarding JMC services.
 
 Rules:
-1. NEVER answer questions unrelated to JMC or Jammu city civic services.
-2. If someone asks about unrelated topics, politely redirect: "I can only help with Jammu Municipal Corporation services. Please ask me about JMC!"
-3. Keep answers concise, helpful, and friendly.
-4. Use **bold** for key terms. Use bullet points for lists.
-5. If you don't know something specific, suggest calling the JMC helpline: 18001807207.
-6. You can mention the JMC website pages and suggest users navigate to them.`;
+1. ONLY answer questions related to JMC or Jammu city civic services. Polite redirect: "I apologize, but I can only assist with Jammu Municipal Corporation services. How can I help you with JMC today?"
+2. When a user asks how to do something, provide a clear, step-by-step answer and ALWAYS provide the exact relative link. Format links like this: [Page Name](/page-path).
+3. Anticipate user needs. If they ask about property tax, provide the link to pay but also mention the relevant department.
+4. For complaints or grievances, politely route the user to [Contact Us](/contact) or the MyJammu portal.
+5. If you do not have the specific answer, kindly provide the JMC Toll-Free Helpline: 1800-180-7207.`;
 
 /**
  * AI fallback for queries not matched by the local knowledge base.
  * Only activated if VITE_AI_API_KEY is set in the environment.
  * Returns a promise that resolves to a string answer or null.
  */
-export async function aiAnswer(query) {
-  const apiKey = import.meta.env.VITE_AI_API_KEY;
+async function aiAnswer(query) {
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
   try {
@@ -868,3 +895,18 @@ export async function aiAnswer(query) {
     return null;
   }
 }
+
+
+module.exports = {
+  pageRoutes,
+  knowledgeBase,
+  quickActions,
+  detectGreeting,
+  detectNavigation,
+  findAnswer,
+  getPopularPages,
+  findRelatedRoute,
+  getEntryById,
+  getFollowUps,
+  aiAnswer
+};
