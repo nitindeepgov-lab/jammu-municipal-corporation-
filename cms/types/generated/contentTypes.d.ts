@@ -592,6 +592,39 @@ export interface ApiEventActivityEventActivity
   };
 }
 
+export interface ApiHeroSlideHeroSlide extends Struct.CollectionTypeSchema {
+  collectionName: 'hero_slides';
+  info: {
+    description: 'Banner images shown in the homepage hero slider. Use the order field to control display sequence.';
+    displayName: '\uD83D\uDDBC\uFE0F Hero Slide';
+    pluralName: 'hero-slides';
+    singularName: 'hero-slide';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::hero-slide.hero-slide'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    subtitle: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiLocationLocation extends Struct.CollectionTypeSchema {
   collectionName: 'locations';
   info: {
@@ -753,13 +786,16 @@ export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     designation: Schema.Attribute.String & Schema.Attribute.Required;
+    email: Schema.Attribute.Email;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::official.official'
     > &
       Schema.Attribute.Private;
+    mobile: Schema.Attribute.String;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    office_phone: Schema.Attribute.String;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     picture: Schema.Attribute.Media<'images'>;
     publishedAt: Schema.Attribute.DateTime;
@@ -1483,6 +1519,7 @@ declare module '@strapi/strapi' {
       'api::bulletin-board.bulletin-board': ApiBulletinBoardBulletinBoard;
       'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
       'api::event-activity.event-activity': ApiEventActivityEventActivity;
+      'api::hero-slide.hero-slide': ApiHeroSlideHeroSlide;
       'api::location.location': ApiLocationLocation;
       'api::minister.minister': ApiMinisterMinister;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;

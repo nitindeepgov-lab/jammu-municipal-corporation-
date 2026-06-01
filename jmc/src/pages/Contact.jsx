@@ -1,166 +1,6 @@
+import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
-
-const officers = [
-  {
-    name: "Devansh Yadav, IAS",
-    designation: "Commissioner",
-    office: "2542192, 2547846",
-    mobile: "9797999495",
-    email: "mc.jmc@jk.gov.in",
-  },
-  {
-    name: "Rajeev Khajuria, JKAS",
-    designation: "Joint Commissioner (Adm.)",
-    office: "2546252",
-    mobile: "9906069409",
-  },
-  {
-    name: "Subah Mehta, JKAS",
-    designation: "Joint Commissioner (R&E)",
-    office: "",
-    mobile: "9419145837",
-  },
-  {
-    name: "Abdul Star, JKAS",
-    designation: "Joint Commissioner (H & S)",
-    office: "",
-    mobile: "9419027458",
-  },
-  {
-    name: "Chand Singh, JKAS",
-    designation: "Secretary",
-    office: "",
-    mobile: "7006046450",
-    email: "secy.jmcjmu@gmail.com",
-  },
-  {
-    name: "Sanjay Badyal, JKAS",
-    designation: "Deputy Commissioner (North)",
-    office: "",
-    mobile: "9419137292",
-  },
-  {
-    name: "Lal Chand, JKAS",
-    designation: "Deputy Commissioner (South)",
-    office: "",
-    mobile: "7889455797",
-  },
-  {
-    name: "Amit Kumar, JKAS",
-    designation: "Financial Advisor / CAO",
-    office: "",
-    mobile: "9419383788",
-  },
-  {
-    name: "Sunil Gandotra",
-    designation: "Superintending Engineer, PHE",
-    office: "",
-    mobile: "9419147521",
-  },
-  {
-    name: "Dr. Vinod Sharma",
-    designation: "Health Officer",
-    office: "",
-    mobile: "9419182088",
-  },
-  {
-    name: "Firdous Ahmed Qazi",
-    designation: "Joint Commissioner (Works)",
-    office: "",
-    mobile: "7006129804",
-  },
-  {
-    name: "Manoj Kumar",
-    designation: "Senior Town Planner",
-    office: "",
-    mobile: "9419162344",
-  },
-  {
-    name: "Nawaz Ahmed Banday",
-    designation: "Executive Engineer (Division-II)",
-    office: "",
-    mobile: "8803274201",
-  },
-  {
-    name: "Akhil Dutt",
-    designation: "Executive Engineer (Division-III)",
-    office: "",
-    mobile: "7889856380",
-  },
-  {
-    name: "Yasir Bashir Kichloo",
-    designation: "Executive Engineer (Division-IV)",
-    office: "",
-    mobile: "9419184058",
-  },
-  {
-    name: "Janak Singh",
-    designation: "Executive Engineer (Projects Division)",
-    office: "",
-    mobile: "9419161201",
-  },
-  {
-    name: "S.P. Singh, JKAS",
-    designation: "Executive Engineer (Electrical)",
-    office: "",
-    mobile: "9149767538",
-  },
-  {
-    name: "Er. Rayaz-ul-Hussan Mir",
-    designation: "Executive Engineer (Mechanical)",
-    office: "",
-    mobile: "9419211990",
-  },
-  {
-    name: "Vijay Singh Manhas",
-    designation: "Executive Engineer, UEED",
-    office: "",
-    mobile: "9419142784",
-  },
-  {
-    name: "Dharam Vir Singh",
-    designation: "Chief Transport Officer (Zone III)",
-    office: "",
-    mobile: "7780888736",
-  },
-  {
-    name: "Talat Mehmood Khan",
-    designation: "Chief Transport Officer (Zone I & II)",
-    office: "",
-    mobile: "7006480719",
-  },
-  {
-    name: "Dr. Jaswant Singh, JKAS",
-    designation: "Municipal Veterinary Officer",
-    office: "",
-    mobile: "9797682216",
-  },
-  {
-    name: "Dr. Gaurav Chowdhary",
-    designation: "Animal Welfare Officer",
-    office: "",
-    mobile: "9797371677",
-  },
-  {
-    name: "Kamal Kishore",
-    designation: "Building Officer",
-    office: "",
-    mobile: "8492081239",
-  },
-  {
-    name: "Kapil Khajuria",
-    designation: "Building Officer",
-    office: "",
-    mobile: "9018896437",
-  },
-  {
-    name: "Parveen Gupta",
-    designation: "Private Secretary to Commissioner",
-    office: "2542192",
-    mobile: "9419104451",
-    email: "commissionerjmc@gmail.com",
-  },
-];
+import { getOfficials } from "../services/strapiApi";
 
 const offices = [
   {
@@ -184,6 +24,20 @@ const offices = [
 ];
 
 export default function Contact() {
+  const [officers, setOfficers] = useState([]);
+  const [loadingOfficers, setLoadingOfficers] = useState(true);
+
+  useEffect(() => {
+    getOfficials()
+      .then((res) => {
+        setOfficers(res?.data?.data || []);
+      })
+      .catch(() => {
+        setOfficers([]);
+      })
+      .finally(() => setLoadingOfficers(false));
+  }, []);
+
   return (
     <SubpageTemplate title="Contact Us" breadcrumb={[{ name: "Contact Us" }]}>
       <div>
@@ -375,53 +229,70 @@ export default function Contact() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {officers.map((officer, idx) => (
-                  <tr
-                    key={idx}
-                    className={
-                      idx % 2 === 0
-                        ? "bg-white hover:bg-gray-50"
-                        : "bg-gray-50 hover:bg-gray-100"
-                    }
-                  >
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-sm text-center align-middle whitespace-nowrap">
-                      {idx + 1}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-sm align-top break-words">
-                      {officer.name}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                      {officer.designation}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                      {officer.office || "—"}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
-                      {officer.mobile ? (
-                        <a
-                          href={`tel:${officer.mobile}`}
-                          className="text-[#003366] hover:underline"
-                        >
-                          {officer.mobile}
-                        </a>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
-                      {officer.email ? (
-                        <a
-                          href={`mailto:${officer.email}`}
-                          className="text-[#003366] hover:underline break-all"
-                        >
-                          {officer.email}
-                        </a>
-                      ) : (
-                        "—"
-                      )}
+                {loadingOfficers ? (
+                  <tr>
+                    <td colSpan={6} className="py-10 text-center text-sm text-gray-400">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-gray-300 border-t-[#003366] rounded-full animate-spin" />
+                        Loading officer directory...
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : officers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-10 text-center text-sm text-gray-400">
+                      No officer records found. Please check back later.
+                    </td>
+                  </tr>
+                ) : (
+                  officers.map((officer, idx) => (
+                    <tr
+                      key={officer.id ?? idx}
+                      className={
+                        idx % 2 === 0
+                          ? "bg-white hover:bg-gray-50"
+                          : "bg-gray-50 hover:bg-gray-100"
+                      }
+                    >
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-sm text-center align-middle whitespace-nowrap">
+                        {idx + 1}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-sm align-top break-words">
+                        {officer.name}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
+                        {officer.designation}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
+                        {officer.office_phone || "—"}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
+                        {officer.mobile ? (
+                          <a
+                            href={`tel:${officer.mobile}`}
+                            className="text-[#003366] hover:underline"
+                          >
+                            {officer.mobile}
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
+                        {officer.email ? (
+                          <a
+                            href={`mailto:${officer.email}`}
+                            className="text-[#003366] hover:underline break-all"
+                          >
+                            {officer.email}
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

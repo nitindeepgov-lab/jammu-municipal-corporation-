@@ -114,7 +114,7 @@ export default function MinistersCarousel() {
   const [currentPair, setCurrentPair] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [loadError, setLoadError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const allSlides = useMemo(() => {
     if (ministerSlides.length === 0) return [];
@@ -134,19 +134,13 @@ export default function MinistersCarousel() {
           .filter((item) => item.name && item.title)
           .filter((item) => item.is_active !== false);
 
-        setLoadError(false);
-        if (isMounted && cmsSlides.length > 0) {
-          setMinisterSlides(cmsSlides);
-        } else if (isMounted) {
-          setMinisterSlides([]);
-        }
+        if (isMounted) setMinisterSlides(cmsSlides);
       })
       .catch((err) => {
         logError("MinistersCarousel", err);
-        if (isMounted) {
-          setLoadError(true);
-          setMinisterSlides([]);
-        }
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
       });
 
     return () => {
@@ -260,20 +254,18 @@ export default function MinistersCarousel() {
       </div>
 
       <div className="p-1 rounded-lg bg-white overflow-hidden">
-        {ministerSlides.length === 0 ? (
-          <div className="min-h-[240px] flex items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-10 text-center">
-            <div>
-              <p className="text-base font-semibold text-[#003366]">
-                Governing bodies will appear here once CMS content is published.
-              </p>
-              <p className="mt-2 text-sm text-gray-500 max-w-lg">
-                {loadError
-                  ? "The frontend could not load the minister records from the deployed CMS endpoint."
-                  : "Add active minister records in Strapi and publish the backend deployment to show them on the homepage."}
-              </p>
-            </div>
+        {loading ? (
+          /* Skeleton shimmer while fetching */
+          <div className="hidden md:flex md:gap-7">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="min-w-[210px] max-w-[230px] flex-1 bg-gray-100 rounded-2xl p-6 flex flex-col items-center animate-pulse">
+                <div className="w-28 h-28 rounded-full bg-gray-200 mb-4" />
+                <div className="h-3 w-3/4 bg-gray-200 rounded mb-2" />
+                <div className="h-2.5 w-1/2 bg-gray-200 rounded" />
+              </div>
+            ))}
           </div>
-        ) : (
+        ) : ministerSlides.length === 0 ? null : (
           <>
             {/* Desktop: horizontal scroll for many ministers */}
             <div className="hidden md:flex md:gap-7 md:overflow-x-auto md:pb-2 md:snap-x md:snap-mandatory [scrollbar-width:thin]">

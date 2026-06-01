@@ -1,37 +1,50 @@
 import { useState, useEffect, useRef } from 'react'
 import NewsTicker from './NewsTicker'
+import { getHeroSlides } from '../../services/strapiApi'
+import { STRAPI_URL } from '../../config/api'
 
-const slides = [
-  {
-    image: '/banner/jmc-office.jpeg',
-    title: 'Infrastructure Development',
-    subtitle: 'Building roads, parks, and amenities for a better Jammu',
-  },
-  {
-    image: '/banner/banner10.png',
-    title: 'Jammu Municipal Corporation',
-    subtitle: 'Committed to serving the residents of Jammu City',
-  },
-  {
-    image: '/banner/banner9.jpg',
-    title: 'Cleaner, Greener Jammu',
-    subtitle: "JMC's commitment to sanitation and environment",
-  },
-  {
-    image: '/banner/banner1.jpg',
-    title: 'Infrastructure Development',
-    subtitle: 'Building roads, parks, and amenities for a better Jammu',
-  },
-  {
-    image: '/banner/banner8.jpeg',
-    title: 'Infrastructure Development',
-    subtitle: 'Building roads, parks, and amenities for a better Jammu',
-  },
+// Fallback slides used until CMS data loads or if CMS has no entries
+const FALLBACK_SLIDES = [
+  { image: '/banner/jmc-office.jpeg',  title: 'Infrastructure Development',      subtitle: 'Building roads, parks, and amenities for a better Jammu' },
+  { image: '/banner/banner10.png',     title: 'Jammu Municipal Corporation',     subtitle: 'Committed to serving the residents of Jammu City' },
+  { image: '/banner/banner9.jpg',      title: 'Cleaner, Greener Jammu',          subtitle: "JMC's commitment to sanitation and environment" },
+  { image: '/banner/banner1.jpg',      title: 'Infrastructure Development',      subtitle: 'Building roads, parks, and amenities for a better Jammu' },
+  { image: '/banner/banner8.jpeg',     title: 'Infrastructure Development',      subtitle: 'Building roads, parks, and amenities for a better Jammu' },
 ]
 
+function getImageUrl(slide) {
+  const url = slide?.image?.url
+  if (!url) return null
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `${STRAPI_URL}${url}`
+}
+
+function normaliseSlide(item) {
+  return {
+    image: getImageUrl(item) || '/banner/banner10.png',
+    title: item.title || '',
+    subtitle: item.subtitle || '',
+  }
+}
+
 export default function HeroSlider() {
+  const [slides, setSlides] = useState(FALLBACK_SLIDES)
   const [current, setCurrent] = useState(0)
   const timerRef = useRef(null)
+
+  useEffect(() => {
+    getHeroSlides()
+      .then((res) => {
+        const data = res?.data?.data || []
+        if (data.length > 0) {
+          setSlides(data.map(normaliseSlide))
+        }
+        // If CMS empty, keep fallback slides
+      })
+      .catch(() => {
+        // Keep fallback slides on error
+      })
+  }, [])
 
   const next = () => setCurrent(c => (c + 1) % slides.length)
   const prev = () => setCurrent(c => (c - 1 + slides.length) % slides.length)
@@ -42,7 +55,7 @@ export default function HeroSlider() {
       setCurrent((c) => (c + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timerRef.current)
-  }, [])
+  }, [slides.length])
 
   return (
     <section className="relative overflow-hidden" aria-roledescription="carousel" aria-label="JMC Home Banner">
@@ -58,7 +71,7 @@ export default function HeroSlider() {
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover md:object-fill  bg-black"
+              className="w-full h-full object-cover md:object-fill bg-black"
               onError={(e) => { e.target.src = '/banner/banner10.png' }}
             />
             {/* gradient overlays */}
