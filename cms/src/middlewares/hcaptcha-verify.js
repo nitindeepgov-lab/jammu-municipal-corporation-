@@ -24,6 +24,14 @@ module.exports = (config, { strapi }) => {
 
     const secret = process.env.HCAPTCHA_SECRET_KEY;
 
+    // Skip verification if running in local development mode or explicitly bypassed via environment
+    if (process.env.NODE_ENV === "development" || process.env.DISABLE_CAPTCHA === "true") {
+      strapi.log.info(
+        `[hCaptcha] Bypassed verification for local development testing (NODE_ENV: ${process.env.NODE_ENV})`
+      );
+      return next();
+    }
+
     // If no secret key is configured, skip verification (dev mode safety)
     if (!secret) {
       strapi.log.warn(

@@ -1470,6 +1470,151 @@ const injectAdminStyles = () => {
       .jmc-quick-actions { flex-direction: column; }
       .jmc-widget-modal-grid { grid-template-columns: 1fr; }
     }
+
+    /* ═══════════════════════════════════════════
+       31. RESILIENT CONTENT MANAGER REFRESH CONTROLS
+       ═══════════════════════════════════════════ */
+    #jmc-admin-refresh-button {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 99999;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #475569;
+      font-size: 18px;
+      font-weight: bold;
+      backdrop-filter: blur(8px);
+    }
+    #jmc-admin-refresh-button:hover {
+      transform: rotate(180deg) scale(1.05);
+      background: #f8fafc;
+      border-color: #3b82f6;
+      color: #3b82f6;
+      box-shadow: 0 6px 16px rgba(59,130,246,0.16);
+    }
+    #jmc-admin-refresh-button:active {
+      transform: rotate(180deg) scale(0.95);
+    }
+
+    #jmc-empty-refresh-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 500px;
+      padding: 40px;
+      background: rgba(248, 250, 252, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .jmc-empty-refresh-content {
+      text-align: center;
+      max-width: 440px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 40px 32px;
+      border-radius: 24px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.02);
+      transition: all 0.3s ease;
+    }
+    .jmc-empty-refresh-content:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.02);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .jmc-empty-icon {
+      font-size: 42px;
+      color: #3b82f6;
+      margin-bottom: 20px;
+      animation: spinSlow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      display: inline-block;
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+    .jmc-empty-refresh-content h3 {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 10px 0;
+      letter-spacing: -0.01em;
+    }
+    .jmc-empty-refresh-content p {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.6;
+      margin: 0 0 24px 0;
+    }
+    .jmc-refresh-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+    }
+    .jmc-refresh-large-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #ffffff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      max-width: 280px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+      letter-spacing: 0.01em;
+    }
+    .jmc-refresh-large-btn:hover {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+    }
+    .jmc-refresh-large-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    }
+    .jmc-refresh-secondary-btn {
+      background: transparent;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      max-width: 280px;
+      transition: all 0.2s;
+    }
+    .jmc-refresh-secondary-btn:hover {
+      background: #f8fafc;
+      color: #334155;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .jmc-refresh-secondary-btn:active {
+      transform: translateY(0);
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   `;
   document.head.appendChild(style);
 
@@ -2096,90 +2241,84 @@ const injectDashboardWidgets = () => {
 
         <!-- Quick Actions -->
         <div class="jmc-quick-actions">
-          <a href="/admin/content-manager/collection-types/api::tender.tender/create" class="jmc-qa-btn primary">\u2795 New Tender</a>
-          <a href="/admin/content-manager/collection-types/api::news-ticker.news-ticker/create" class="jmc-qa-btn primary">\u2795 News Update</a>
-          <a href="/admin/content-manager/collection-types/api::notice.notice/create" class="jmc-qa-btn outline">\ud83d\udcc4 New Notice</a>
-          <a href="/admin/content-manager/collection-types/api::bulletin-board.bulletin-board/create" class="jmc-qa-btn outline">\ud83d\udccc New Bulletin</a>
-          <a href="/admin/plugins/upload" class="jmc-qa-btn outline">\ud83d\uddbc Media Library</a>
+          <a href="/admin/content-manager/collection-types/api::tender.tender/create" class="jmc-qa-btn primary">➕ New Tender</a>
+          <a href="/admin/content-manager/collection-types/api::news-ticker.news-ticker/create" class="jmc-qa-btn primary">➕ News Update</a>
+          <a href="/admin/content-manager/collection-types/api::notice.notice/create" class="jmc-qa-btn outline">📄 New Notice</a>
+          <a href="/admin/content-manager/collection-types/api::bulletin-board.bulletin-board/create" class="jmc-qa-btn outline">📌 New Bulletin</a>
+          <a href="/admin/plugins/upload" class="jmc-qa-btn outline">🖼 Media Library</a>
         </div>
 
-        <!-- Stats -->
+        <!-- Dynamic Stats -->
         <div class="jmc-stats-grid">
           <div class="jmc-stat-card">
             <h4>Portal Visitors</h4>
-            <div class="val">4,289</div>
-            <div class="trend">\u2191 +12% this week</div>
+            <div class="val">...</div>
           </div>
           <div class="jmc-stat-card">
             <h4>Open Tenders</h4>
-            <div class="val">24</div>
-            <div class="trend">\u2191 3 new</div>
+            <div class="val">...</div>
           </div>
           <div class="jmc-stat-card">
             <h4>Active Notices</h4>
-            <div class="val">18</div>
-            <div class="trend">Up to date</div>
+            <div class="val">...</div>
           </div>
           <div class="jmc-stat-card">
             <h4>Officials Listed</h4>
-            <div class="val">42</div>
-            <div class="trend">All verified</div>
+            <div class="val">...</div>
           </div>
           <div class="jmc-stat-card">
             <h4>Councillors</h4>
-            <div class="val">75</div>
-            <div class="trend">All active</div>
+            <div class="val">...</div>
           </div>
           <div class="jmc-stat-card">
             <h4>Media Files</h4>
-            <div class="val">320+</div>
-            <div class="trend">6 uploads today</div>
+            <div class="val">...</div>
           </div>
         </div>
 
         <!-- Content Management Section -->
         <div class="jmc-section-header">
-          <h2>\ud83d\udcc1 Content Management</h2>
+          <h2>📁 Content Management</h2>
           <span>All content types</span>
         </div>
         <div class="jmc-dash-grid" id="jmc-content-widgets">
           <a href="/admin/content-manager/collection-types/api::tender.tender" class="jmc-widget-card blue">
-            <div class="jmc-widget-icon">\ud83d\udcc4</div>
+            <div class="jmc-widget-icon">📄</div>
             <h3>Tenders</h3>
             <p>Manage regular municipal tenders & NIT documents.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::smart-city-tender.smart-city-tender" class="jmc-widget-card sky">
-            <div class="jmc-widget-icon">\ud83c\udfd7</div>
+            <div class="jmc-widget-icon">🏗</div>
             <h3>Smart City Tenders</h3>
             <p>Smart city project tender documents & tracking.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::news-ticker.news-ticker" class="jmc-widget-card orange">
-            <div class="jmc-widget-icon">\ud83d\udcf0</div>
+            <div class="jmc-widget-icon">📰</div>
             <h3>News Ticker</h3>
             <p>Manage scrolling news updates on the portal.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::notice.notice" class="jmc-widget-card purple">
-            <div class="jmc-widget-icon">\ud83d\udccc</div>
+            <div class="jmc-widget-icon">📌</div>
             <h3>Notices & Circulars</h3>
             <p>Official municipal notices, orders & circulars.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::bulletin-board.bulletin-board" class="jmc-widget-card green">
-            <div class="jmc-widget-icon">\ud83d\udccb</div>
+            <div class="jmc-widget-icon">📋</div>
             <h3>Bulletin Board</h3>
             <p>Homepage announcements & public bulletins.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::official.official" class="jmc-widget-card orange">
-            <div class="jmc-widget-icon">\ud83d\udc64</div>
+            <div class="jmc-widget-icon">👤</div>
             <h3>Officials Directory</h3>
             <p>Who's who — officer profiles & contact info.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::councillor-detail.councillor-detail" class="jmc-widget-card teal">
-            <div class="jmc-widget-icon">\ud83c\udfe4</div>
+            <div class="jmc-widget-icon">🏢</div>
             <h3>Councillor Details</h3>
             <p>Ward-wise councillor profiles & information.</p>
           </a>
           <a href="/admin/content-manager/collection-types/api::health.health" class="jmc-widget-card red">
-            <div class="jmc-widget-icon">\ud83c\udfe5</div>
+            <div class="jmc-widget-icon">🏥</div>
             <h3>Health Section</h3>
             <p>Health department notices & service updates.</p>
           </a>
@@ -2206,88 +2345,43 @@ const injectDashboardWidgets = () => {
             <h3>Reload Transactions</h3>
             <p>Refresh pending payment statuses.</p>
           </button>
-          <button type="button" id="jmc-update-status" class="jmc-widget-card red">
-            <div class="jmc-widget-icon">S</div>
-            <h3>Update Status</h3>
-            <p>Set to SUCCESS, FAILED, PENDING, INITIATED.</p>
-          </button>
         </div>
 
         <!-- System & Tools Section -->
         <div class="jmc-section-header">
-          <h2>\u2699\ufe0f System & Tools</h2>
+          <h2>⚙️ System & Tools</h2>
           <span>Administration</span>
         </div>
         <div class="jmc-dash-grid" id="jmc-system-widgets">
           <a href="/admin/settings" class="jmc-widget-card gray">
-            <div class="jmc-widget-icon">\u2699\ufe0f</div>
+            <div class="jmc-widget-icon">⚙️</div>
             <h3>Admin Settings</h3>
             <p>Roles, permissions, tokens & API config.</p>
           </a>
           <a href="/admin/plugins/upload" class="jmc-widget-card purple">
-            <div class="jmc-widget-icon">\ud83d\uddbc</div>
+            <div class="jmc-widget-icon">🖼</div>
             <h3>Media Library</h3>
             <p>Upload & manage images, documents and files.</p>
           </a>
           <a href="/admin/settings/users" class="jmc-widget-card blue">
-            <div class="jmc-widget-icon">\ud83d\udc65</div>
+            <div class="jmc-widget-icon">👥</div>
             <h3>Admin Users</h3>
             <p>Manage CMS administrator accounts & access.</p>
           </a>
           <a href="/admin/settings/api-tokens" class="jmc-widget-card orange">
-            <div class="jmc-widget-icon">\ud83d\udd11</div>
+            <div class="jmc-widget-icon">🔑</div>
             <h3>API Tokens</h3>
             <p>Generate and manage API access tokens.</p>
           </a>
-
-          <!-- Add Widget Button -->
-          <button class="jmc-add-widget-btn" id="jmc-add-widget-trigger">
-            <div class="plus">+</div>
-            <span>Add Widget</span>
-          </button>
         </div>
 
         <!-- Recent Activity -->
         <div class="jmc-section-header">
-          <h2>\ud83d\udcca Recent Activity</h2>
-          <span>Last 24 hours</span>
+          <h2>📊 Recent Activity</h2>
+          <span>Latest Updates</span>
         </div>
-        <div class="jmc-activity-panel">
-          <div class="jmc-activity-item">
-            <div class="jmc-activity-dot" style="background:#10b981"></div>
-            <div>
-              <div class="act-text"><strong>New tender</strong> published — NIT No. JMC/2025/042</div>
-              <div class="act-time">2 hours ago</div>
-            </div>
-          </div>
-          <div class="jmc-activity-item">
-            <div class="jmc-activity-dot" style="background:#3b82f6"></div>
-            <div>
-              <div class="act-text"><strong>3 notices</strong> updated in Orders & Circulars</div>
-              <div class="act-time">5 hours ago</div>
-            </div>
-          </div>
-          <div class="jmc-activity-item">
-            <div class="jmc-activity-dot" style="background:#f59e0b"></div>
-            <div>
-              <div class="act-text"><strong>News ticker</strong> updated with municipal election dates</div>
-              <div class="act-time">8 hours ago</div>
-            </div>
-          </div>
-          <div class="jmc-activity-item">
-            <div class="jmc-activity-dot" style="background:#8b5cf6"></div>
-            <div>
-              <div class="act-text"><strong>Bulletin board</strong> — 2 new announcements added</div>
-              <div class="act-time">Yesterday</div>
-            </div>
-          </div>
-          <div class="jmc-activity-item">
-            <div class="jmc-activity-dot" style="background:#ef4444"></div>
-            <div>
-              <div class="act-text"><strong>5 councillor profiles</strong> updated with new photos</div>
-              <div class="act-time">Yesterday</div>
-            </div>
-          </div>
+        <div class="jmc-activity-panel" id="jmc-activity-list">
+          <p style="font-size:12.5px;color:var(--jmc-text-dim);margin:0;padding:10px 0;">Loading recent activity feed...</p>
         </div>
       `;
 
@@ -2298,89 +2392,58 @@ const injectDashboardWidgets = () => {
         mainContainer.appendChild(dashboard);
       }
 
-      // Add Widget modal logic
-      const trigger = document.getElementById("jmc-add-widget-trigger");
-      if (trigger) {
-        trigger.addEventListener("click", () => {
-          if (document.getElementById("jmc-widget-modal-overlay")) return;
+      // Fetch dynamic statistics from the DB
+      const loadDynamicStats = async () => {
+        // Safety guard: if the dashboard is no longer in the DOM, return false to halt polling
+        if (!document.getElementById("custom-jmc-dashboard")) return false;
 
-          const overlay = document.createElement("div");
-          overlay.className = "jmc-widget-modal-overlay";
-          overlay.id = "jmc-widget-modal-overlay";
-          overlay.innerHTML = `
-            <div class="jmc-widget-modal">
-              <div class="jmc-widget-modal-header">
-                <h2>Add Dashboard Widget</h2>
-                <button id="jmc-modal-close">\u2715</button>
-              </div>
-              <div class="jmc-widget-modal-body">
-                <p style="margin:0 0 16px;font-size:12.5px;color:var(--jmc-text-dim);">Click a widget to open it. Widgets link to CMS sections for quick access.</p>
-                <div class="jmc-widget-modal-grid">
-                  <a href="/admin/content-manager/collection-types/api::tender.tender" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83d\udcc4</div>
-                    <div class="wo-text"><h4>Tenders</h4><p>Regular tenders</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::smart-city-tender.smart-city-tender" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83c\udfd7</div>
-                    <div class="wo-text"><h4>Smart City</h4><p>Smart city tenders</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::news-ticker.news-ticker" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83d\udcf0</div>
-                    <div class="wo-text"><h4>News Ticker</h4><p>News updates</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::notice.notice" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83d\udccc</div>
-                    <div class="wo-text"><h4>Notices</h4><p>Orders & circulars</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::bulletin-board.bulletin-board" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83d\udccb</div>
-                    <div class="wo-text"><h4>Bulletin Board</h4><p>Announcements</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::official.official" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83d\udc64</div>
-                    <div class="wo-text"><h4>Officials</h4><p>Officer directory</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::councillor-detail.councillor-detail" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83c\udfe4</div>
-                    <div class="wo-text"><h4>Councillors</h4><p>Ward members</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::health.health" class="jmc-widget-option">
-                    <div class="wo-icon">🏥</div>
-                    <div class="wo-text"><h4>Health</h4><p>Health department</p></div>
-                  </a>
-                  <a href="/admin/content-manager/collection-types/api::transaction.transaction" class="jmc-widget-option">
-                    <div class="wo-icon">₹</div>
-                    <div class="wo-text"><h4>Transactions</h4><p>Payment logs</p></div>
-                  </a>
-                  <a href="/admin/plugins/upload" class="jmc-widget-option">
-                    <div class="wo-icon">\ud83d\uddbc</div>
-                    <div class="wo-text"><h4>Media Library</h4><p>Files & images</p></div>
-                  </a>
-                  <a href="/admin/settings" class="jmc-widget-option">
-                    <div class="wo-icon">\u2699\ufe0f</div>
-                    <div class="wo-text"><h4>Settings</h4><p>Admin config</p></div>
-                  </a>
-                </div>
-              </div>
-            </div>
-          `;
-          document.body.appendChild(overlay);
+        try {
+          const res = await fetch("/api/visitor-count/dashboard-stats");
+          if (res.ok) {
+            // Re-verify after fetch completed to prevent race conditions during unmounts
+            const currentDash = document.getElementById("custom-jmc-dashboard");
+            if (!currentDash) return false;
 
-          // Close handlers
-          document
-            .getElementById("jmc-modal-close")
-            .addEventListener("click", () => overlay.remove());
-          overlay.addEventListener("click", (e) => {
-            if (e.target === overlay) overlay.remove();
-          });
-          document.addEventListener("keydown", function escHandler(e) {
-            if (e.key === "Escape") {
-              overlay.remove();
-              document.removeEventListener("keydown", escHandler);
+            const stats = await res.json();
+            const cards = currentDash.querySelectorAll(".jmc-stat-card .val");
+            if (cards && cards.length >= 6) {
+              cards[0].textContent = Number(stats.visitors || 0).toLocaleString();
+              cards[1].textContent = Number(stats.tenders || 0).toLocaleString();
+              cards[2].textContent = Number(stats.notices || 0).toLocaleString();
+              cards[3].textContent = Number(stats.officials || 0).toLocaleString();
+              cards[4].textContent = Number(stats.councillors || 0).toLocaleString();
+              cards[5].textContent = Number(stats.mediaFiles || 0).toLocaleString();
             }
-          });
-        });
-      }
+
+            // Update Recent Activity Panel dynamically
+            const activityPanel = currentDash.querySelector("#jmc-activity-list");
+            if (activityPanel && stats.recentActivity) {
+              activityPanel.innerHTML = stats.recentActivity.map(act => `
+                <div class="jmc-activity-item">
+                  <div class="jmc-activity-dot" style="background:${act.color}"></div>
+                  <div>
+                    <div class="act-text">${act.text}</div>
+                    <div class="act-time">${act.time}</div>
+                  </div>
+                </div>
+              `).join("");
+            }
+          }
+        } catch (error) {
+          console.error("[visitor-count] Error loading dashboard stats:", error);
+        }
+        return true;
+      };
+
+      loadDynamicStats();
+
+      // Poll every 3 seconds to keep stats and recent activities fully real-time
+      const statsPollInterval = setInterval(async () => {
+        const active = await loadDynamicStats();
+        if (!active) {
+          clearInterval(statsPollInterval);
+        }
+      }, 3000);
 
       const verifyBtn = document.getElementById("jmc-verify-payment");
       if (verifyBtn) {
@@ -2583,145 +2646,6 @@ const injectDashboardWidgets = () => {
           }
         });
       }
-
-      const updateStatusBtn = document.getElementById("jmc-update-status");
-      if (updateStatusBtn) {
-        updateStatusBtn.addEventListener("click", () => {
-          if (document.getElementById("jmc-update-status-overlay")) return;
-
-          const overlay = document.createElement("div");
-          overlay.className = "jmc-widget-modal-overlay";
-          overlay.id = "jmc-update-status-overlay";
-          overlay.innerHTML = `
-            <div class="jmc-widget-modal">
-              <div class="jmc-widget-modal-header">
-                <h2>Update Transaction Status</h2>
-                <button id="jmc-update-status-close">X</button>
-              </div>
-              <div class="jmc-widget-modal-body">
-                <p style="margin:0 0 16px;font-size:12.5px;color:var(--jmc-text-dim);">Use Transaction ID or Order ID from the receipt.</p>
-                <div class="jmc-action-field">
-                  <label class="jmc-action-label" for="jmc-update-status-transaction">Transaction ID</label>
-                  <input id="jmc-update-status-transaction" class="jmc-action-input" type="text" placeholder="BillDesk transaction ID" />
-                </div>
-                <div class="jmc-action-field">
-                  <label class="jmc-action-label" for="jmc-update-status-order">Order ID (optional)</label>
-                  <input id="jmc-update-status-order" class="jmc-action-input" type="text" placeholder="Merchant order ID" />
-                </div>
-                <div class="jmc-action-field">
-                  <label class="jmc-action-label" for="jmc-update-status-value">Status</label>
-                  <select id="jmc-update-status-value" class="jmc-action-input">
-                    <option value="PENDING">PENDING</option>
-                    <option value="SUCCESS">SUCCESS</option>
-                    <option value="FAILED">FAILED</option>
-                    <option value="INITIATED">INITIATED</option>
-                  </select>
-                </div>
-                <div class="jmc-action-field">
-                  <label class="jmc-action-label" for="jmc-update-status-reason">Reason (optional)</label>
-                  <input id="jmc-update-status-reason" class="jmc-action-input" type="text" placeholder="Manual override reason" />
-                </div>
-                <div class="jmc-action-row">
-                  <button id="jmc-update-status-submit" class="jmc-qa-btn primary" type="button">Update Status</button>
-                  <button id="jmc-update-status-reset" class="jmc-qa-btn outline" type="button">Clear</button>
-                </div>
-                <div id="jmc-update-status-result" class="jmc-action-result">Awaiting input.</div>
-              </div>
-            </div>
-          `;
-          document.body.appendChild(overlay);
-
-          const close = () => overlay.remove();
-          const closeBtn = document.getElementById("jmc-update-status-close");
-          if (closeBtn) closeBtn.addEventListener("click", close);
-          overlay.addEventListener("click", (e) => {
-            if (e.target === overlay) close();
-          });
-          document.addEventListener("keydown", function escHandler(e) {
-            if (e.key === "Escape") {
-              close();
-              document.removeEventListener("keydown", escHandler);
-            }
-          });
-
-          const txnInput = document.getElementById(
-            "jmc-update-status-transaction",
-          );
-          const orderInput = document.getElementById("jmc-update-status-order");
-          const statusInput = document.getElementById(
-            "jmc-update-status-value",
-          );
-          const reasonInput = document.getElementById(
-            "jmc-update-status-reason",
-          );
-          const submitBtn = document.getElementById("jmc-update-status-submit");
-          const resetBtn = document.getElementById("jmc-update-status-reset");
-          const resultEl = document.getElementById("jmc-update-status-result");
-
-          const setResult = (text) => {
-            if (resultEl) resultEl.textContent = text;
-          };
-
-          if (submitBtn) {
-            submitBtn.addEventListener("click", async () => {
-              const transactionId = txnInput?.value?.trim() || "";
-              const orderId = orderInput?.value?.trim() || "";
-              const status = statusInput?.value || "";
-              const reason = reasonInput?.value?.trim() || "";
-
-              if (!transactionId && !orderId) {
-                setResult("Transaction ID or Order ID is required.");
-                return;
-              }
-
-              submitBtn.disabled = true;
-              setResult("Updating status...");
-
-              try {
-                const res = await fetch("/api/billdesk/mark-status", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    transactionId,
-                    orderId,
-                    status,
-                    reason,
-                  }),
-                });
-
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                  throw new Error(
-                    data.error?.message || "Unable to update status.",
-                  );
-                }
-
-                const result = data.data || {};
-                const lines = [
-                  `Status: ${result.status || "-"}`,
-                  `Transaction ID: ${result.transactionId || "-"}`,
-                  `Order ID: ${result.orderId || "-"}`,
-                ];
-                setResult(lines.join("\n"));
-              } catch (error) {
-                setResult(error.message || "Unable to update status.");
-              } finally {
-                submitBtn.disabled = false;
-              }
-            });
-          }
-
-          if (resetBtn) {
-            resetBtn.addEventListener("click", () => {
-              if (txnInput) txnInput.value = "";
-              if (orderInput) orderInput.value = "";
-              if (statusInput) statusInput.value = "PENDING";
-              if (reasonInput) reasonInput.value = "";
-              setResult("Awaiting input.");
-            });
-          }
-        });
-      }
     }
   };
 
@@ -2869,6 +2793,95 @@ const injectTransactionFieldEnhancements = () => {
   setTimeout(handleTransactionFields, 1500);
 };
 
+const injectResilientRefreshTools = () => {
+  if (typeof document === "undefined") return;
+
+  // 1) Inject floating bottom-right refresh button on all admin pages
+  const existingFloatingBtn = document.getElementById("jmc-admin-refresh-button");
+  if (!existingFloatingBtn) {
+    const btn = document.createElement("div");
+    btn.id = "jmc-admin-refresh-button";
+    btn.title = "Refresh Content Panel";
+    btn.innerHTML = "⟳";
+    btn.addEventListener("click", () => {
+      window.location.reload();
+    });
+    document.body.appendChild(btn);
+  }
+
+  // 2) Active observer to watch for empty content manager states
+  const checkEmptyContentManager = () => {
+    const isContentManager = window.location.pathname.includes("/content-manager");
+    if (!isContentManager) return;
+
+    // A. Primary: check standard <main> tag
+    let mainContainer = document.querySelector("main");
+
+    // B. Sibling fallback: If <main> is missing, look next to the sub-sidebar navigation panel
+    if (!mainContainer) {
+      const subSidebar = document.querySelector('nav[aria-label="Content Manager"]') || 
+                         Array.from(document.querySelectorAll('nav')).find(n => n.textContent.includes('Collection Types'));
+      if (subSidebar && subSidebar.parentElement) {
+        const siblings = Array.from(subSidebar.parentElement.children);
+        const siblingContent = siblings.find(el => el !== subSidebar && !el.tagName.toLowerCase().includes('nav'));
+        if (siblingContent) {
+          mainContainer = siblingContent;
+        }
+      }
+    }
+
+    // C. Root sidebar sibling fallback
+    if (!mainContainer) {
+      const firstNav = document.querySelector('nav');
+      if (firstNav && firstNav.parentElement) {
+        const siblings = Array.from(firstNav.parentElement.children);
+        const siblingContent = siblings.find(el => el !== firstNav && !el.tagName.toLowerCase().includes('nav'));
+        if (siblingContent) {
+          mainContainer = siblingContent;
+        }
+      }
+    }
+
+    if (!mainContainer) return;
+
+    const existingRefreshBox = document.getElementById("jmc-empty-refresh-box");
+    
+    // Check if any interactive tables, layouts, forms, skeletons or headers are loaded
+    const activeElements = Array.from(mainContainer.querySelectorAll("table, form, h1, [role='grid'], [class*='Content'] h2, button, p, a, svg, [class*='Skeleton'], [class*='Loading']"));
+    
+    // Safety check: Filter out elements that belong to our own refresh panel to prevent infinite loops
+    const realActiveContent = activeElements.filter(el => !el.closest("#jmc-empty-refresh-box"));
+    const hasActiveContent = realActiveContent.length > 0;
+    
+    // If it's completely empty or taking too long, we inject a beautiful centered refresh card!
+    if (!hasActiveContent) {
+      if (!existingRefreshBox) {
+        const box = document.createElement("div");
+        box.id = "jmc-empty-refresh-box";
+        box.innerHTML = `
+          <div class="jmc-empty-refresh-content">
+            <div class="jmc-empty-icon">⟳</div>
+            <h3>Workspace Panel Loading Error</h3>
+            <p>The workspace panel is taking too long to load or failed to render. Click below to refresh the view.</p>
+            <div class="jmc-refresh-btn-group">
+              <button onclick="window.location.reload()" class="jmc-refresh-large-btn">⟳ Refresh Content</button>
+              <button onclick="window.location.reload()" class="jmc-refresh-secondary-btn">Hard Reload App</button>
+            </div>
+          </div>
+        `;
+        mainContainer.appendChild(box);
+      }
+    } else {
+      if (existingRefreshBox) {
+        existingRefreshBox.remove();
+      }
+    }
+  };
+
+  // Run initial check and bind to route changes/DOM mutations
+  setInterval(checkEmptyContentManager, 2000);
+};
+
 export default {
   config: {
     auth: { logo },
@@ -2909,10 +2922,11 @@ export default {
   bootstrap() {
     injectAdminStyles();
     injectLoginPageEnhancements();
-    injectHCaptchaOnLogin();
+    // injectHCaptchaOnLogin(); // Temporarily commented for local testing
     setTimeout(() => {
       injectDashboardWidgets();
       injectTransactionFieldEnhancements();
+      injectResilientRefreshTools();
     }, 500);
   },
 };

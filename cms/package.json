@@ -12,6 +12,7 @@
     "seed:example": "node ./scripts/seed.js",
     "seed:officials": "node ./scripts/seed-officials.js",
     "seed:councillors": "node ./scripts/seed-councillorDetails.js",
+    "reset:admin": "node ./scripts/reset-admin-password.js",
     "check:db": "node ./scripts/check-db-health.js",
     "cleanup:councillors": "node ./scripts/cleanup-councillors.js",
     "keep-alive": "node ./scripts/keep-alive.js",

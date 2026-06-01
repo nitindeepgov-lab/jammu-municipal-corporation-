@@ -20,5 +20,14 @@ module.exports = {
         description: 'Increment and return visitor count',
       },
     },
+    {
+      method: 'GET',
+      path: '/visitor-count/dashboard-stats',
+      handler: 'visitor-count.dashboardStats',
+      config: {
+        auth: false,
+        description: 'Get dashboard counts statistics',
+      },
+    },
   ],
 };
