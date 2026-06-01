@@ -48,13 +48,19 @@ module.exports = () => ({
       };
     }
 
-    // 4) AI fallback (only if API key is set)
+    // 4) Live database-backed lookup for current website content
+    const databaseReply = await knowledge.getDatabaseAnswer(queryText);
+    if (databaseReply) {
+      return databaseReply;
+    }
+
+    // 5) AI fallback (only if API key is set)
     const aiReply = await knowledge.aiAnswer(queryText, history);
     if (aiReply) {
       return { text: aiReply, followUps: [] };
     }
 
-    // 5) Fallback
+    // 6) Fallback
     const FALLBACK = "I couldn't find a specific answer for that. Try rephrasing, or pick a suggestion below.\n\n• How to **pay fees online**\n• **File a complaint** or grievance\n• Find **JMC officer contacts**\n• View **notices & tenders**\n• Access **RTI information**";
     return {
       text: FALLBACK,
