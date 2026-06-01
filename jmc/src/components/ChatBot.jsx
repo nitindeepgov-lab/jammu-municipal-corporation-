@@ -37,6 +37,14 @@ const makeWelcome = () => ({
 const FALLBACK =
   "I couldn't find a specific answer for that. Try rephrasing, or pick a suggestion below.\n\n• How to **pay fees online**\n• **File a complaint** or grievance\n• Find **JMC officer contacts**\n• View **notices & tenders**\n• Access **RTI information**";
 
+const quickActions = [
+  { id: "pay-fees", label: "Pay fees online" },
+  { id: "complaint", label: "File a complaint" },
+  { id: "contacts", label: "Officer contacts" },
+  { id: "notices", label: "Notices and tenders" },
+  { id: "rti", label: "RTI information" },
+];
+
 /* ═══════════════════════════════════════════════════════════════
    Markdown-lite renderer
    ═══════════════════════════════════════════════════════════════ */
