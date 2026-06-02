@@ -40,25 +40,58 @@ const injectAdminStyles = () => {
        1. GLOBAL FOUNDATION
        ═══════════════════════════════════════════ */
     :root {
+      /* ── Core Palette ── */
       --jmc-navy: #0A1628;
       --jmc-navy-light: #152238;
       --jmc-blue: #003366;
       --jmc-blue-soft: #1e40af;
+      --jmc-blue-glow: rgba(0, 51, 102, 0.15);
       --jmc-accent: #FF6600;
       --jmc-accent-soft: #ff8533;
-      --jmc-bg: #f8f9fb;
+      --jmc-accent-glow: rgba(255, 102, 0, 0.12);
+      --jmc-emerald: #059669;
+      --jmc-emerald-soft: #10b981;
+      /* ── Surfaces ── */
+      --jmc-bg: #f4f6fa;
+      --jmc-bg-elevated: #f8f9fc;
       --jmc-surface: #ffffff;
-      --jmc-border: #e5e7eb;
-      --jmc-border-light: #f0f1f3;
-      --jmc-text-primary: #111827;
-      --jmc-text-secondary: #6b7280;
-      --jmc-text-dim: #9ca3af;
-      --jmc-radius: 10px;
-      --jmc-radius-lg: 14px;
-      --jmc-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-      --jmc-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      --jmc-shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
-      --jmc-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --jmc-surface-hover: #fafbfe;
+      /* ── Borders ── */
+      --jmc-border: #e2e5ea;
+      --jmc-border-light: #edf0f4;
+      --jmc-border-focus: rgba(0, 51, 102, 0.25);
+      /* ── Text ── */
+      --jmc-text-primary: #0f172a;
+      --jmc-text-secondary: #64748b;
+      --jmc-text-dim: #94a3b8;
+      /* ── Radius ── */
+      --jmc-radius-xs: 6px;
+      --jmc-radius-sm: 8px;
+      --jmc-radius: 12px;
+      --jmc-radius-lg: 16px;
+      --jmc-radius-xl: 20px;
+      /* ── Shadows — Layered for depth ── */
+      --jmc-shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
+      --jmc-shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+      --jmc-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.03);
+      --jmc-shadow-md: 0 8px 24px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03);
+      --jmc-shadow-lg: 0 20px 48px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+      --jmc-shadow-xl: 0 32px 64px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.05);
+      --jmc-shadow-blue: 0 4px 16px rgba(0, 51, 102, 0.12);
+      --jmc-shadow-accent: 0 4px 16px rgba(255, 102, 0, 0.15);
+      /* ── Gradients ── */
+      --jmc-gradient-primary: linear-gradient(135deg, #003366 0%, #004d99 50%, #002855 100%);
+      --jmc-gradient-accent: linear-gradient(135deg, #FF6600 0%, #ff8533 100%);
+      --jmc-gradient-sidebar: linear-gradient(180deg, #080e1e 0%, #0c1a30 30%, #0f2040 60%, #0a1628 100%);
+      --jmc-gradient-surface: linear-gradient(180deg, #ffffff 0%, #fafbfd 100%);
+      --jmc-gradient-hero: linear-gradient(135deg, #003366 0%, #1a4d80 40%, #005599 70%, #003366 100%);
+      /* ── Transitions ── */
+      --jmc-ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --jmc-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --jmc-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --jmc-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --jmc-transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      --jmc-transition-slow: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     /* ═══ ABSOLUTE DARK MODE LOCK ═══ */
     html, html[data-theme="dark"], html[data-theme="light"],
@@ -140,6 +173,7 @@ const injectAdminStyles = () => {
 
     * {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      box-sizing: border-box;
     }
 
     /* Smoother rendering */
@@ -147,26 +181,58 @@ const injectAdminStyles = () => {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       background: var(--jmc-bg) !important;
+      text-rendering: optimizeLegibility;
     }
 
-    /* Targeted transition timing — replaces expensive global * rule */
+    /* Selection color */
+    ::selection {
+      background: rgba(0, 51, 102, 0.12);
+      color: var(--jmc-blue);
+    }
+
+    /* Targeted transition timing */
     a, button, input, textarea, select,
     [class*="SubNav"] a, [class*="AssetCard"],
     [class*="FolderCard"], tbody tr, .jmc-widget-card,
     .jmc-stat-card, .jmc-qa-btn, [class*="Badge"],
     [role="tab"], [class*="SettingsNav"] a {
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-timing-function: var(--jmc-ease);
+    }
+
+    /* ── CSS-only ripple effect for buttons ── */
+    button, .jmc-qa-btn, a.jmc-widget-card {
+      position: relative;
+      overflow: hidden;
+    }
+    button::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.25) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    button:active::after {
+      opacity: 1;
+      transition: opacity 0s;
     }
 
     /* ═══════════════════════════════════════════
        2. MAIN SIDEBAR (Left Navigation)
-       Premium glassmorphic dark nav
+       Premium glassmorphic dark nav with animated gradient
        ═══════════════════════════════════════════ */
+    @keyframes sidebarGradientShift {
+      0%, 100% { background-position: 50% 0%; }
+      50% { background-position: 50% 100%; }
+    }
     body > div:first-child > div > nav:first-of-type,
     [class*="LeftMenu"], [class*="leftMenu"] {
-      background: linear-gradient(180deg, #0a1628 0%, #0f1d33 40%, #122240 100%) !important;
-      border-right: 1px solid rgba(255,255,255,0.06) !important;
-      box-shadow: 2px 0 40px rgba(0,0,0,0.25), inset -1px 0 0 rgba(255,255,255,0.03) !important;
+      background: var(--jmc-gradient-sidebar) !important;
+      background-size: 100% 200% !important;
+      animation: sidebarGradientShift 15s ease infinite !important;
+      border-right: 1px solid rgba(255,255,255,0.04) !important;
+      box-shadow: 4px 0 32px rgba(0,0,0,0.3), inset -1px 0 0 rgba(255,255,255,0.02) !important;
       overflow-y: auto !important;
       scrollbar-width: none !important;
     }
@@ -176,30 +242,33 @@ const injectAdminStyles = () => {
     /* Sidebar links — refined touch targets */
     body > div:first-child > div > nav:first-of-type a,
     [class*="LeftMenu"] a, [class*="leftMenu"] a {
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      border-radius: 10px !important;
-      margin: 3px 8px !important;
+      transition: all 0.3s var(--jmc-ease) !important;
+      border-radius: var(--jmc-radius) !important;
+      margin: 2px 10px !important;
       padding: 10px 14px !important;
-      min-height: 42px !important;
+      min-height: 44px !important;
       display: flex !important;
       align-items: center !important;
       position: relative !important;
+      border: 1px solid transparent !important;
     }
     body > div:first-child > div > nav:first-of-type a:hover,
     [class*="LeftMenu"] a:hover, [class*="leftMenu"] a:hover {
-      background: rgba(255, 255, 255, 0.08) !important;
-      transform: translateX(2px) !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.04) !important;
+      transform: translateX(3px) !important;
     }
     body > div:first-child > div > nav:first-of-type a[aria-current="page"],
     [class*="LeftMenu"] a[aria-current="page"], [class*="leftMenu"] a[aria-current="page"] {
-      background: linear-gradient(135deg, rgba(255, 102, 0, 0.12), rgba(255, 102, 0, 0.05)) !important;
-      box-shadow: inset 3px 0 0 var(--jmc-accent), 0 0 20px rgba(255, 102, 0, 0.06) !important;
+      background: linear-gradient(135deg, rgba(255, 102, 0, 0.1), rgba(255, 140, 0, 0.04)) !important;
+      border-color: rgba(255, 102, 0, 0.08) !important;
+      box-shadow: inset 3px 0 0 var(--jmc-accent), 0 0 24px rgba(255, 102, 0, 0.05) !important;
     }
     body > div:first-child > div > nav:first-of-type a[aria-current="page"] svg,
     [class*="LeftMenu"] a[aria-current="page"] svg {
       color: var(--jmc-accent) !important;
       fill: var(--jmc-accent) !important;
-      filter: drop-shadow(0 0 4px rgba(255, 102, 0, 0.3)) !important;
+      filter: drop-shadow(0 0 6px rgba(255, 102, 0, 0.4)) !important;
     }
     body > div:first-child > div > nav:first-of-type a[aria-current="page"] span,
     [class*="LeftMenu"] a[aria-current="page"] span {
@@ -210,29 +279,29 @@ const injectAdminStyles = () => {
     /* Sidebar icons — subtle glow on hover */
     body > div:first-child > div > nav:first-of-type svg,
     [class*="LeftMenu"] svg, [class*="leftMenu"] svg {
-      color: rgba(255,255,255,0.45) !important;
-      fill: rgba(255,255,255,0.45) !important;
+      color: rgba(255,255,255,0.4) !important;
+      fill: rgba(255,255,255,0.4) !important;
       width: 18px !important;
       height: 18px !important;
       flex-shrink: 0 !important;
-      transition: all 0.25s ease !important;
+      transition: all 0.3s ease !important;
     }
     body > div:first-child > div > nav:first-of-type a:hover svg,
     [class*="LeftMenu"] a:hover svg, [class*="leftMenu"] a:hover svg {
-      color: rgba(255,255,255,0.95) !important;
-      fill: rgba(255,255,255,0.95) !important;
-      filter: drop-shadow(0 0 3px rgba(255,255,255,0.15)) !important;
+      color: rgba(255,255,255,0.9) !important;
+      fill: rgba(255,255,255,0.9) !important;
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.2)) !important;
     }
 
     /* Sidebar text — premium typography */
     body > div:first-child > div > nav:first-of-type span,
     [class*="LeftMenu"] span, [class*="leftMenu"] span {
-      color: rgba(255,255,255,0.65) !important;
+      color: rgba(255,255,255,0.6) !important;
       font-weight: 500 !important;
       font-size: 13.5px !important;
       letter-spacing: 0.01em !important;
       line-height: 1.3 !important;
-      transition: color 0.2s ease !important;
+      transition: color 0.3s ease !important;
     }
     body > div:first-child > div > nav:first-of-type a:hover span,
     [class*="LeftMenu"] a:hover span, [class*="leftMenu"] a:hover span {
@@ -242,18 +311,28 @@ const injectAdminStyles = () => {
     /* Sidebar section labels */
     body > div:first-child > div > nav:first-of-type p,
     [class*="LeftMenu"] p, [class*="leftMenu"] p {
-      color: rgba(255,255,255,0.25) !important;
+      color: rgba(255,255,255,0.2) !important;
       font-size: 9px !important;
       text-transform: uppercase !important;
       letter-spacing: 0.15em !important;
       font-weight: 700 !important;
-      margin: 16px 14px 4px !important;
+      margin: 20px 14px 6px !important;
+      padding-top: 12px !important;
+      border-top: 1px solid rgba(255,255,255,0.04) !important;
+    }
+    body > div:first-child > div > nav:first-of-type p:first-of-type {
+      border-top: none !important;
+      margin-top: 8px !important;
     }
 
-    /* Sidebar logo area */
+    /* Sidebar logo area — glow effect */
     body > div:first-child > div > nav:first-of-type > div:first-child {
-      border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.05) !important;
       margin-bottom: 8px !important;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%) !important;
+    }
+    body > div:first-child > div > nav:first-of-type > div:first-child img {
+      filter: drop-shadow(0 0 12px rgba(255, 102, 0, 0.2)) !important;
     }
 
     /* Responsive sidebar */
@@ -265,13 +344,24 @@ const injectAdminStyles = () => {
     }
 
     /* ═══════════════════════════════════════════
-       3. TOP BAR / HEADER
+       3. TOP BAR / HEADER — Frosted Glass
        ═══════════════════════════════════════════ */
     header, [class*="Header"] {
-      background: var(--jmc-surface) !important;
-      border-bottom: 1px solid var(--jmc-border) !important;
-      box-shadow: var(--jmc-shadow-sm) !important;
-      backdrop-filter: blur(12px) !important;
+      background: rgba(255, 255, 255, 0.82) !important;
+      border-bottom: none !important;
+      box-shadow: 0 1px 0 var(--jmc-border-light), var(--jmc-shadow-xs) !important;
+      backdrop-filter: blur(16px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+      position: relative !important;
+    }
+    header::after, [class*="Header"]::after {
+      content: '' !important;
+      position: absolute !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      height: 1px !important;
+      background: linear-gradient(90deg, transparent 0%, var(--jmc-border) 30%, var(--jmc-border) 70%, transparent 100%) !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -300,33 +390,36 @@ const injectAdminStyles = () => {
     table, [class*="TableWrapper"], [class*="DynamicTable"] {
       border-radius: var(--jmc-radius) !important;
       overflow: hidden !important;
+      box-shadow: var(--jmc-shadow-sm) !important;
     }
     thead th {
-      background: #f1f3f8 !important;
+      background: linear-gradient(180deg, #f5f7fb 0%, #edf0f6 100%) !important;
       color: var(--jmc-text-secondary) !important;
       font-weight: 700 !important;
       font-size: 10.5px !important;
       text-transform: uppercase !important;
       letter-spacing: 0.08em !important;
       padding: 14px 16px !important;
-      border-bottom: 1px solid var(--jmc-border) !important;
+      border-bottom: 2px solid var(--jmc-border) !important;
       white-space: nowrap !important;
       position: sticky !important;
       top: 0 !important;
       z-index: 5 !important;
     }
     tbody tr {
-      transition: var(--jmc-transition) !important;
+      transition: all 0.2s var(--jmc-ease) !important;
       background: var(--jmc-surface) !important;
+      position: relative !important;
     }
     tbody tr:hover {
-      background: #f0f4ff !important;
+      background: linear-gradient(90deg, rgba(0, 51, 102, 0.02), rgba(0, 51, 102, 0.04), transparent) !important;
+      box-shadow: inset 3px 0 0 var(--jmc-blue) !important;
     }
-    tbody tr:hover td {
+    tbody tr:hover td:first-child {
       color: var(--jmc-blue) !important;
     }
     tbody td {
-      padding: 16px 16px !important;
+      padding: 14px 16px !important;
       border-bottom: 1px solid var(--jmc-border-light) !important;
       font-size: 13px !important;
       color: var(--jmc-text-primary) !important;
@@ -338,14 +431,14 @@ const injectAdminStyles = () => {
 
     /* ── Zebra striping ── */
     tbody tr:nth-child(even) {
-      background: #fafbfd !important;
+      background: var(--jmc-bg-elevated) !important;
     }
     tbody tr:nth-child(odd) {
       background: var(--jmc-surface) !important;
     }
     tbody tr:nth-child(even):hover,
     tbody tr:nth-child(odd):hover {
-      background: #f0f4ff !important;
+      background: linear-gradient(90deg, rgba(0, 51, 102, 0.02), rgba(0, 51, 102, 0.04), transparent) !important;
     }
 
     /* ── CSS Row numbers ── */
@@ -364,11 +457,12 @@ const injectAdminStyles = () => {
     }
     /* Row action buttons (edit icon, dots) */
     tbody td:last-child button {
-      opacity: 0.4 !important;
-      transition: opacity 0.2s !important;
+      opacity: 0.3 !important;
+      transition: all 0.25s ease !important;
     }
     tbody tr:hover td:last-child button {
       opacity: 1 !important;
+      color: var(--jmc-blue) !important;
     }
 
     /* ── Content Manager List Header Bar ── */
@@ -403,66 +497,82 @@ const injectAdminStyles = () => {
     }
 
     /* ═══════════════════════════════════════════
-       7. BUTTONS — Global Polish
+       7. BUTTONS — Premium Polish
        ═══════════════════════════════════════════ */
     button {
-      border-radius: 8px !important;
+      border-radius: var(--jmc-radius-sm) !important;
       transition: var(--jmc-transition) !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.01em !important;
     }
 
-    /* Primary buttons */
+    /* Primary buttons — gradient with glow */
     button[class*="Primary"], button[aria-label*="Create"],
     a[class*="Primary"] {
-      background: var(--jmc-blue) !important;
-      border-color: var(--jmc-blue) !important;
-      box-shadow: 0 2px 8px rgba(0, 51, 102, 0.2) !important;
+      background: var(--jmc-gradient-primary) !important;
+      border-color: transparent !important;
+      box-shadow: var(--jmc-shadow-blue) !important;
+      color: #fff !important;
     }
     button[class*="Primary"]:hover, button[aria-label*="Create"]:hover,
     a[class*="Primary"]:hover {
-      background: #004080 !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.3) !important;
+      background: linear-gradient(135deg, #004080 0%, #0059b3 50%, #003366 100%) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(0, 51, 102, 0.3), 0 2px 6px rgba(0, 51, 102, 0.15) !important;
+    }
+    button[class*="Primary"]:active, button[aria-label*="Create"]:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 2px 8px rgba(0, 51, 102, 0.2) !important;
     }
 
     /* Secondary / ghost buttons */
     button[class*="Secondary"], button[class*="Tertiary"] {
       border-color: var(--jmc-border) !important;
+      background: var(--jmc-surface) !important;
     }
     button[class*="Secondary"]:hover, button[class*="Tertiary"]:hover {
       background: var(--jmc-bg) !important;
-      border-color: var(--jmc-text-dim) !important;
+      border-color: var(--jmc-blue) !important;
+      color: var(--jmc-blue) !important;
+      transform: translateY(-1px) !important;
     }
 
-    /* Danger buttons */
+    /* Danger buttons — gradient red */
     button[class*="Danger"], button[class*="danger"] {
-      background: #dc2626 !important;
-      border-color: #dc2626 !important;
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+      border-color: transparent !important;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2) !important;
     }
     button[class*="Danger"]:hover, button[class*="danger"]:hover {
-      background: #b91c1c !important;
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important;
     }
 
     /* ═══════════════════════════════════════════
-       8. FORM INPUTS — Clean & Refined
+       8. FORM INPUTS — Premium Focus States
        ═══════════════════════════════════════════ */
     input:not([type="checkbox"]):not([type="radio"]),
     textarea, select,
     [class*="Input"], [class*="Textarea"], [class*="Select"] {
-      border-radius: 8px !important;
-      border-color: var(--jmc-border) !important;
-      transition: var(--jmc-transition) !important;
+      border-radius: var(--jmc-radius-sm) !important;
+      border: 1.5px solid var(--jmc-border) !important;
+      transition: all 0.25s var(--jmc-ease) !important;
       font-size: 14px !important;
       background: var(--jmc-surface) !important;
     }
     input:not([type="checkbox"]):not([type="radio"]):focus,
     textarea:focus, select:focus {
       border-color: var(--jmc-blue) !important;
-      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.08) !important;
+      box-shadow: 0 0 0 3px var(--jmc-blue-glow), var(--jmc-shadow-sm) !important;
       outline: none !important;
     }
+    input:not([type="checkbox"]):not([type="radio"]):hover,
+    textarea:hover, select:hover {
+      border-color: var(--jmc-text-dim) !important;
+    }
 
-    /* Labels */
+    /* Labels — refined */
     label {
       font-size: 13px !important;
       font-weight: 600 !important;
@@ -474,40 +584,53 @@ const injectAdminStyles = () => {
     [class*="Hint"], [class*="Description"] p {
       font-size: 12px !important;
       color: var(--jmc-text-dim) !important;
+      line-height: 1.5 !important;
     }
 
     /* ═══════════════════════════════════════════
-       9. MODALS & DIALOGS
+       9. MODALS & DIALOGS — Glass Morphism
        ═══════════════════════════════════════════ */
     [class*="Dialog"], [class*="Modal"], [role="dialog"] {
-      border-radius: var(--jmc-radius-lg) !important;
-      box-shadow: var(--jmc-shadow-lg), 0 0 0 1px rgba(0,0,0,0.04) !important;
+      border-radius: var(--jmc-radius-xl) !important;
+      box-shadow: var(--jmc-shadow-xl), 0 0 0 1px rgba(0,0,0,0.03) !important;
       overflow: hidden !important;
+      border: 1px solid var(--jmc-border-light) !important;
+      animation: modalEntrance 0.35s var(--jmc-ease-out) !important;
+    }
+    @keyframes modalEntrance {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
     /* Modal backdrop */
     [class*="ModalOverlay"], [class*="Overlay"] {
-      backdrop-filter: blur(6px) !important;
-      background: rgba(0, 0, 0, 0.35) !important;
+      backdrop-filter: blur(10px) saturate(150%) !important;
+      -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
+      background: rgba(15, 23, 42, 0.4) !important;
+      animation: fadeIn 0.2s ease-out !important;
     }
 
     /* ═══════════════════════════════════════════
-       10. BADGES & CHIPS
+       10. BADGES & CHIPS — Premium Pills
        ═══════════════════════════════════════════ */
     [class*="Badge"], [class*="Status"] {
-      border-radius: 6px !important;
-      font-weight: 600 !important;
-      font-size: 11px !important;
-      letter-spacing: 0.02em !important;
+      border-radius: 20px !important;
+      font-weight: 700 !important;
+      font-size: 10.5px !important;
+      letter-spacing: 0.03em !important;
+      padding: 3px 10px !important;
+      text-transform: uppercase !important;
     }
     /* Published badge */
     [class*="Badge"][class*="success"], [class*="published"] {
-      background: #ecfdf5 !important;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
       color: #059669 !important;
+      border: 1px solid rgba(5, 150, 105, 0.12) !important;
     }
     /* Draft badge */
     [class*="Badge"][class*="secondary"], [class*="draft"] {
-      background: #fef9c3 !important;
+      background: linear-gradient(135deg, #fef9c3, #fef3c7) !important;
       color: #a16207 !important;
+      border: 1px solid rgba(161, 98, 7, 0.1) !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -563,8 +686,31 @@ const injectAdminStyles = () => {
       min-width: 32px !important;
       height: 32px !important;
       font-size: 13px !important;
-      border-radius: 8px !important;
+      border-radius: 50% !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: 1px solid var(--jmc-border-light) !important;
+      background: var(--jmc-surface) !important;
+      color: var(--jmc-text-secondary) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
+    [class*="Pagination"] button:hover,
+    [class*="pagination"] button:hover {
+      background: var(--jmc-bg) !important;
+      border-color: var(--jmc-blue) !important;
+      color: var(--jmc-blue) !important;
+    }
+    [class*="Pagination"] button[aria-current="page"],
+    [class*="pagination"] button[aria-current="page"],
+    [class*="Pagination"] button[class*="active"],
+    [class*="pagination"] button[class*="active"] {
+      background: var(--jmc-gradient-primary) !important;
+      color: #ffffff !important;
+      border-color: transparent !important;
+      box-shadow: var(--jmc-shadow-blue) !important;
+    }
+
 
     /* ═══════════════════════════════════════════
        14. ALERTS / NOTIFICATIONS
@@ -1003,10 +1149,10 @@ const injectAdminStyles = () => {
     }
 
     /* ═══════════════════════════════════════════
-       28. ANIMATIONS
+       28. ANIMATIONS — Enhanced System
        ═══════════════════════════════════════════ */
     @keyframes slideInDown {
-      0% { opacity: 0; transform: translateY(-12px) scale(0.99); }
+      0% { opacity: 0; transform: translateY(-16px) scale(0.98); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes fadeIn {
@@ -1014,61 +1160,87 @@ const injectAdminStyles = () => {
       100% { opacity: 1; }
     }
     @keyframes slideInUp {
-      0% { opacity: 0; transform: translateY(16px); }
-      100% { opacity: 1; transform: translateY(0); }
+      0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
     }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(0, 51, 102, 0.1); }
+      50% { box-shadow: 0 0 20px rgba(0, 51, 102, 0.2); }
+    }
+    @keyframes counterUp {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes subtleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
 
-    /* Page entrance — start hidden, fade in once layout is ready */
+    /* Page entrance — smooth fade in */
     #app > div {
       opacity: 0;
-      animation: appFadeIn 0.5s ease-out 0.3s forwards;
+      animation: appFadeIn 0.6s var(--jmc-ease-out) 0.2s forwards;
     }
     @keyframes appFadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
+      0% { opacity: 0; transform: translateY(4px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
     /* Per-page content transition */
     main > div {
-      animation: fadeIn 0.3s ease-out;
+      animation: fadeIn 0.35s var(--jmc-ease-out);
     }
 
     /* ── Staggered dashboard widget entrance ── */
     .jmc-dash-grid > * {
       opacity: 0;
-      animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideInUp 0.5s var(--jmc-ease-out) forwards;
     }
-    .jmc-dash-grid > *:nth-child(1) { animation-delay: 0.05s; }
-    .jmc-dash-grid > *:nth-child(2) { animation-delay: 0.1s; }
-    .jmc-dash-grid > *:nth-child(3) { animation-delay: 0.15s; }
-    .jmc-dash-grid > *:nth-child(4) { animation-delay: 0.2s; }
-    .jmc-dash-grid > *:nth-child(5) { animation-delay: 0.25s; }
-    .jmc-dash-grid > *:nth-child(6) { animation-delay: 0.3s; }
-    .jmc-dash-grid > *:nth-child(7) { animation-delay: 0.35s; }
-    .jmc-dash-grid > *:nth-child(8) { animation-delay: 0.4s; }
+    .jmc-dash-grid > *:nth-child(1) { animation-delay: 0.03s; }
+    .jmc-dash-grid > *:nth-child(2) { animation-delay: 0.06s; }
+    .jmc-dash-grid > *:nth-child(3) { animation-delay: 0.09s; }
+    .jmc-dash-grid > *:nth-child(4) { animation-delay: 0.12s; }
+    .jmc-dash-grid > *:nth-child(5) { animation-delay: 0.15s; }
+    .jmc-dash-grid > *:nth-child(6) { animation-delay: 0.18s; }
+    .jmc-dash-grid > *:nth-child(7) { animation-delay: 0.21s; }
+    .jmc-dash-grid > *:nth-child(8) { animation-delay: 0.24s; }
+    .jmc-dash-grid > *:nth-child(9) { animation-delay: 0.27s; }
+    .jmc-dash-grid > *:nth-child(10) { animation-delay: 0.3s; }
 
     /* ═══════════════════════════════════════════
-       31. LOADING STATES
+       31. LOADING STATES — Premium Shimmer
        ═══════════════════════════════════════════ */
     [class*="Loading"], [class*="Loader"] {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+      background: linear-gradient(90deg, var(--jmc-bg) 25%, var(--jmc-border-light) 50%, var(--jmc-bg) 75%) !important;
       background-size: 200% 100% !important;
-      animation: shimmer 1.5s infinite !important;
-      border-radius: 8px !important;
+      animation: shimmer 1.8s ease infinite !important;
+      border-radius: var(--jmc-radius-sm) !important;
     }
 
     /* ═══════════════════════════════════════════
-       32. NOTIFICATION TOASTS
+       32. NOTIFICATION TOASTS — Premium Glass
        ═══════════════════════════════════════════ */
     [class*="Notification"], [class*="notification"] {
-      border-radius: 12px !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-      backdrop-filter: blur(8px) !important;
-      animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      border-radius: var(--jmc-radius-lg) !important;
+      box-shadow: var(--jmc-shadow-lg) !important;
+      backdrop-filter: blur(12px) saturate(150%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+      animation: notifSlideIn 0.4s var(--jmc-ease-out) !important;
+      border: 1px solid var(--jmc-border-light) !important;
+      overflow: hidden !important;
+    }
+    @keyframes notifSlideIn {
+      0% { opacity: 0; transform: translateX(40px) scale(0.96); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
     }
 
     /* ═══════════════════════════════════════════
@@ -1087,7 +1259,7 @@ const injectAdminStyles = () => {
     *:focus-visible {
       outline: 2px solid var(--jmc-blue) !important;
       outline-offset: 2px !important;
-      box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1) !important;
+      box-shadow: 0 0 0 4px var(--jmc-blue-glow) !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -1111,7 +1283,7 @@ const injectAdminStyles = () => {
     }
 
     /* ═══════════════════════════════════════════
-       29. DASHBOARD — Custom Widgets
+       29. DASHBOARD — Premium Redesign
        ═══════════════════════════════════════════ */
     .dashboard-active main > *:not(#custom-jmc-dashboard) {
       display: none !important;
@@ -1121,157 +1293,238 @@ const injectAdminStyles = () => {
     }
 
     #custom-jmc-dashboard {
-      padding: 36px 40px;
-      margin: 28px 40px;
-      background: var(--jmc-surface);
-      border-radius: 16px;
-      box-shadow: var(--jmc-shadow);
-      border: 1px solid var(--jmc-border);
-      animation: slideInDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      position: relative; z-index: 10; overflow: hidden;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+      animation: fadeIn 0.5s var(--jmc-ease-out) forwards;
+      position: relative; z-index: 10;
     }
-    #custom-jmc-dashboard::before {
+
+    /* ── Hero Welcome Banner ── */
+    .jmc-dash-hero {
+      background: var(--jmc-gradient-hero);
+      background-size: 200% 200%;
+      animation: gradientFlow 12s ease infinite;
+      padding: 40px 44px;
+      border-radius: var(--jmc-radius-xl);
+      margin: 28px 40px 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--jmc-shadow-md), 0 4px 20px rgba(0, 51, 102, 0.15);
+    }
+    .jmc-dash-hero::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, var(--jmc-accent), #ff9933, var(--jmc-blue), #4a90d9);
+      top: -50%; right: -20%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .jmc-dash-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%; left: -10%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255, 102, 0, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
     }
 
     .jmc-dash-header {
-      margin-bottom: 28px;
+      margin-bottom: 0;
       display: flex; justify-content: space-between; align-items: flex-start;
+      position: relative; z-index: 1;
     }
     .jmc-dash-header h1 {
-      font-size: 24px; font-weight: 800;
-      color: var(--jmc-text-primary); margin: 0;
+      font-size: 28px; font-weight: 800;
+      color: #ffffff; margin: 0;
       letter-spacing: -0.02em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .jmc-dash-header p {
-      color: var(--jmc-text-dim); font-size: 14px; margin-top: 4px;
+      color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 6px;
+      font-weight: 500;
     }
     .jmc-dash-header-actions {
       display: flex; align-items: center; gap: 10px;
     }
 
     .custom-badge {
-      padding: 6px 14px;
-      background: rgba(5, 150, 105, 0.08);
-      color: #059669; border-radius: 20px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #fff; border-radius: 24px;
       font-weight: 600; font-size: 12px;
       display: flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
     }
     .custom-badge::before {
       content: ''; display: block;
-      width: 6px; height: 6px;
-      background: #10b981; border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
+      width: 7px; height: 7px;
+      background: #34d399; border-radius: 50%;
+      box-shadow: 0 0 10px #34d399;
+      animation: subtleBounce 2s ease infinite;
     }
 
     /* ── Quick Actions Row ── */
     .jmc-quick-actions {
       display: flex; gap: 10px; flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin: 24px 40px;
+      padding: 0;
     }
     .jmc-qa-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px;
-      border-radius: 10px;
-      font-size: 12.5px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--jmc-radius);
+      font-size: 13px; font-weight: 600;
       text-decoration: none !important;
-      transition: var(--jmc-transition);
+      transition: all 0.25s var(--jmc-ease);
       cursor: pointer; border: none;
+      letter-spacing: 0.01em;
     }
     .jmc-qa-btn.primary {
-      background: var(--jmc-blue); color: #fff;
-      box-shadow: 0 2px 8px rgba(0,51,102,0.2);
+      background: var(--jmc-gradient-primary); color: #fff;
+      box-shadow: var(--jmc-shadow-blue);
     }
     .jmc-qa-btn.primary:hover {
-      background: #004080;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0,51,102,0.3);
+      background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,51,102,0.3);
     }
     .jmc-qa-btn.outline {
       background: var(--jmc-surface);
       color: var(--jmc-text-secondary);
       border: 1px solid var(--jmc-border);
+      box-shadow: var(--jmc-shadow-xs);
     }
     .jmc-qa-btn.outline:hover {
-      background: var(--jmc-bg);
-      border-color: var(--jmc-text-dim);
-      color: var(--jmc-text-primary);
+      background: var(--jmc-bg-elevated);
+      border-color: var(--jmc-blue);
+      color: var(--jmc-blue);
+      transform: translateY(-2px);
+      box-shadow: var(--jmc-shadow-sm);
     }
 
     /* ── Stats Grid ── */
     .jmc-stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px; margin-bottom: 28px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px; margin: 0 40px 28px;
     }
     .jmc-stat-card {
-      background: var(--jmc-bg);
+      background: var(--jmc-surface);
       border: 1px solid var(--jmc-border-light);
-      border-radius: 12px; padding: 18px;
-      display: flex; flex-direction: column; gap: 3px;
-      transition: var(--jmc-transition);
+      border-radius: var(--jmc-radius); padding: 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      transition: all 0.3s var(--jmc-ease);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--jmc-shadow-xs);
+    }
+    .jmc-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--jmc-blue), rgba(0,51,102,0.3));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .jmc-stat-card:hover::before {
+      opacity: 1;
     }
     .jmc-stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--jmc-shadow-sm);
+      transform: translateY(-3px);
+      box-shadow: var(--jmc-shadow-md);
       border-color: var(--jmc-border);
     }
     .jmc-stat-card h4 {
       margin: 0; color: var(--jmc-text-dim);
-      font-size: 10px; text-transform: uppercase;
+      font-size: 10.5px; text-transform: uppercase;
       letter-spacing: 0.08em; font-weight: 700;
     }
     .jmc-stat-card .val {
-      font-size: 22px; font-weight: 800;
+      font-size: 26px; font-weight: 800;
       color: var(--jmc-text-primary);
       letter-spacing: -0.02em;
+      animation: counterUp 0.6s var(--jmc-ease-out);
     }
-    .jmc-stat-card .trend { font-size: 11px; color: #059669; font-weight: 600; }
+    .jmc-stat-card .trend { font-size: 11px; color: var(--jmc-emerald); font-weight: 600; }
 
     /* ── Section Headers ── */
     .jmc-section-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin: 28px 0 14px;
+      margin: 32px 40px 16px;
     }
     .jmc-section-header h2 {
-      margin: 0; font-size: 14px; font-weight: 700;
+      margin: 0; font-size: 15px; font-weight: 700;
       color: var(--jmc-text-primary);
       letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .jmc-section-header h2::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--jmc-border), transparent);
+      margin-left: 12px;
+      min-width: 40px;
     }
     .jmc-section-header span {
       font-size: 11px; color: var(--jmc-text-dim);
       font-weight: 500;
+      padding: 4px 10px;
+      background: var(--jmc-bg-elevated);
+      border-radius: 20px;
+      border: 1px solid var(--jmc-border-light);
     }
 
     /* ── Widget Grid ── */
     .jmc-dash-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
+      gap: 14px;
+      margin: 0 40px;
     }
 
     .jmc-widget-card {
       text-decoration: none !important;
       background: var(--jmc-surface);
-      border-radius: 12px; padding: 20px;
-      display: flex; flex-direction: column; gap: 8px;
+      border-radius: var(--jmc-radius); padding: 22px;
+      display: flex; flex-direction: column; gap: 10px;
       border: 1px solid var(--jmc-border-light);
-      transition: var(--jmc-transition);
+      transition: all 0.3s var(--jmc-ease);
       position: relative; overflow: hidden; cursor: pointer;
+      box-shadow: var(--jmc-shadow-xs);
+    }
+    .jmc-widget-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--jmc-gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .jmc-widget-card:hover::before {
+      opacity: 1;
     }
     .jmc-widget-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--jmc-shadow);
+      transform: translateY(-4px);
+      box-shadow: var(--jmc-shadow-md);
       border-color: var(--jmc-border);
     }
 
     .jmc-widget-icon {
-      width: 40px; height: 40px; border-radius: 10px;
+      width: 44px; height: 44px; border-radius: var(--jmc-radius);
       display: flex; justify-content: center; align-items: center;
-      font-size: 18px; margin-bottom: 2px;
+      font-size: 20px; margin-bottom: 2px;
+      transition: all 0.3s var(--jmc-ease);
+    }
+    .jmc-widget-card:hover .jmc-widget-icon {
+      transform: scale(1.08);
     }
     .jmc-widget-card h3 {
       margin: 0; font-size: 13px; font-weight: 700;
@@ -1282,23 +1535,44 @@ const injectAdminStyles = () => {
       line-height: 1.45;
     }
 
-    /* Card color classes */
+    /* Card color classes — with hover glow */
     .jmc-widget-card.blue .jmc-widget-icon { background: #eef2ff; color: #4338ca; }
     .jmc-widget-card.blue h3 { color: #3730a3; }
+    .jmc-widget-card.blue:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(67, 56, 202, 0.1); }
+    .jmc-widget-card.blue:hover::before { background: linear-gradient(90deg, #4338ca, #6366f1); }
+
     .jmc-widget-card.orange .jmc-widget-icon { background: #fff7ed; color: #ea580c; }
     .jmc-widget-card.orange h3 { color: #c2410c; }
+    .jmc-widget-card.orange:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(234, 88, 12, 0.1); }
+    .jmc-widget-card.orange:hover::before { background: linear-gradient(90deg, #ea580c, #f97316); }
+
     .jmc-widget-card.green .jmc-widget-icon { background: #f0fdf4; color: #16a34a; }
     .jmc-widget-card.green h3 { color: #15803d; }
+    .jmc-widget-card.green:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(22, 163, 74, 0.1); }
+    .jmc-widget-card.green:hover::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
+
     .jmc-widget-card.purple .jmc-widget-icon { background: #faf5ff; color: #9333ea; }
     .jmc-widget-card.purple h3 { color: #7e22ce; }
+    .jmc-widget-card.purple:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(147, 51, 234, 0.1); }
+    .jmc-widget-card.purple:hover::before { background: linear-gradient(90deg, #9333ea, #a855f7); }
+
     .jmc-widget-card.gray .jmc-widget-icon { background: #f1f5f9; color: #475569; }
     .jmc-widget-card.gray h3 { color: #475569; }
+
     .jmc-widget-card.red .jmc-widget-icon { background: #fef2f2; color: #dc2626; }
     .jmc-widget-card.red h3 { color: #b91c1c; }
+    .jmc-widget-card.red:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(220, 38, 38, 0.1); }
+    .jmc-widget-card.red:hover::before { background: linear-gradient(90deg, #dc2626, #ef4444); }
+
     .jmc-widget-card.teal .jmc-widget-icon { background: #f0fdfa; color: #0d9488; }
     .jmc-widget-card.teal h3 { color: #0f766e; }
+    .jmc-widget-card.teal:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(13, 148, 136, 0.1); }
+    .jmc-widget-card.teal:hover::before { background: linear-gradient(90deg, #0d9488, #14b8a6); }
+
     .jmc-widget-card.sky .jmc-widget-icon { background: #f0f9ff; color: #0284c7; }
     .jmc-widget-card.sky h3 { color: #0369a1; }
+    .jmc-widget-card.sky:hover { box-shadow: var(--jmc-shadow-md), 0 4px 16px rgba(2, 132, 199, 0.1); }
+    .jmc-widget-card.sky:hover::before { background: linear-gradient(90deg, #0284c7, #0ea5e9); }
 
     /* ── Add Widget Button ── */
     .jmc-add-widget-btn {
@@ -1428,25 +1702,36 @@ const injectAdminStyles = () => {
       white-space: pre-wrap; min-height: 24px;
     }
 
-    /* ── Activity Feed ── */
+    /* ── Activity Feed — Timeline Style ── */
     .jmc-activity-panel {
-      margin-top: 28px; padding: 20px 24px;
-      background: var(--jmc-bg);
+      margin: 28px 40px 40px; padding: 24px;
+      background: var(--jmc-surface);
       border: 1px solid var(--jmc-border-light);
-      border-radius: 12px;
+      border-radius: var(--jmc-radius);
+      box-shadow: var(--jmc-shadow-xs);
     }
     .jmc-activity-item {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 12px 0;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 0;
       border-bottom: 1px solid var(--jmc-border-light);
+      position: relative;
     }
     .jmc-activity-item:last-child { border-bottom: none; }
     .jmc-activity-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      margin-top: 5px; flex-shrink: 0;
+      width: 10px; height: 10px; border-radius: 50%;
+      margin-top: 4px; flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(255,255,255,1), 0 0 0 4px var(--jmc-border-light);
+      position: relative; z-index: 1;
+    }
+    .jmc-activity-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 4px; top: 28px; bottom: -2px;
+      width: 2px;
+      background: var(--jmc-border-light);
     }
     .jmc-activity-item .act-text {
-      font-size: 12.5px; color: var(--jmc-text-secondary);
+      font-size: 13px; color: var(--jmc-text-secondary);
       line-height: 1.5;
     }
     .jmc-activity-item .act-text strong {
@@ -1765,13 +2050,28 @@ const injectLoginPageEnhancements = () => {
       }
     });
 
-    // ── 2. Style the outermost wrapper (page background) ────
+    // ── 2. Style the outermost wrapper (animated gradient background) ────
     const appRoot = document.querySelector("#app > div");
     if (appRoot) {
       appRoot.style.cssText = `
-        background: #f1f3f8 !important;
+        background: linear-gradient(135deg, #0a1628 0%, #0f2040 25%, #1a3a5c 50%, #0c1a30 75%, #0a1628 100%) !important;
+        background-size: 400% 400% !important;
+        animation: gradientFlow 15s ease infinite !important;
         min-height: 100vh !important;
+        position: relative !important;
       `;
+      // Add floating blob shapes
+      if (!document.getElementById('jmc-login-blobs')) {
+        const blobs = document.createElement('div');
+        blobs.id = 'jmc-login-blobs';
+        blobs.style.cssText = 'position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;';
+        blobs.innerHTML = `
+          <div style="position:absolute;top:15%;right:10%;width:300px;height:300px;background:radial-gradient(circle,rgba(255,102,0,0.08) 0%,transparent 70%);border-radius:50%;animation:subtleBounce 8s ease infinite;"></div>
+          <div style="position:absolute;bottom:20%;left:5%;width:400px;height:400px;background:radial-gradient(circle,rgba(0,102,204,0.06) 0%,transparent 70%);border-radius:50%;animation:subtleBounce 10s ease 2s infinite;"></div>
+          <div style="position:absolute;top:60%;right:30%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.03) 0%,transparent 70%);border-radius:50%;animation:subtleBounce 6s ease 1s infinite;"></div>
+        `;
+        appRoot.appendChild(blobs);
+      }
     }
 
     // ── 3. Find the main content area and center it ─────────
@@ -1785,6 +2085,8 @@ const injectLoginPageEnhancements = () => {
         justify-content: center !important;
         min-height: 100vh !important;
         padding: 40px 20px !important;
+        position: relative !important;
+        z-index: 1 !important;
       `;
       // The wrapper inside main (holds logo column + form column)
       const mainChild = main.children[0];
@@ -1797,11 +2099,14 @@ const injectLoginPageEnhancements = () => {
           max-width: 420px !important;
           gap: 0 !important;
           padding: 0 !important;
-          background: #ffffff !important;
-          border-radius: 16px !important;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.06) !important;
-          border: 1px solid #e5e7eb !important;
+          background: rgba(255, 255, 255, 0.95) !important;
+          backdrop-filter: blur(20px) saturate(180%) !important;
+          -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+          border-radius: 20px !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.1) !important;
+          border: 1px solid rgba(255,255,255,0.3) !important;
           overflow: hidden !important;
+          animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
         `;
       }
     }
@@ -1992,6 +2297,11 @@ const injectHCaptchaOnLogin = () => {
       color: #6b7280;
       padding: 16px;
       text-align: center;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
     }
   `;
   document.head.appendChild(captchaStyle);
@@ -2229,13 +2539,16 @@ const injectDashboardWidgets = () => {
       });
 
       dashboard.innerHTML = `
-        <div class="jmc-dash-header">
-          <div>
-            <h1>${greeting}, Administrator</h1>
-            <p>${dateStr} — Jammu Municipal Corporation CMS</p>
-          </div>
-          <div class="jmc-dash-header-actions">
-            <div class="custom-badge">System Online</div>
+        <div class="jmc-dash-hero">
+          <div class="jmc-dash-header">
+            <div>
+              <h1>${greeting}, Administrator</h1>
+              <p>${dateStr} — Jammu Municipal Corporation CMS</p>
+            </div>
+            <div class="jmc-dash-header-actions">
+              <div class="custom-badge">System Online</div>
+              <div class="custom-badge" id="jmc-live-clock" style="font-variant-numeric:tabular-nums;">${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
           </div>
         </div>
 
@@ -2437,13 +2750,21 @@ const injectDashboardWidgets = () => {
 
       loadDynamicStats();
 
-      // Poll every 3 seconds to keep stats and recent activities fully real-time
+      // Live clock update — tick every second
+      const clockInterval = setInterval(() => {
+        const clockEl = document.getElementById("jmc-live-clock");
+        if (!clockEl) { clearInterval(clockInterval); return; }
+        clockEl.textContent = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }, 1000);
+
+      // Poll every 5 seconds for stats (reduced from 3s for performance)
       const statsPollInterval = setInterval(async () => {
         const active = await loadDynamicStats();
         if (!active) {
           clearInterval(statsPollInterval);
+          clearInterval(clockInterval);
         }
-      }, 3000);
+      }, 5000);
 
       const verifyBtn = document.getElementById("jmc-verify-payment");
       if (verifyBtn) {
@@ -2922,7 +3243,7 @@ export default {
   bootstrap() {
     injectAdminStyles();
     injectLoginPageEnhancements();
-    // injectHCaptchaOnLogin(); // Temporarily commented for local testing
+    injectHCaptchaOnLogin();
     setTimeout(() => {
       injectDashboardWidgets();
       injectTransactionFieldEnhancements();

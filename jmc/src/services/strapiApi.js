@@ -148,6 +148,10 @@ export const getHeroSlides = () =>
   getCached("hero-slides", () =>
     api.get("/hero-slides?populate=image&sort=order:asc&filters[is_active][$eq]=true")
   );
+<<<<<<< HEAD
+=======
+
+>>>>>>> ebc7ded632d305b316fd3b7f78afa55bf408e6bb
 
 // ── Photo Gallery ─────────────────────────────────────────────
 
