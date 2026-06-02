@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
 import {
   getNotices,
@@ -40,16 +41,13 @@ export default function Notices() {
     const mapBulletinItems = (res) =>
       (res.data?.data || []).map((item) => {
         const a = item.attributes || item;
-        let href = a.link || "#";
-        if (a.document?.data?.attributes?.url) {
-          href = `${STRAPI_URL}${a.document.data.attributes.url}`;
-        } else if (a.document?.url) {
-          href = `${STRAPI_URL}${a.document.url}`;
-        }
+        const id = item.documentId || item.id;
+        const href = id ? `/notices/orders-circulars/${id}` : "#";
         return {
           title: a.title,
           date: formatDate(a.release_date || a.notice_date),
           href,
+          internal: true
         };
       });
 
@@ -162,24 +160,43 @@ export default function Notices() {
                           {notice.date}
                         </div>
                         <div className="flex-1">
+                          {notice.internal ? (
+                            <Link
+                              to={notice.href}
+                              className="text-[#003366] hover:text-[#FF6600] text-sm font-medium hover:underline transition-colors block"
+                            >
+                              <span className="text-[#FF6600] mr-1">►</span>
+                              {notice.title}
+                            </Link>
+                          ) : (
+                            <a
+                              href={notice.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#003366] hover:text-[#FF6600] text-sm font-medium hover:underline transition-colors block"
+                            >
+                              <span className="text-[#FF6600] mr-1">►</span>
+                              {notice.title}
+                            </a>
+                          )}
+                        </div>
+                        {notice.internal ? (
+                          <Link
+                            to={notice.href}
+                            className="flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded transition-colors block"
+                          >
+                            View
+                          </Link>
+                        ) : (
                           <a
                             href={notice.href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#003366] hover:text-[#FF6600] text-sm font-medium hover:underline transition-colors"
+                            className="flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded transition-colors block"
                           >
-                            <span className="text-[#FF6600] mr-1">►</span>
-                            {notice.title}
+                            View
                           </a>
-                        </div>
-                        <a
-                          href={notice.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded transition-colors"
-                        >
-                          View
-                        </a>
+                        )}
                       </li>
                     ))}
                   </ul>
