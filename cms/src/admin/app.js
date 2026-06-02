@@ -2985,9 +2985,36 @@ const injectDashboardWidgets = () => {
     }
   };
 
-  // Run fast check immediately and on every DOM mutation (not debounced)
+  // Intercept history and SPA navigation changes
+  const patchHistory = () => {
+    if (typeof window === "undefined" || !window.history) return;
+    
+    const pushState = window.history.pushState;
+    if (pushState && !pushState.jmcPatched) {
+      window.history.pushState = function (...args) {
+        pushState.apply(this, args);
+        fastRouteCheck();
+      };
+      window.history.pushState.jmcPatched = true;
+    }
+
+    const replaceState = window.history.replaceState;
+    if (replaceState && !replaceState.jmcPatched) {
+      window.history.replaceState = function (...args) {
+        replaceState.apply(this, args);
+        fastRouteCheck();
+      };
+      window.history.historyChangePatched = true; // marker
+      window.history.replaceState.jmcPatched = true;
+    }
+
+    window.addEventListener("popstate", fastRouteCheck);
+  };
+  patchHistory();
+
+  // Run fast check immediately and on every DOM mutation (debounced & subtree true for reliability)
   const routeObserver = new MutationObserver(fastRouteCheck);
-  routeObserver.observe(document.body, { childList: true, subtree: false });
+  routeObserver.observe(document.body, { childList: true, subtree: true });
   fastRouteCheck();
 
   // Heavy dashboard build — debounced
