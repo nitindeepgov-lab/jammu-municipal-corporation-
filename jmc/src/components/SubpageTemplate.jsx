@@ -30,7 +30,7 @@ const PAGE_NAV = [
   { name: "Smart City", to: "/smart-city", icon: Building },
   { name: "Development Works", to: "/development-works", icon: Wrench },
   { name: "Photo Gallery", to: "/gallery", icon: Camera },
-  { name: "Swachh Mission", to: "/swachh-mission", icon: Leaf },
+  { name: "Officer Directory", to: "/officers-directory", icon: Users },
   { name: "RTI", to: "/rti", icon: Info },
   { name: "Contact Us", to: "/contact", icon: Phone },
   { name: "Feedback", to: "/feedback", icon: MessageSquare },
@@ -54,12 +54,6 @@ const IMPORTANT_LINKS = [
     name: "Tenders",
     href: "https://jmc.jk.gov.in/tenders.aspx",
     icon: FileText,
-  },
-  
-  {
-    name: "JMC Official Portal",
-    href: "https://jmc.jk.gov.in/",
-    icon: ExternalLink,
   },
   { name: "Web Information Manager", to: "/web-info-manager", icon: Users },
 ];

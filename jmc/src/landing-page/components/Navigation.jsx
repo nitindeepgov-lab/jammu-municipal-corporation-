@@ -89,7 +89,7 @@ const navLinks = [
       { name: "Public Notices", to: "/notices" },
       { name: "Council Updates", to: "/notices" },
       { name: "Smart City", to: "/smart-city" },
-      { name: "Swachh Mission", to: "/swachh-mission" },
+      { name: "Officer Directory", to: "/officers-directory" },
       { name: "Development Works", to: "/development-works" },
     ],
   },
@@ -107,7 +107,15 @@ const navLinks = [
       { name: "RTI ACT 2005", to: "/rti/document/rti-act-2005" },
     ],
   },
-  { name: "Contact Us", to: "/contact" },
+  {
+    name: "Contact Us",
+    to: "/contact",
+    hasDropdown: true,
+    dropdown: [
+      { name: "Contact Us", to: "/contact" },
+      { name: "Officer Directory", to: "/officers-directory" },
+    ],
+  },
   {
     name: "Ex Municipal Councillor",
     to: "/councillor-details",

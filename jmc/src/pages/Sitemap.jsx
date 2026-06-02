@@ -88,7 +88,7 @@ export default function Sitemap() {
         { label: 'Development Works', path: '/development-works' },
         { label: 'Smart City Projects', path: '/smart-city' },
         { label: 'Smart City Tenders', path: '/smart-city-tenders' },
-        { label: 'Swachh Bharat Mission', path: '/swachh-mission' },
+        { label: 'Officer Directory', path: '/officers-directory' },
       ],
     },
     {

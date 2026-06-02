@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { logError } from "../utils/errorLogger";
 import { PROD_STRAPI_URL } from "../config/api";
-import localData from "../assets/data.js";
+import localData from "../assets/councillorData.js";
 
 // Party colour mapping with more vibrant colors
 const PARTY_STYLES = {
