@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import NewsTicker from './NewsTicker'
+import { getHeroSlides } from '../../services/strapiApi'
+import { STRAPI_URL } from '../../config/api'
+import { logError } from '../../utils/errorLogger'
 
-const slides = [
+const STATIC_FALLBACK_SLIDES = [
   {
     image: '/banner/jmc-office.jpeg',
     title: 'Infrastructure Development',
@@ -30,19 +33,47 @@ const slides = [
 ]
 
 export default function HeroSlider() {
+  const [slides, setSlides] = useState(STATIC_FALLBACK_SLIDES)
   const [current, setCurrent] = useState(0)
   const timerRef = useRef(null)
+
+  useEffect(() => {
+    getHeroSlides()
+      .then((res) => {
+        const fetchedData = res.data?.data || []
+        if (fetchedData.length > 0) {
+          const mappedSlides = fetchedData.map((item) => {
+            let imgUrl = item.image_url || '/banner/banner10.png'
+            if (item.image?.url) {
+              const url = item.image.url
+              imgUrl = url.startsWith('http') ? url : `${STRAPI_URL}${url}`
+            }
+            return {
+              image: imgUrl,
+              title: item.title || 'Jammu Municipal Corporation',
+              subtitle: item.subtitle || '',
+            }
+          })
+          setSlides(mappedSlides)
+        }
+      })
+      .catch((err) => {
+        logError('HeroSlider', err)
+        // Keep fallback slides
+      })
+  }, [])
 
   const next = () => setCurrent(c => (c + 1) % slides.length)
   const prev = () => setCurrent(c => (c - 1 + slides.length) % slides.length)
 
   useEffect(() => {
+    if (slides.length <= 1) return
     clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
       setCurrent((c) => (c + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timerRef.current)
-  }, [])
+  }, [slides.length])
 
   return (
     <section className="relative overflow-hidden" aria-roledescription="carousel" aria-label="JMC Home Banner">

@@ -1,8 +1,73 @@
+import { useState, useEffect } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { Link } from "react-router-dom";
+import { getOfficials } from "../services/strapiApi";
 import { rtiDocuments } from "./rtiDocuments";
 
+const fallbackOfficers = [
+  {
+    name: "Chand Singh, JKAS",
+    designation: "Secretary, JMC",
+    rti_role: "PIO",
+  },
+  {
+    name: "Rajeev Khajuria, JKAS",
+    designation: "Joint Commissioner (Adm.)",
+    rti_role: "First Appellate Authority",
+  },
+  {
+    name: "Mr. Devansh Yadav, IAS",
+    designation: "Municipal Commissioner",
+    rti_role: "Second Appellate Authority",
+  },
+];
+
 export default function RTI() {
+  const [officers, setOfficers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getOfficials()
+      .then((res) => {
+        const data = res?.data?.data || [];
+        const filtered = data
+          .filter((item) => {
+            const attr = item.attributes || item;
+            return !!attr.rti_role;
+          })
+          .map((item) => {
+            const attr = item.attributes || item;
+            return {
+              name: attr.name,
+              designation: attr.designation,
+              rti_role: attr.rti_role,
+            };
+          });
+
+        if (filtered.length > 0) {
+          // Sort by role hierarchy: PIO -> FAA -> SAA
+          const orderMap = {
+            "PIO": 1,
+            "First Appellate Authority": 2,
+            "Second Appellate Authority": 3,
+          };
+          filtered.sort(
+            (a, b) => (orderMap[a.rti_role] || 99) - (orderMap[b.rti_role] || 99)
+          );
+          setOfficers(filtered);
+        } else {
+          setOfficers(fallbackOfficers);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load RTI officers:", err);
+        setOfficers(fallbackOfficers);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <SubpageTemplate
       title="Right to Information (RTI)"
@@ -29,45 +94,40 @@ export default function RTI() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                <tr className="hover:bg-gray-50">
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-700 font-medium align-top break-words">
-                    Chand Singh, JKAS
-                  </td>
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-500 align-top break-words">
-                    Secretary, JMC
-                  </td>
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 align-top break-words">
-                    <span className="bg-blue-100 text-blue-700 text-sm px-2 py-1 rounded-full">
-                      PIO
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-700 font-medium align-top break-words">
-                    Rajeev Khajuria, JKAS
-                  </td>
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-500 align-top break-words">
-                    Joint Commissioner (Adm.)
-                  </td>
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 align-top break-words">
-                    <span className="bg-green-100 text-green-700 text-sm px-2 py-1 rounded-full">
-                      First Appellate Authority
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-700 font-medium align-top break-words">
-                    Mr. Devansh Yadav, IAS
-                  </td>
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-500 align-top break-words">
-                    Municipal Commissioner
-                  </td>
-                  <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 align-top break-words">
-                    <span className="bg-purple-100 text-purple-700 text-sm px-2 py-1 rounded-full">
-                      Second Appellate Authority
-                    </span>
-                  </td>
-                </tr>
+                {loading && officers.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="text-center py-8">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-gray-200 border-t-[#003366] rounded-full animate-spin" />
+                        <span className="text-xs text-gray-500 font-semibold">Loading PIO list...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  officers.map((row, idx) => {
+                    let roleColor = "bg-blue-100 text-blue-700";
+                    if (row.rti_role === "First Appellate Authority")
+                      roleColor = "bg-green-100 text-green-700";
+                    if (row.rti_role === "Second Appellate Authority")
+                      roleColor = "bg-purple-100 text-purple-700";
+
+                    return (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-700 font-medium align-top break-words">
+                          {row.name}
+                        </td>
+                        <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-gray-500 align-top break-words">
+                          {row.designation}
+                        </td>
+                        <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 align-top break-words">
+                          <span className={`${roleColor} text-xs sm:text-sm px-2.5 py-1 rounded-full font-medium inline-block`}>
+                            {row.rti_role}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

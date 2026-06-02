@@ -29,6 +29,26 @@
     "order": {
       "type": "integer",
       "default": 0
+    },
+    "email": {
+      "type": "string",
+      "required": false
+    },
+    "mobile": {
+      "type": "string",
+      "required": false
+    },
+    "office_phone": {
+      "type": "string",
+      "required": false
+    },
+    "message": {
+      "type": "text",
+      "required": false
+    },
+    "rti_role": {
+      "type": "string",
+      "required": false
     }
   }
 }

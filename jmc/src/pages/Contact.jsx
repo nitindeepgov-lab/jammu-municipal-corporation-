@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
+import { getOfficials } from "../services/strapiApi";
 
-const officers = [
+const fallbackOfficers = [
   {
     name: "Devansh Yadav, IAS",
     designation: "Commissioner",
@@ -184,6 +186,38 @@ const offices = [
 ];
 
 export default function Contact() {
+  const [officers, setOfficers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getOfficials()
+      .then((res) => {
+        const data = res?.data?.data || [];
+        if (data.length > 0) {
+          const mapped = data.map((item) => {
+            const attr = item.attributes || item;
+            return {
+              name: attr.name,
+              designation: attr.designation,
+              office: attr.office_phone,
+              mobile: attr.mobile,
+              email: attr.email,
+            };
+          });
+          setOfficers(mapped);
+        } else {
+          setOfficers(fallbackOfficers);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load officers directory, using fallback:", err);
+        setOfficers(fallbackOfficers);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <SubpageTemplate title="Contact Us" breadcrumb={[{ name: "Contact Us" }]}>
       <div>
@@ -375,53 +409,70 @@ export default function Contact() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {officers.map((officer, idx) => (
-                  <tr
-                    key={idx}
-                    className={
-                      idx % 2 === 0
-                        ? "bg-white hover:bg-gray-50"
-                        : "bg-gray-50 hover:bg-gray-100"
-                    }
-                  >
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-sm text-center align-middle whitespace-nowrap">
-                      {idx + 1}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-sm align-top break-words">
-                      {officer.name}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                      {officer.designation}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                      {officer.office || "—"}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
-                      {officer.mobile ? (
-                        <a
-                          href={`tel:${officer.mobile}`}
-                          className="text-[#003366] hover:underline"
-                        >
-                          {officer.mobile}
-                        </a>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                    <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
-                      {officer.email ? (
-                        <a
-                          href={`mailto:${officer.email}`}
-                          className="text-[#003366] hover:underline break-all"
-                        >
-                          {officer.email}
-                        </a>
-                      ) : (
-                        "—"
-                      )}
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center py-10">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="w-6 h-6 border-2 border-gray-200 border-t-[#003366] rounded-full animate-spin" />
+                        <span className="text-xs text-gray-500 font-semibold">Loading directory...</span>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : officers.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="text-center py-10 text-xs text-gray-500 font-semibold">
+                      No officers found in directory.
+                    </td>
+                  </tr>
+                ) : (
+                  officers.map((officer, idx) => (
+                    <tr
+                      key={idx}
+                      className={
+                        idx % 2 === 0
+                          ? "bg-white hover:bg-gray-50"
+                          : "bg-gray-50 hover:bg-gray-100"
+                      }
+                    >
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-sm text-center align-middle whitespace-nowrap">
+                        {idx + 1}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-sm align-top break-words">
+                        {officer.name}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
+                        {officer.designation}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
+                        {officer.office || "—"}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
+                        {officer.mobile ? (
+                          <a
+                            href={`tel:${officer.mobile}`}
+                            className="text-[#003366] hover:underline"
+                          >
+                            {officer.mobile}
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
+                        {officer.email ? (
+                          <a
+                            href={`mailto:${officer.email}`}
+                            className="text-[#003366] hover:underline break-all"
+                          >
+                            {officer.email}
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

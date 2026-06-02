@@ -36,6 +36,37 @@ module.exports = () => ({
       };
     }
 
+    // If AI is configured, let the AI generate a smart GPT-like response using RAG context!
+    const hasApiKey = !!process.env.OPENAI_API_KEY;
+    if (hasApiKey) {
+      const aiReply = await knowledge.aiAnswer(queryText, history);
+      if (aiReply) {
+        // Try to automatically attach a navigation button if the AI suggests a route
+        const suggestedRoute = knowledge.detectNavigation(aiReply);
+        
+        // Formulate follow-up action options based on keyword matching
+        let followUps = [];
+        const entry = knowledge.findAnswer(queryText);
+        if (entry) {
+          followUps = knowledge.getFollowUps(entry);
+        } else {
+          // Default follow ups
+          followUps = [
+            { id: "pay-online-how", label: "💳 Pay Online" },
+            { id: "contact-helpline", label: "📞 Contact JMC" },
+          ];
+        }
+
+        return {
+          text: aiReply,
+          followUps,
+          nav: suggestedRoute || undefined,
+        };
+      }
+    }
+
+    // --- LOCAL FALLBACK LOGIC (when OpenAI is not set) ---
+
     // 3) Knowledge base lookup
     const entry = knowledge.findAnswer(queryText);
     if (entry) {
@@ -54,13 +85,7 @@ module.exports = () => ({
       return databaseReply;
     }
 
-    // 5) AI fallback (only if API key is set)
-    const aiReply = await knowledge.aiAnswer(queryText, history);
-    if (aiReply) {
-      return { text: aiReply, followUps: [] };
-    }
-
-    // 6) Fallback
+    // 5) Final Fallback
     const FALLBACK = "I couldn't find a specific answer for that. Try rephrasing, or pick a suggestion below.\n\n• How to **pay fees online**\n• **File a complaint** or grievance\n• Find **JMC officer contacts**\n• View **notices & tenders**\n• Access **RTI information**";
     return {
       text: FALLBACK,

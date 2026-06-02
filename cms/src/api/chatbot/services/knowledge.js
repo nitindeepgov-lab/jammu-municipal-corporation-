@@ -1171,9 +1171,37 @@ async function aiAnswer(query, history = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
+  // Gather context from local knowledge base and live database (RAG)
+  let contextParts = [];
+
+  // 1) Find local knowledge match
+  try {
+    const localMatch = findAnswer(query);
+    if (localMatch) {
+      contextParts.push(`[Local Knowledge Reference]\nQuestion: ${localMatch.q}\nAnswer: ${localMatch.a}`);
+    }
+  } catch (e) {
+    console.error("AI Context - Local KB match error:", e.message);
+  }
+
+  // 2) Find database match
+  try {
+    const dbMatch = await getDatabaseAnswer(query);
+    if (dbMatch && dbMatch.text) {
+      contextParts.push(`[Live Database Reference]\n${dbMatch.text}`);
+    }
+  } catch (e) {
+    console.error("AI Context - DB match error:", e.message);
+  }
+
+  const contextStr = contextParts.join("\n\n");
+  const systemPromptWithContext = contextStr 
+    ? `${AI_SYSTEM_PROMPT}\n\n=== RETRIEVED CONTEXT FROM DATABASE & KNOWLEDGE BASE ===\nUse the following official records to answer the user query accurately:\n${contextStr}\n======================================================`
+    : AI_SYSTEM_PROMPT;
+
   try {
     const messages = [
-      { role: "system", content: AI_SYSTEM_PROMPT },
+      { role: "system", content: systemPromptWithContext },
       ...history.map((h) => ({
         role: h.role === "bot" ? "assistant" : "user",
         content: h.text || h.content,
@@ -1190,8 +1218,8 @@ async function aiAnswer(query, history = []) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages,
-        max_tokens: 400,
-        temperature: 0.4,
+        max_tokens: 500,
+        temperature: 0.3,
       }),
     });
 
@@ -1199,7 +1227,8 @@ async function aiAnswer(query, history = []) {
     const data = await res.json();
     const replyText = data.choices?.[0]?.message?.content || null;
     return replyText ? linkifyText(replyText) : null;
-  } catch {
+  } catch (e) {
+    console.error("AI Answer fetch failed:", e.message);
     return null;
   }
 }
