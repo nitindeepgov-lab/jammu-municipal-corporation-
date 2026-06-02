@@ -26,6 +26,18 @@
       "required": false,
       "allowedTypes": ["images"]
     },
+    "office_phone": {
+      "type": "string",
+      "required": false
+    },
+    "mobile": {
+      "type": "string",
+      "required": false
+    },
+    "email": {
+      "type": "email",
+      "required": false
+    },
     "order": {
       "type": "integer",
       "default": 0

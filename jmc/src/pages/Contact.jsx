@@ -1,168 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getOfficials } from "../services/strapiApi";
-
-const fallbackOfficers = [
-  {
-    name: "Devansh Yadav, IAS",
-    designation: "Commissioner",
-    office: "2542192, 2547846",
-    mobile: "9797999495",
-    email: "mc.jmc@jk.gov.in",
-  },
-  {
-    name: "Rajeev Khajuria, JKAS",
-    designation: "Joint Commissioner (Adm.)",
-    office: "2546252",
-    mobile: "9906069409",
-  },
-  {
-    name: "Subah Mehta, JKAS",
-    designation: "Joint Commissioner (R&E)",
-    office: "",
-    mobile: "9419145837",
-  },
-  {
-    name: "Abdul Star, JKAS",
-    designation: "Joint Commissioner (H & S)",
-    office: "",
-    mobile: "9419027458",
-  },
-  {
-    name: "Chand Singh, JKAS",
-    designation: "Secretary",
-    office: "",
-    mobile: "7006046450",
-    email: "secy.jmcjmu@gmail.com",
-  },
-  {
-    name: "Sanjay Badyal, JKAS",
-    designation: "Deputy Commissioner (North)",
-    office: "",
-    mobile: "9419137292",
-  },
-  {
-    name: "Lal Chand, JKAS",
-    designation: "Deputy Commissioner (South)",
-    office: "",
-    mobile: "7889455797",
-  },
-  {
-    name: "Amit Kumar, JKAS",
-    designation: "Financial Advisor / CAO",
-    office: "",
-    mobile: "9419383788",
-  },
-  {
-    name: "Sunil Gandotra",
-    designation: "Superintending Engineer, PHE",
-    office: "",
-    mobile: "9419147521",
-  },
-  {
-    name: "Dr. Vinod Sharma",
-    designation: "Health Officer",
-    office: "",
-    mobile: "9419182088",
-  },
-  {
-    name: "Firdous Ahmed Qazi",
-    designation: "Joint Commissioner (Works)",
-    office: "",
-    mobile: "7006129804",
-  },
-  {
-    name: "Manoj Kumar",
-    designation: "Senior Town Planner",
-    office: "",
-    mobile: "9419162344",
-  },
-  {
-    name: "Nawaz Ahmed Banday",
-    designation: "Executive Engineer (Division-II)",
-    office: "",
-    mobile: "8803274201",
-  },
-  {
-    name: "Akhil Dutt",
-    designation: "Executive Engineer (Division-III)",
-    office: "",
-    mobile: "7889856380",
-  },
-  {
-    name: "Yasir Bashir Kichloo",
-    designation: "Executive Engineer (Division-IV)",
-    office: "",
-    mobile: "9419184058",
-  },
-  {
-    name: "Janak Singh",
-    designation: "Executive Engineer (Projects Division)",
-    office: "",
-    mobile: "9419161201",
-  },
-  {
-    name: "S.P. Singh, JKAS",
-    designation: "Executive Engineer (Electrical)",
-    office: "",
-    mobile: "9149767538",
-  },
-  {
-    name: "Er. Rayaz-ul-Hussan Mir",
-    designation: "Executive Engineer (Mechanical)",
-    office: "",
-    mobile: "9419211990",
-  },
-  {
-    name: "Vijay Singh Manhas",
-    designation: "Executive Engineer, UEED",
-    office: "",
-    mobile: "9419142784",
-  },
-  {
-    name: "Dharam Vir Singh",
-    designation: "Chief Transport Officer (Zone III)",
-    office: "",
-    mobile: "7780888736",
-  },
-  {
-    name: "Talat Mehmood Khan",
-    designation: "Chief Transport Officer (Zone I & II)",
-    office: "",
-    mobile: "7006480719",
-  },
-  {
-    name: "Dr. Jaswant Singh, JKAS",
-    designation: "Municipal Veterinary Officer",
-    office: "",
-    mobile: "9797682216",
-  },
-  {
-    name: "Dr. Gaurav Chowdhary",
-    designation: "Animal Welfare Officer",
-    office: "",
-    mobile: "9797371677",
-  },
-  {
-    name: "Kamal Kishore",
-    designation: "Building Officer",
-    office: "",
-    mobile: "8492081239",
-  },
-  {
-    name: "Kapil Khajuria",
-    designation: "Building Officer",
-    office: "",
-    mobile: "9018896437",
-  },
-  {
-    name: "Parveen Gupta",
-    designation: "Private Secretary to Commissioner",
-    office: "2542192",
-    mobile: "9419104451",
-    email: "commissionerjmc@gmail.com",
-  },
-];
 
 const offices = [
   {
@@ -187,35 +25,17 @@ const offices = [
 
 export default function Contact() {
   const [officers, setOfficers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingOfficers, setLoadingOfficers] = useState(true);
 
   useEffect(() => {
     getOfficials()
       .then((res) => {
-        const data = res?.data?.data || [];
-        if (data.length > 0) {
-          const mapped = data.map((item) => {
-            const attr = item.attributes || item;
-            return {
-              name: attr.name,
-              designation: attr.designation,
-              office: attr.office_phone,
-              mobile: attr.mobile,
-              email: attr.email,
-            };
-          });
-          setOfficers(mapped);
-        } else {
-          setOfficers(fallbackOfficers);
-        }
+        setOfficers(res?.data?.data || []);
       })
-      .catch((err) => {
-        console.error("Failed to load officers directory, using fallback:", err);
-        setOfficers(fallbackOfficers);
+      .catch(() => {
+        setOfficers([]);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoadingOfficers(false));
   }, []);
 
   return (
@@ -409,25 +229,25 @@ export default function Contact() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {loading ? (
+                {loadingOfficers ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-10">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="w-6 h-6 border-2 border-gray-200 border-t-[#003366] rounded-full animate-spin" />
-                        <span className="text-xs text-gray-500 font-semibold">Loading directory...</span>
+                    <td colSpan={6} className="py-10 text-center text-sm text-gray-400">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-gray-300 border-t-[#003366] rounded-full animate-spin" />
+                        Loading officer directory...
                       </div>
                     </td>
                   </tr>
                 ) : officers.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-10 text-xs text-gray-500 font-semibold">
-                      No officers found in directory.
+                    <td colSpan={6} className="py-10 text-center text-sm text-gray-400">
+                      No officer records found. Please check back later.
                     </td>
                   </tr>
                 ) : (
                   officers.map((officer, idx) => (
                     <tr
-                      key={idx}
+                      key={officer.id ?? idx}
                       className={
                         idx % 2 === 0
                           ? "bg-white hover:bg-gray-50"
@@ -444,7 +264,7 @@ export default function Contact() {
                         {officer.designation}
                       </td>
                       <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                        {officer.office || "—"}
+                        {officer.office_phone || "—"}
                       </td>
                       <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
                         {officer.mobile ? (

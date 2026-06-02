@@ -595,8 +595,8 @@ export interface ApiEventActivityEventActivity
 export interface ApiHeroSlideHeroSlide extends Struct.CollectionTypeSchema {
   collectionName: 'hero_slides';
   info: {
-    description: 'Banners displayed in the homepage slideshow. Use order to prioritize.';
-    displayName: '\uD83D\uDDBC\uFE0F Hero Slide Banner';
+    description: 'Banner images shown in the homepage hero slider. Use the order field to control display sequence.';
+    displayName: '\uD83D\uDDBC\uFE0F Hero Slide';
     pluralName: 'hero-slides';
     singularName: 'hero-slide';
   };
@@ -607,8 +607,8 @@ export interface ApiHeroSlideHeroSlide extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    image: Schema.Attribute.Media<'images'>;
-    image_url: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -786,14 +786,13 @@ export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     designation: Schema.Attribute.String & Schema.Attribute.Required;
-    email: Schema.Attribute.String;
+    email: Schema.Attribute.Email;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::official.official'
     > &
       Schema.Attribute.Private;
-    message: Schema.Attribute.Text;
     mobile: Schema.Attribute.String;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     office_phone: Schema.Attribute.String;

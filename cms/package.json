@@ -19,6 +19,7 @@
     "grant:councillors": "node ./scripts/grant-councillors-permissions.js",
     "grant:officials": "node ./scripts/grant-officials-permissions.js",
     "grant:ministers": "node ./scripts/grant-ministers-permissions.js",
+    "grant:hero-slides": "node ./scripts/grant-hero-slides-permissions.js",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",

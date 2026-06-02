@@ -4,8 +4,8 @@
   "info": {
     "singularName": "hero-slide",
     "pluralName": "hero-slides",
-    "displayName": "🖼️ Hero Slide Banner",
-    "description": "Banners displayed in the homepage slideshow. Use order to prioritize."
+    "displayName": "🖼️ Hero Slide",
+    "description": "Banner images shown in the homepage hero slider. Use the order field to control display sequence."
   },
   "options": {
     "draftAndPublish": false
@@ -23,16 +23,16 @@
     "image": {
       "type": "media",
       "multiple": false,
-      "required": false,
+      "required": true,
       "allowedTypes": ["images"]
-    },
-    "image_url": {
-      "type": "string",
-      "required": false
     },
     "order": {
       "type": "integer",
       "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

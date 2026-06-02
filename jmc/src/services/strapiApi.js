@@ -149,6 +149,12 @@ export const getHeroSlides = () =>
     api.get("/hero-slides?populate=image&sort=order:asc")
   );
 
+// ── Hero Slides ───────────────────────────────────────────────
+
+/** Fetch all active hero banner slides ordered by 'order' */
+export const getHeroSlides = () =>
+  api.get("/hero-slides?populate=image&sort=order:asc&filters[is_active][$eq]=true");
+
 // ── Photo Gallery ─────────────────────────────────────────────
 
 /** Fetch all published photo gallery items ordered by 'order' */
