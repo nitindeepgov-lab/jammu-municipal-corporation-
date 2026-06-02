@@ -1,6 +1,62 @@
+import { useEffect, useState } from "react";
 import SubpageTemplate from '../components/SubpageTemplate'
+import { getOfficials } from "../services/strapiApi";
+import { STRAPI_URL } from "../config/api";
+
+const fallback = {
+  name: "Mr. Devansh Yadav, IAS",
+  designation: "Municipal Commissioner",
+  email: "mc.jmc@jk.gov.in",
+  mobile: "18001807207 (Toll Free)",
+  officePhone: "2542192, 2547846",
+  image: "/officials/com.jpg",
+  message: `The Jammu Municipal Corporation is deeply committed to serving the citizens of Jammu with integrity, efficiency, and transparency. Our goal is to ensure that every resident of this historic city receives quality civic services, ranging from sanitation and water supply to road infrastructure and public health.
+
+We are actively working towards making Jammu a smart, clean, and green city under various Government of India flagship programmes including the Smart Cities Mission and Swachh Bharat Mission (Urban). Our teams are working round the clock to address citizen grievances and improve the overall quality of urban life.
+
+I invite all citizens to engage with our e-governance portal for hassle-free access to municipal services — pay your property tax online, register your complaints, apply for building plans, and access birth/death certificates from the comfort of your home.
+
+Your feedback and suggestions are invaluable for us to continually improve. Together, let us build a Jammu that we all are proud of.`,
+};
 
 export default function Commissioner() {
+  const [commissioner, setCommissioner] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getOfficials()
+      .then((res) => {
+        const data = res?.data?.data || [];
+        const found = data.find((item) => {
+          const attr = item.attributes || item;
+          return attr.designation?.toLowerCase() === "commissioner";
+        });
+        if (found) {
+          const attr = found.attributes || found;
+          setCommissioner({
+            name: attr.name,
+            designation: attr.designation,
+            email: attr.email || null,
+            mobile: attr.mobile || null,
+            officePhone: attr.office_phone || null,
+            image: attr.picture?.url ? `${STRAPI_URL}${attr.picture.url}` : "/officials/com.jpg",
+            message: attr.message || null,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load commissioner details:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const activeProfile = commissioner || fallback;
+  const paragraphs = (activeProfile.message || fallback.message)
+    .split("\n\n")
+    .filter(Boolean);
+
   return (
     <SubpageTemplate
       title="Commissioner's Desk"
@@ -13,17 +69,18 @@ export default function Commissioner() {
             <div className="bg-white rounded shadow-sm overflow-hidden">
               <div className="h-64 bg-[#003366] overflow-hidden">
                 <img
-                  src="/officials/com.jpg"
+                  src={activeProfile.image}
                   alt="Municipal Commissioner"
                   className="w-full h-full object-cover object-top"
                   onError={(e) => {
-                    e.target.parentNode.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white text-6xl font-bold">DY</div>`
+                    e.target.onerror = null;
+                    e.target.src = "/officials/com.jpg";
                   }}
                 />
               </div>
               <div className="p-5 text-center">
-                <h2 className="text-[#003366] font-bold text-base">Mr. Devansh Yadav, IAS</h2>
-                <p className="text-[#FF6600] text-sm font-medium mt-1">Municipal Commissioner</p>
+                <h2 className="text-[#003366] font-bold text-base">{activeProfile.name}</h2>
+                <p className="text-[#FF6600] text-sm font-medium mt-1">{activeProfile.designation}</p>
                 <p className="text-gray-500 text-xs mt-0.5">Jammu Municipal Corporation</p>
                 <div className="mt-4 pt-4 border-t border-gray-100 text-left space-y-2 text-xs text-gray-600">
                   <div className="flex items-center gap-2">
@@ -32,8 +89,16 @@ export default function Commissioner() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[#003366]">📞</span>
-                    18001807207 (Toll Free)
+                    {activeProfile.officePhone || "2542192, 2547846"}
                   </div>
+                  {activeProfile.email && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#003366]">📧</span>
+                      <a href={`mailto:${activeProfile.email}`} className="text-[#003366] hover:underline break-all">
+                        {activeProfile.email}
+                      </a>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <span className="text-[#003366]">🌐</span>
                     <a href="https://jmc.jk.gov.in" target="_blank" rel="noopener noreferrer" className="text-[#003366] hover:underline">jmc.jk.gov.in</a>
@@ -50,30 +115,23 @@ export default function Commissioner() {
                 <div className="w-1 h-8 bg-[#FF6600] rounded-full"></div>
                 <h2 className="text-xl font-bold text-[#003366]">Commissioner's Message</h2>
               </div>
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                The Jammu Municipal Corporation is deeply committed to serving the citizens of Jammu with
-                integrity, efficiency, and transparency. Our goal is to ensure that every resident of this
-                historic city receives quality civic services, ranging from sanitation and water supply to
-                road infrastructure and public health.
-              </p>
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                We are actively working towards making Jammu a smart, clean, and green city under various
-                Government of India flagship programmes including the Smart Cities Mission and Swachh Bharat
-                Mission (Urban). Our teams are working round the clock to address citizen grievances and improve
-                the overall quality of urban life.
-              </p>
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                I invite all citizens to engage with our e-governance portal for hassle-free access to municipal
-                services — pay your property tax online, register your complaints, apply for building plans, and
-                access birth/death certificates from the comfort of your home.
-              </p>
-              <p className="text-gray-700 text-sm leading-relaxed">
-                Your feedback and suggestions are invaluable for us to continually improve. Together, let us
-                build a Jammu that we all are proud of.
-              </p>
+              
+              {loading && !commissioner ? (
+                <div className="flex flex-col items-center justify-center py-10">
+                  <div className="w-8 h-8 border-2 border-gray-200 border-t-[#003366] rounded-full animate-spin" />
+                  <p className="text-xs text-gray-400 mt-2 font-semibold">Loading message...</p>
+                </div>
+              ) : (
+                paragraphs.map((p, i) => (
+                  <p key={i} className="text-gray-700 text-sm leading-relaxed mb-4">
+                    {p}
+                  </p>
+                ))
+              )}
+
               <div className="mt-6 pt-4 border-t border-gray-100">
-                <p className="font-bold text-[#003366] text-sm">Mr. Devansh Yadav, IAS</p>
-                <p className="text-gray-500 text-xs">Municipal Commissioner, Jammu</p>
+                <p className="font-bold text-[#003366] text-sm">{activeProfile.name}</p>
+                <p className="text-gray-500 text-xs">{activeProfile.designation}, Jammu</p>
               </div>
             </div>
 

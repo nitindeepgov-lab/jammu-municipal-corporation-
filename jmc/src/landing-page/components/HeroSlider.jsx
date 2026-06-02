@@ -50,6 +50,7 @@ export default function HeroSlider() {
   const prev = () => setCurrent(c => (c - 1 + slides.length) % slides.length)
 
   useEffect(() => {
+    if (slides.length <= 1) return
     clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
       setCurrent((c) => (c + 1) % slides.length)

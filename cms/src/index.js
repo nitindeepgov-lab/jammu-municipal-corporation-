@@ -146,26 +146,37 @@ module.exports = {
         "api::tender.tender",
         "api::smart-city-tender.smart-city-tender",
         "api::councillor-detail.councillor-detail",
+        "api::hero-slide.hero-slide",
+        "api::minister.minister",
+        "api::photo-gallery.photo-gallery",
+        "api::location.location",
+        "api::event-activity.event-activity",
       ];
 
+      const promises = [];
       for (const ct of contentTypes) {
         for (const method of ["find", "findOne"]) {
           const action = `${ct}.${method}`;
-          const existing = await strapi
-            .query("plugin::users-permissions.permission")
-            .findOne({ where: { action, role: publicRole.id } });
+          promises.push(
+            (async () => {
+              const existing = await strapi
+                .query("plugin::users-permissions.permission")
+                .findOne({ where: { action, role: publicRole.id } });
 
-          if (!existing) {
-            await strapi
-              .query("plugin::users-permissions.permission")
-              .create({ data: { action, role: publicRole.id, enabled: true } });
-          } else if (!existing.enabled) {
-            await strapi
-              .query("plugin::users-permissions.permission")
-              .update({ where: { id: existing.id }, data: { enabled: true } });
-          }
+              if (!existing) {
+                await strapi
+                  .query("plugin::users-permissions.permission")
+                  .create({ data: { action, role: publicRole.id, enabled: true } });
+              } else if (!existing.enabled) {
+                await strapi
+                  .query("plugin::users-permissions.permission")
+                  .update({ where: { id: existing.id }, data: { enabled: true } });
+              }
+            })()
+          );
         }
       }
+      await Promise.all(promises);
     } catch (error) {
       strapi.log.warn(
         `Skipping public permission sync during bootstrap: ${error.message}`,

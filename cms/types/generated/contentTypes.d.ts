@@ -799,6 +799,7 @@ export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     picture: Schema.Attribute.Media<'images'>;
     publishedAt: Schema.Attribute.DateTime;
+    rti_role: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
