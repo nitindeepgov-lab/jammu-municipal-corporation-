@@ -143,17 +143,12 @@ export const getMinisters = () =>
 
 // ── Hero Slides ──────────────────────────────────────────────
 
-/** Fetch all published hero slide banners ordered by 'order' */
-export const getHeroSlides = () =>
-  getCached("hero-slides", () =>
-    api.get("/hero-slides?populate=image&sort=order:asc")
-  );
-
-// ── Hero Slides ───────────────────────────────────────────────
-
 /** Fetch all active hero banner slides ordered by 'order' */
 export const getHeroSlides = () =>
-  api.get("/hero-slides?populate=image&sort=order:asc&filters[is_active][$eq]=true");
+  getCached("hero-slides", () =>
+    api.get("/hero-slides?populate=image&sort=order:asc&filters[is_active][$eq]=true")
+  );
+
 
 // ── Photo Gallery ─────────────────────────────────────────────
 
