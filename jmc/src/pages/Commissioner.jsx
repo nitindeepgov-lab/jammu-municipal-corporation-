@@ -3,22 +3,6 @@ import SubpageTemplate from '../components/SubpageTemplate'
 import { getOfficials } from "../services/strapiApi";
 import { STRAPI_URL } from "../config/api";
 
-const fallback = {
-  name: "Mr. Devansh Yadav, IAS",
-  designation: "Municipal Commissioner",
-  email: "mc.jmc@jk.gov.in",
-  mobile: "18001807207 (Toll Free)",
-  officePhone: "2542192, 2547846",
-  image: "/officials/com.jpg",
-  message: `The Jammu Municipal Corporation is deeply committed to serving the citizens of Jammu with integrity, efficiency, and transparency. Our goal is to ensure that every resident of this historic city receives quality civic services, ranging from sanitation and water supply to road infrastructure and public health.
-
-We are actively working towards making Jammu a smart, clean, and green city under various Government of India flagship programmes including the Smart Cities Mission and Swachh Bharat Mission (Urban). Our teams are working round the clock to address citizen grievances and improve the overall quality of urban life.
-
-I invite all citizens to engage with our e-governance portal for hassle-free access to municipal services — pay your property tax online, register your complaints, apply for building plans, and access birth/death certificates from the comfort of your home.
-
-Your feedback and suggestions are invaluable for us to continually improve. Together, let us build a Jammu that we all are proud of.`,
-};
-
 export default function Commissioner() {
   const [commissioner, setCommissioner] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +23,7 @@ export default function Commissioner() {
             email: attr.email || null,
             mobile: attr.mobile || null,
             officePhone: attr.office_phone || null,
-            image: attr.picture?.url ? `${STRAPI_URL}${attr.picture.url}` : "/officials/com.jpg",
+            image: attr.picture?.url ? (attr.picture.url.startsWith("http") ? attr.picture.url : `${STRAPI_URL}${attr.picture.url}`) : "/officials/com.jpg",
             message: attr.message || null,
           });
         }
@@ -52,8 +36,21 @@ export default function Commissioner() {
       });
   }, []);
 
-  const activeProfile = commissioner || fallback;
-  const paragraphs = (activeProfile.message || fallback.message)
+  if (!loading && !commissioner) {
+    return (
+      <SubpageTemplate
+        title="Commissioner's Desk"
+        breadcrumb={[{ name: "Commissioner's Desk" }]}
+      >
+        <div className="bg-white rounded shadow-sm p-8 text-center text-gray-500">
+          Commissioner profile is not published in the CMS yet.
+        </div>
+      </SubpageTemplate>
+    );
+  }
+
+  const activeProfile = commissioner;
+  const paragraphs = (activeProfile?.message || "")
     .split("\n\n")
     .filter(Boolean);
 
@@ -68,19 +65,17 @@ export default function Commissioner() {
           <div className="md:col-span-1">
             <div className="bg-white rounded shadow-sm overflow-hidden">
               <div className="h-64 bg-[#003366] overflow-hidden">
-                <img
-                  src={activeProfile.image}
-                  alt="Municipal Commissioner"
-                  className="w-full h-full object-cover object-top"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/officials/com.jpg";
-                  }}
-                />
+                {activeProfile?.image && (
+                  <img
+                    src={activeProfile.image}
+                    alt="Municipal Commissioner"
+                    className="w-full h-full object-cover object-top"
+                  />
+                )}
               </div>
               <div className="p-5 text-center">
-                <h2 className="text-[#003366] font-bold text-base">{activeProfile.name}</h2>
-                <p className="text-[#FF6600] text-sm font-medium mt-1">{activeProfile.designation}</p>
+                <h2 className="text-[#003366] font-bold text-base">{activeProfile?.name}</h2>
+                <p className="text-[#FF6600] text-sm font-medium mt-1">{activeProfile?.designation}</p>
                 <p className="text-gray-500 text-xs mt-0.5">Jammu Municipal Corporation</p>
                 <div className="mt-4 pt-4 border-t border-gray-100 text-left space-y-2 text-xs text-gray-600">
                   <div className="flex items-center gap-2">
@@ -89,7 +84,7 @@ export default function Commissioner() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[#003366]">📞</span>
-                    {activeProfile.officePhone || "2542192, 2547846"}
+                    {activeProfile?.officePhone || "—"}
                   </div>
                   {activeProfile.email && (
                     <div className="flex items-center gap-2">
@@ -130,8 +125,8 @@ export default function Commissioner() {
               )}
 
               <div className="mt-6 pt-4 border-t border-gray-100">
-                <p className="font-bold text-[#003366] text-sm">{activeProfile.name}</p>
-                <p className="text-gray-500 text-xs">{activeProfile.designation}, Jammu</p>
+                <p className="font-bold text-[#003366] text-sm">{activeProfile?.name}</p>
+                <p className="text-gray-500 text-xs">{activeProfile?.designation}, Jammu</p>
               </div>
             </div>
 

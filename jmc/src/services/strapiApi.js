@@ -187,6 +187,14 @@ export const getCouncillorsPaginated = (
   });
 };
 
+// ── Contact Offices ────────────────────────────────────────
+
+/** Fetch all published contact office entries ordered by display order */
+export const getOfficeLocations = () =>
+  getCached("office-locations", () =>
+    api.get("/office-locations?sort=order:asc&filters[is_active][$eq]=true")
+  );
+
 // ── Payment Locations ─────────────────────────────────────
 
 /** Fetch all published payment locations ordered by ward number (desc) */
