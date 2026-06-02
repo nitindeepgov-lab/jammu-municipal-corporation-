@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
-import { getOfficials } from "../services/strapiApi";
+import { 
+  MapPin, 
+  ArrowUpRight, 
+  Landmark, 
+  ExternalLink,
+  PhoneCall
+} from "lucide-react";
 
 const offices = [
   {
@@ -8,100 +13,142 @@ const offices = [
     address: "Town Hall Jammu, Jammu and Kashmir 180001",
     phone: "18001807207 (Toll Free)",
     hours: "10:00 AM – 05:00 PM (Working Days)",
+    icon: <Landmark className="w-5 h-5 text-[#003366]" />,
+    color: "border-l-4 border-[#003366]"
   },
   {
     title: "Zone – North Office",
     address: "Peer Mitha, Jammu",
     phone: "Contact HQ",
     hours: "10:00 AM – 05:00 PM",
+    icon: <MapPin className="w-5 h-5 text-[#FF6600]" />,
+    color: "border-l-4 border-[#FF6600]"
   },
   {
     title: "Zone – South Office",
     address: "Bohri, Jammu",
     phone: "Contact HQ",
     hours: "10:00 AM – 05:00 PM",
+    icon: <MapPin className="w-5 h-5 text-[#FF6600]" />,
+    color: "border-l-4 border-[#FF6600]"
   },
 ];
 
 export default function Contact() {
-  const [officers, setOfficers] = useState([]);
-  const [loadingOfficers, setLoadingOfficers] = useState(true);
-
-  useEffect(() => {
-    getOfficials()
-      .then((res) => {
-        setOfficers(res?.data?.data || []);
-      })
-      .catch(() => {
-        setOfficers([]);
-      })
-      .finally(() => setLoadingOfficers(false));
-  }, []);
 
   return (
     <SubpageTemplate title="Contact Us" breadcrumb={[{ name: "Contact Us" }]}>
-      <div>
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Contact Info */}
-          <div className="space-y-6">
-            <div className="bg-white rounded shadow-sm p-6">
-              <h2 className="text-lg font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-5 inline-block">
-                Office Addresses
-              </h2>
-              {offices.map((office, idx) => (
-                <div key={idx} className="mb-5 last:mb-0">
-                  <h3 className="font-bold text-[#003366] text-sm mb-2">
-                    {office.title}
-                  </h3>
-                  <div className="pl-3 border-l-2 border-gray-200 space-y-1 text-sm text-gray-600">
-                    <p>📍 {office.address}</p>
-                    <p>📞 {office.phone}</p>
-                    <p>🕐 {office.hours}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="max-w-6xl mx-auto space-y-10 pb-10">
+        
+        {/* Intro Hero Section */}
+        <div className="bg-gradient-to-r from-[#003366] to-[#004a8f] rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-lg border-b-4 border-[#FF6600]">
+          <div className="absolute -right-16 -top-16 w-48 h-48 bg-white/5 rounded-full" />
+          <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-[#FF6600]/10 rounded-full" />
+          
+          <div className="relative z-10 max-w-3xl">
+            <span className="inline-flex items-center gap-1 bg-[#FF6600] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-3">
+              JMC Connect
+            </span>
+            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              Get in Touch with Jammu Municipal Corporation
+            </h2>
+            <p className="mt-2 text-white/80 text-sm md:text-base leading-relaxed">
+              Reach out to our offices, call our emergency helplines, query the administrative officer directory, or submit formal complaints directly online.
+            </p>
+          </div>
+        </div>
 
-            <div className="bg-[#003366] text-white rounded shadow-sm p-6">
-              <h2 className="text-lg font-bold mb-4">Helpline Numbers</h2>
+        {/* Quick Contact & Form Grid */}
+        <div className="grid lg:grid-cols-12 gap-8">
+          
+          {/* Left Column: Office Addresses & Helplines */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Helplines Box */}
+            <div className="bg-gradient-to-br from-slate-900 to-[#0A1628] text-white rounded-2xl shadow-md p-6 border border-slate-800">
+              <h2 className="text-base font-bold tracking-wide uppercase text-[#FF6600] flex items-center gap-2 mb-4">
+                <PhoneCall className="w-5 h-5" /> Emergency Helplines
+              </h2>
+              
               <div className="space-y-3">
-                <div className="flex justify-between items-center bg-white/10 rounded px-4 py-3">
-                  <span className="text-sm">General Helpline (Toll Free)</span>
-                  <strong className="text-[#FF6600] text-sm">
-                    18001807207
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 hover:bg-white/10 transition-colors">
+                  <span className="text-xs font-semibold text-white/70">General Helpline (Toll Free)</span>
+                  <strong className="text-white text-base font-bold tracking-wider sm:text-right">
+                    1800 180 7207
                   </strong>
                 </div>
-                <div className="flex justify-between items-center bg-white/10 rounded px-4 py-3">
-                  <span className="text-sm">PHE Water Supply Helpline</span>
+                
+                <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-xl px-4 py-3 hover:bg-white/10 transition-colors">
+                  <span className="text-xs font-semibold text-white/70">PHE Water Supply Help</span>
                   <a
                     href="https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#FF6600] text-sm hover:underline"
+                    className="inline-flex items-center gap-1 text-[#FF6600] hover:text-[#ff8533] text-xs font-bold transition-colors"
                   >
-                    View Numbers
+                    View PDF <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-                <div className="flex justify-between items-center bg-white/10 rounded px-4 py-3">
-                  <span className="text-sm">Online Grievance Portal</span>
+                
+                <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-xl px-4 py-3 hover:bg-white/10 transition-colors">
+                  <span className="text-xs font-semibold text-white/70">Online Grievance Desk</span>
                   <a
                     href="https://jmc.jk.gov.in/OnlineGrievances.aspx"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#FF6600] text-sm hover:underline"
+                    className="inline-flex items-center gap-1 text-[#FF6600] hover:text-[#ff8533] text-xs font-bold transition-colors"
                   >
-                    Register Now
+                    Register Now <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
             </div>
+
+            {/* Office Addresses */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-5">
+              <h2 className="text-base font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-2 inline-block">
+                🏢 Office Locations
+              </h2>
+              
+              <div className="space-y-4">
+                {offices.map((office, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`p-4 bg-slate-50/50 rounded-xl border border-slate-100 ${office.color} hover:bg-slate-50 hover:shadow-sm transition-all duration-300`}
+                  >
+                    <div className="flex items-center gap-2.5 mb-2">
+                      {office.icon}
+                      <h3 className="font-bold text-[#003366] text-sm">
+                        {office.title}
+                      </h3>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-slate-600 pl-7">
+                      <p className="flex items-start gap-1.5">
+                        <span className="text-slate-400">Address:</span>
+                        <span>{office.address}</span>
+                      </p>
+                      <p className="flex items-center gap-1.5">
+                        <span className="text-slate-400">Phone:</span>
+                        <span className="font-semibold text-slate-700">{office.phone}</span>
+                      </p>
+                      <p className="flex items-center gap-1.5">
+                        <span className="text-slate-400">Hours:</span>
+                        <span>{office.hours}</span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
 
-          {/* Grievance Form */}
-          <div className="bg-white rounded shadow-sm p-6">
-            <h2 className="text-lg font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-5 inline-block">
-              Register a Complaint / Grievance
+          {/* Right Column: Complaint / Grievance Form */}
+          <div className="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8">
+            <h2 className="text-lg font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-6 inline-block">
+              ✍️ Register a Complaint / Grievance
             </h2>
+            
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -110,234 +157,97 @@ export default function Contact() {
                   "_blank",
                 );
               }}
-              className="space-y-4"
+              className="space-y-5"
             >
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter your full name"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#003366]"
-                />
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter your full name"
+                    className="w-full border border-slate-200 bg-slate-50/50 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Mobile Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="10-digit mobile number"
+                    className="w-full border border-slate-200 bg-slate-50/50 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile Number *
-                </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="10-digit mobile number"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#003366]"
-                />
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    className="w-full border border-slate-200 bg-slate-50/50 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Department <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    required
+                    className="w-full border border-slate-200 bg-slate-50/50 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all cursor-pointer bg-white"
+                  >
+                    <option value="">Select Department</option>
+                    <option>Water Supply / PHE</option>
+                    <option>Sanitation / Solid Waste</option>
+                    <option>Roads / Engineering</option>
+                    <option>Street Lighting</option>
+                    <option>Property Tax</option>
+                    <option>Health Department</option>
+                    <option>Other</option>
+                  </select>
+                </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#003366]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Department *
-                </label>
-                <select
-                  required
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#003366] bg-white"
-                >
-                  <option value="">Select Department</option>
-                  <option>Water Supply / PHE</option>
-                  <option>Sanitation / Solid Waste</option>
-                  <option>Roads / Engineering</option>
-                  <option>Street Lighting</option>
-                  <option>Property Tax</option>
-                  <option>Health Department</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Complaint Description *
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Complaint Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
                   rows={4}
-                  placeholder="Describe your grievance in detail..."
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#003366] resize-none"
+                  placeholder="Describe your grievance or complaint in detail..."
+                  className="w-full border border-slate-200 bg-slate-50/50 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all resize-none"
                 />
               </div>
+
               <button
                 type="submit"
-                className="w-full bg-[#003366] hover:bg-[#004080] text-white py-2.5 rounded font-medium text-sm transition-colors"
+                className="w-full bg-gradient-to-r from-[#003366] to-[#004a8f] hover:from-[#00254c] hover:to-[#003366] text-white py-3 rounded-xl font-bold text-sm tracking-wide transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-1.5"
               >
-                Submit on JMC Portal
+                Submit on JMC Portal <ExternalLink className="w-4 h-4" />
               </button>
-              <p className="text-xs text-gray-500 text-center">
-                For immediate help, call Toll Free: <strong>18001807207</strong>
+              
+              <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+                Clicking submit redirects you to the official Jammu Municipal Corporation Integrated Grievance Portal. For immediate assistance, please call Toll Free: <strong className="text-slate-600">1800 180 7207</strong>.
               </p>
             </form>
           </div>
+
         </div>
 
-        {/* Officer Directory */}
-        <div className="mt-8 bg-white rounded shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">
-            Officer Directory
+        {/* Map Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+          <h2 className="text-base font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">
+            🗺️ Find Us on Map
           </h2>
-          <p className="text-sm text-gray-500 mb-4">
-            For PHE Water Supply helpline numbers,{" "}
-            <a
-              href="https://jmc.jk.gov.in/adminjmcpanel/noticefiles/318202558462347.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#003366] underline"
-            >
-              click here (PDF)
-            </a>
-            . For online birth &amp; death certificate helpline:{" "}
-            <strong>0191-2578503</strong>.
-          </p>
-          <div className="w-full">
-            <table className="w-full table-fixed text-sm sm:text-sm border border-gray-200">
-              <thead className="bg-[#003366] text-white">
-                <tr>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-center text-[11px] font-semibold w-12 whitespace-nowrap">
-                    S.No
-                  </th>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
-                    Name
-                  </th>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
-                    Designation
-                  </th>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
-                    Office
-                  </th>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
-                    Mobile
-                  </th>
-                  <th className="px-2.5 sm:px-3 py-2.5 sm:py-3 text-left text-[11px] font-semibold whitespace-normal break-words">
-                    Email
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {loadingOfficers ? (
-                  <tr>
-                    <td colSpan={6} className="py-10 text-center text-sm text-gray-400">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 border-2 border-gray-300 border-t-[#003366] rounded-full animate-spin" />
-                        Loading officer directory...
-                      </div>
-                    </td>
-                  </tr>
-                ) : officers.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-10 text-center text-sm text-gray-400">
-                      No officer records found. Please check back later.
-                    </td>
-                  </tr>
-                ) : (
-                  officers.map((officer, idx) => (
-                    <tr
-                      key={officer.id ?? idx}
-                      className={
-                        idx % 2 === 0
-                          ? "bg-white hover:bg-gray-50"
-                          : "bg-gray-50 hover:bg-gray-100"
-                      }
-                    >
-                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-400 text-sm text-center align-middle whitespace-nowrap">
-                        {idx + 1}
-                      </td>
-                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-800 font-medium text-sm align-top break-words">
-                        {officer.name}
-                      </td>
-                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                        {officer.designation}
-                      </td>
-                      <td className="px-2.5 sm:px-3 py-2.5 text-gray-600 text-sm align-top break-words">
-                        {officer.office_phone || "—"}
-                      </td>
-                      <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
-                        {officer.mobile ? (
-                          <a
-                            href={`tel:${officer.mobile}`}
-                            className="text-[#003366] hover:underline"
-                          >
-                            {officer.mobile}
-                          </a>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                      <td className="px-2.5 sm:px-3 py-2.5 text-sm align-top break-all">
-                        {officer.email ? (
-                          <a
-                            href={`mailto:${officer.email}`}
-                            className="text-[#003366] hover:underline break-all"
-                          >
-                            {officer.email}
-                          </a>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3 text-xs">
-            <a
-              href="https://jmc.jk.gov.in/sanitationstaff.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 border border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white px-3 py-1.5 rounded transition-colors"
-            >
-              Sanitation Staff →
-            </a>
-            <a
-              href="https://jmc.jk.gov.in/enforcementstaff.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 border border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white px-3 py-1.5 rounded transition-colors"
-            >
-              Enforcement Staff →
-            </a>
-            <a
-              href="https://jmc.jk.gov.in/worksstaff.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 border border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white px-3 py-1.5 rounded transition-colors"
-            >
-              Works Staff →
-            </a>
-            <a
-              href="https://jmc.jk.gov.in/councillors.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 border border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white px-3 py-1.5 rounded transition-colors"
-            >
-              Municipal Councillors →
-            </a>
-          </div>
-        </div>
-
-        {/* Map */}
-        <div className="mt-8 bg-white rounded shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#003366] border-b-2 border-[#FF6600] pb-2 mb-4 inline-block">
-            Location
-          </h2>
-          <div className="rounded overflow-hidden border border-gray-200 h-72">
+          <div className="rounded-xl overflow-hidden border border-slate-200 h-80 shadow-inner relative">
             <iframe
               title="JMC Location"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3370.8!2d74.8636!3d32.7266!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391e84b2f2e35c5d%3A0x2b3e5c98e4e64a3e!2sJammu%20Municipal%20Corporation!5e1!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin"
@@ -349,6 +259,7 @@ export default function Contact() {
             ></iframe>
           </div>
         </div>
+
       </div>
     </SubpageTemplate>
   );

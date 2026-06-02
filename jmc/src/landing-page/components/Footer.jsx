@@ -57,7 +57,7 @@ const footerColumns = [
         href: "https://jmc.jk.gov.in/forms/achievement1.pdf",
       },
       { name: "Smart City Projects", to: "/smart-city" },
-      { name: "Swachh Bharat Mission", to: "/swachh-mission" },
+      { name: "Officer Directory", to: "/officers-directory" },
       { name: "Council Updates", to: "/notices" },
       { name: "E-Governance Portal", to: "/egov" },
       { name: "Polythene Control", to: "/information/polythene-control" },

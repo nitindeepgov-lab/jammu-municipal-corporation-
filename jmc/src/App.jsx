@@ -81,6 +81,7 @@ const SanitationDepartment = lazy(() => import("./pages/SanitationDepartment"));
 const UrbanPlanning = lazy(() => import("./pages/UrbanPlanning"));
 const WaterSupplyDivision = lazy(() => import("./pages/WaterSupplyDivision"));
 const HorticultureDepartment = lazy(() => import("./pages/HorticultureDepartment"));
+const OfficerDirectory = lazy(() => import("./pages/OfficerDirectory"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Policy pages — loaded as a group
@@ -169,6 +170,7 @@ export default function App() {
             <Route path="/departments/urban-planning" element={<UrbanPlanning />} />
             <Route path="/departments/water-supply" element={<WaterSupplyDivision />} />
             <Route path="/departments/horticulture" element={<HorticultureDepartment />} />
+            <Route path="/officers-directory" element={<OfficerDirectory />} />
             <Route path="/admin" element={<AdminRedirect />} />
             <Route path="/Admin" element={<AdminRedirect />} />
             {/* 404 catch-all — must be last */}
