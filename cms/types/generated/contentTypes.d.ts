@@ -786,13 +786,14 @@ export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     designation: Schema.Attribute.String & Schema.Attribute.Required;
-    email: Schema.Attribute.Email;
+    email: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::official.official'
     > &
       Schema.Attribute.Private;
+    message: Schema.Attribute.Text;
     mobile: Schema.Attribute.String;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     office_phone: Schema.Attribute.String;
