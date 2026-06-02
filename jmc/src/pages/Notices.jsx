@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
 import {
   getNotices,
@@ -204,62 +203,29 @@ export default function Notices() {
                 ) : (
                   <ul className="space-y-3.5">
                     {currentItems.map((notice, idx) => (
-                      <li
-                        key={idx}
-                        className="group relative bg-white hover:bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.015)]"
-                      >
-                        {/* JMC Orange indicator */}
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#FF6600] rounded-l-2xl transition-colors duration-300" />
-                        
-                        <DateWidget dateStr={notice.date} />
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-2 select-none">
-                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 border rounded-full ${getCategoryBadge(notice.title).bg}`}>
-                              {getCategoryBadge(notice.title).label}
-                            </span>
-                          </div>
-                          
-                          {notice.internal ? (
-                            <Link
-                              to={notice.href}
-                              className="text-slate-800 group-hover:text-[#003366] text-sm font-semibold hover:underline transition-colors block leading-snug"
-                            >
-                              {notice.title}
-                            </Link>
-                          ) : (
-                            <a
-                              href={notice.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-slate-800 group-hover:text-[#003366] text-sm font-semibold hover:underline transition-colors block leading-snug"
-                            >
-                              {notice.title}
-                            </a>
-                          )}
+                      <li key={idx} className="py-4 flex items-start gap-4">
+                        <div className="flex-shrink-0 bg-[#003366] text-white text-center px-3 py-1.5 rounded text-xs min-w-[80px]">
+                          {notice.date}
                         </div>
-                        
-                        <div className="w-full sm:w-auto flex justify-end shrink-0 mt-3 sm:mt-0">
-                          {notice.internal ? (
-                            <Link
-                              to={notice.href}
-                              className="flex items-center gap-1.5 border border-[#FF6600]/25 text-[#FF6600] group-hover:bg-[#FF6600] group-hover:text-white text-xs font-black px-4 py-2 rounded-xl transition-all duration-300 active:scale-95 shadow-sm"
-                            >
-                              View
-                              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                            </Link>
-                          ) : (
-                            <a
-                              href={notice.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1.5 border border-[#FF6600]/25 text-[#FF6600] group-hover:bg-[#FF6600] group-hover:text-white text-xs font-black px-4 py-2 rounded-xl transition-all duration-300 active:scale-95 shadow-sm"
-                            >
-                              View
-                              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                            </a>
-                          )}
+                        <div className="flex-1">
+                          <a
+                            href={notice.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#003366] hover:text-[#FF6600] text-sm font-medium hover:underline transition-colors"
+                          >
+                            <span className="text-[#FF6600] mr-1">►</span>
+                            {notice.title}
+                          </a>
                         </div>
+                        <a
+                          href={notice.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded transition-colors"
+                        >
+                          View
+                        </a>
                       </li>
                     ))}
                   </ul>
