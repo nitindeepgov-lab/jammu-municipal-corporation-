@@ -7,8 +7,8 @@ function getImageUrl(slide) {
   const url = slide?.image?.url || slide?.image_url
   if (!url) return null
   if (url.startsWith('http://') || url.startsWith('https://')) return url
-  if (url.startsWith('/')) return url
-  return `${STRAPI_URL}${url}`
+  // Relative paths (e.g. /api/neon-uploads/...) must be served from the CMS, not the frontend origin
+  return `${STRAPI_URL}${url.startsWith('/') ? url : `/${url}`}`
 }
 
 function normaliseSlide(item) {

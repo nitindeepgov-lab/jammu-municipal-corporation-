@@ -771,6 +771,41 @@ export interface ApiNoticeNotice extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiOfficeLocationOfficeLocation
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'office_locations';
+  info: {
+    description: 'Office address cards displayed on the Contact Us page.';
+    displayName: '\uD83C\uDFE2 Contact Office';
+    pluralName: 'office-locations';
+    singularName: 'office-location';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    address: Schema.Attribute.Text & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    hours: Schema.Attribute.String;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::office-location.office-location'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    phone: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiOfficialOfficial extends Struct.CollectionTypeSchema {
   collectionName: 'officials';
   info: {
@@ -1527,6 +1562,7 @@ declare module '@strapi/strapi' {
       'api::minister.minister': ApiMinisterMinister;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
       'api::notice.notice': ApiNoticeNotice;
+      'api::office-location.office-location': ApiOfficeLocationOfficeLocation;
       'api::official.official': ApiOfficialOfficial;
       'api::photo-gallery.photo-gallery': ApiPhotoGalleryPhotoGallery;
       'api::smart-city-tender.smart-city-tender': ApiSmartCityTenderSmartCityTender;
