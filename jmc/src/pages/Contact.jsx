@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { 
   MapPin, 
@@ -6,35 +7,22 @@ import {
   ExternalLink,
   PhoneCall
 } from "lucide-react";
-
-const offices = [
-  {
-    title: "Main Office (Head Quarters)",
-    address: "Town Hall Jammu, Jammu and Kashmir 180001",
-    phone: "18001807207 (Toll Free)",
-    hours: "10:00 AM – 05:00 PM (Working Days)",
-    icon: <Landmark className="w-5 h-5 text-[#003366]" />,
-    color: "border-l-4 border-[#003366]"
-  },
-  {
-    title: "Zone – North Office",
-    address: "Peer Mitha, Jammu",
-    phone: "Contact HQ",
-    hours: "10:00 AM – 05:00 PM",
-    icon: <MapPin className="w-5 h-5 text-[#FF6600]" />,
-    color: "border-l-4 border-[#FF6600]"
-  },
-  {
-    title: "Zone – South Office",
-    address: "Bohri, Jammu",
-    phone: "Contact HQ",
-    hours: "10:00 AM – 05:00 PM",
-    icon: <MapPin className="w-5 h-5 text-[#FF6600]" />,
-    color: "border-l-4 border-[#FF6600]"
-  },
-];
+import { getOfficeLocations } from "../services/strapiApi";
 
 export default function Contact() {
+  const [offices, setOffices] = useState([]);
+  const [loadingOffices, setLoadingOffices] = useState(true);
+
+  useEffect(() => {
+    getOfficeLocations()
+      .then((res) => {
+        setOffices(res?.data?.data || []);
+      })
+      .catch(() => {
+        setOffices([]);
+      })
+      .finally(() => setLoadingOffices(false));
+  }, []);
 
   return (
     <SubpageTemplate title="Contact Us" breadcrumb={[{ name: "Contact Us" }]}>
@@ -111,33 +99,56 @@ export default function Contact() {
               </h2>
               
               <div className="space-y-4">
-                {offices.map((office, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`p-4 bg-slate-50/50 rounded-xl border border-slate-100 ${office.color} hover:bg-slate-50 hover:shadow-sm transition-all duration-300`}
-                  >
-                    <div className="flex items-center gap-2.5 mb-2">
-                      {office.icon}
-                      <h3 className="font-bold text-[#003366] text-sm">
-                        {office.title}
-                      </h3>
-                    </div>
-                    <div className="space-y-1.5 text-xs text-slate-600 pl-7">
-                      <p className="flex items-start gap-1.5">
-                        <span className="text-slate-400">Address:</span>
-                        <span>{office.address}</span>
-                      </p>
-                      <p className="flex items-center gap-1.5">
-                        <span className="text-slate-400">Phone:</span>
-                        <span className="font-semibold text-slate-700">{office.phone}</span>
-                      </p>
-                      <p className="flex items-center gap-1.5">
-                        <span className="text-slate-400">Hours:</span>
-                        <span>{office.hours}</span>
-                      </p>
-                    </div>
+                {loadingOffices ? (
+                  <div className="py-8 text-center text-sm text-slate-400">
+                    Loading office locations from CMS...
                   </div>
-                ))}
+                ) : offices.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-slate-400">
+                    No office locations are published in the CMS.
+                  </div>
+                ) : (
+                  offices.map((office, idx) => {
+                    const attr = office.attributes || office;
+                    const isMainOffice = idx === 0;
+                    const icon = isMainOffice ? (
+                      <Landmark className="w-5 h-5 text-[#003366]" />
+                    ) : (
+                      <MapPin className="w-5 h-5 text-[#FF6600]" />
+                    );
+                    const color = isMainOffice
+                      ? "border-l-4 border-[#003366]"
+                      : "border-l-4 border-[#FF6600]";
+
+                    return (
+                      <div 
+                        key={office.id ?? idx} 
+                        className={`p-4 bg-slate-50/50 rounded-xl border border-slate-100 ${color} hover:bg-slate-50 hover:shadow-sm transition-all duration-300`}
+                      >
+                        <div className="flex items-center gap-2.5 mb-2">
+                          {icon}
+                          <h3 className="font-bold text-[#003366] text-sm">
+                            {attr.title}
+                          </h3>
+                        </div>
+                        <div className="space-y-1.5 text-xs text-slate-600 pl-7">
+                          <p className="flex items-start gap-1.5">
+                            <span className="text-slate-400">Address:</span>
+                            <span>{attr.address}</span>
+                          </p>
+                          <p className="flex items-center gap-1.5">
+                            <span className="text-slate-400">Phone:</span>
+                            <span className="font-semibold text-slate-700">{attr.phone || "—"}</span>
+                          </p>
+                          <p className="flex items-center gap-1.5">
+                            <span className="text-slate-400">Hours:</span>
+                            <span>{attr.hours || "—"}</span>
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 

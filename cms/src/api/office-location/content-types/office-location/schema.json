@@ -1,11 +1,11 @@
 {
   "kind": "collectionType",
-  "collectionName": "hero_slides",
+  "collectionName": "office_locations",
   "info": {
-    "singularName": "hero-slide",
-    "pluralName": "hero-slides",
-    "displayName": "🖼️ Hero Slide",
-    "description": "Banner images shown in the homepage hero slider. Use the order field to control display sequence."
+    "singularName": "office-location",
+    "pluralName": "office-locations",
+    "displayName": "🏢 Contact Office",
+    "description": "Office address cards displayed on the Contact Us page."
   },
   "options": {
     "draftAndPublish": false
@@ -16,17 +16,15 @@
       "type": "string",
       "required": true
     },
-    "subtitle": {
+    "address": {
+      "type": "text",
+      "required": true
+    },
+    "phone": {
       "type": "string",
       "required": false
     },
-    "image": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": ["images"]
-    },
-    "image_url": {
+    "hours": {
       "type": "string",
       "required": false
     },

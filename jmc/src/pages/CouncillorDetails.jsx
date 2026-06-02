@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { logError } from "../utils/errorLogger";
 import { PROD_STRAPI_URL } from "../config/api";
-import localData from "../assets/councillorData.js";
+import { getCouncillorsPaginated } from "../services/strapiApi";
 
 // Party colour mapping with more vibrant colors
 const PARTY_STYLES = {
@@ -92,7 +92,6 @@ export default function CouncillorDetails() {
   const [councillors, setCouncillors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedWard, setSelectedWard] = useState("all");
-  const [source, setSource] = useState("cms"); // 'cms' | 'local'
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -102,82 +101,38 @@ export default function CouncillorDetails() {
   useEffect(() => {
     setLoading(true);
 
-    // Import the new paginated function
-    import("../services/strapiApi").then(({ getCouncillorsPaginated }) => {
-      getCouncillorsPaginated(currentPage, pageSize, selectedWard)
-        .then((res) => {
-          const data = res.data.data || [];
-          const meta = res.data.meta?.pagination || {};
+    getCouncillorsPaginated(currentPage, pageSize, selectedWard)
+      .then((res) => {
+        const data = res.data.data || [];
+        const meta = res.data.meta?.pagination || {};
 
-          if (data.length > 0 || currentPage === 1) {
-            setCouncillors(data);
-            setTotalPages(meta.pageCount || 1);
-            setTotalCount(meta.total || 0);
-            setSource("cms");
-          } else {
-            // Fallback to local data only on first page
-            if (currentPage === 1) {
-              const localFiltered =
-                selectedWard === "all"
-                  ? localData
-                  : localData.filter((c) => c.ward_no === selectedWard);
-
-              const start = 0;
-              const end = pageSize;
-              setCouncillors(localFiltered.slice(start, end));
-              setTotalPages(Math.ceil(localFiltered.length / pageSize));
-              setTotalCount(localFiltered.length);
-              setSource("local");
-            }
-          }
-        })
-        .catch((err) => {
-          logError("CouncillorDetails", err);
-
-          // Fallback to local data with client-side pagination
-          if (currentPage === 1) {
-            const localFiltered =
-              selectedWard === "all"
-                ? localData
-                : localData.filter((c) => c.ward_no === selectedWard);
-
-            const start = (currentPage - 1) * pageSize;
-            const end = start + pageSize;
-            setCouncillors(localFiltered.slice(start, end));
-            setTotalPages(Math.ceil(localFiltered.length / pageSize));
-            setTotalCount(localFiltered.length);
-            setSource("local");
-          }
-        })
-        .finally(() => setLoading(false));
-    });
+        setCouncillors(data);
+        setTotalPages(meta.pageCount || 1);
+        setTotalCount(meta.total || 0);
+      })
+      .catch((err) => {
+        logError("CouncillorDetails", err);
+        setCouncillors([]);
+        setTotalPages(1);
+        setTotalCount(0);
+      })
+      .finally(() => setLoading(false));
   }, [currentPage, selectedWard]);
 
-  // Normalise a councillor entry regardless of source
+  // Normalise a councillor entry from CMS data
   const normalise = (c) => {
-    if (source === "cms") {
-      return {
-        ward_no: String(c.ward_no ?? ""),
-        name: c.name,
-        party_name: c.party_name || "",
-        address: c.address || "",
-        email_id: c.email_id || "",
-        contact_no: c.contact_no || "",
-        photoUrl: c.photo?.url
-          ? c.photo.url.startsWith("http")
-            ? c.photo.url
-            : `${import.meta.env.VITE_STRAPI_URL || PROD_STRAPI_URL}${c.photo.url}`
-          : null,
-      };
-    }
     return {
-      ward_no: c.ward_no,
+      ward_no: String(c.ward_no ?? ""),
       name: c.name,
       party_name: c.party_name || "",
       address: c.address || "",
       email_id: c.email_id || "",
       contact_no: c.contact_no || "",
-      photoUrl: null,
+      photoUrl: c.photo?.url
+        ? c.photo.url.startsWith("http")
+          ? c.photo.url
+          : `${import.meta.env.VITE_STRAPI_URL || PROD_STRAPI_URL}${c.photo.url}`
+        : null,
     };
   };
 

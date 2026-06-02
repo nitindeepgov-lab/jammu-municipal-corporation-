@@ -4,24 +4,6 @@ import { Link } from "react-router-dom";
 import { getOfficials } from "../services/strapiApi";
 import { rtiDocuments } from "./rtiDocuments";
 
-const fallbackOfficers = [
-  {
-    name: "Chand Singh, JKAS",
-    designation: "Secretary, JMC",
-    rti_role: "PIO",
-  },
-  {
-    name: "Rajeev Khajuria, JKAS",
-    designation: "Joint Commissioner (Adm.)",
-    rti_role: "First Appellate Authority",
-  },
-  {
-    name: "Mr. Devansh Yadav, IAS",
-    designation: "Municipal Commissioner",
-    rti_role: "Second Appellate Authority",
-  },
-];
-
 export default function RTI() {
   const [officers, setOfficers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,12 +38,12 @@ export default function RTI() {
           );
           setOfficers(filtered);
         } else {
-          setOfficers(fallbackOfficers);
+          setOfficers([]);
         }
       })
       .catch((err) => {
         console.error("Failed to load RTI officers:", err);
-        setOfficers(fallbackOfficers);
+        setOfficers([]);
       })
       .finally(() => {
         setLoading(false);
@@ -101,6 +83,12 @@ export default function RTI() {
                         <div className="w-5 h-5 border-2 border-gray-200 border-t-[#003366] rounded-full animate-spin" />
                         <span className="text-xs text-gray-500 font-semibold">Loading PIO list...</span>
                       </div>
+                    </td>
+                  </tr>
+                ) : officers.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="text-center py-8 text-gray-400 text-sm">
+                      No RTI officers are published in the CMS.
                     </td>
                   </tr>
                 ) : (

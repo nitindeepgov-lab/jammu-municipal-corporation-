@@ -3,32 +3,25 @@ import NewsTicker from './NewsTicker'
 import { getHeroSlides } from '../../services/strapiApi'
 import { STRAPI_URL } from '../../config/api'
 
-// Fallback slides used until CMS data loads or if CMS has no entries
-const FALLBACK_SLIDES = [
-  { image: '/banner/jmc-office.jpeg',  title: 'Infrastructure Development',      subtitle: 'Building roads, parks, and amenities for a better Jammu' },
-  { image: '/banner/banner10.png',     title: 'Jammu Municipal Corporation',     subtitle: 'Committed to serving the residents of Jammu City' },
-  { image: '/banner/banner9.jpg',      title: 'Cleaner, Greener Jammu',          subtitle: "JMC's commitment to sanitation and environment" },
-  { image: '/banner/banner1.jpg',      title: 'Infrastructure Development',      subtitle: 'Building roads, parks, and amenities for a better Jammu' },
-  { image: '/banner/banner8.jpeg',     title: 'Infrastructure Development',      subtitle: 'Building roads, parks, and amenities for a better Jammu' },
-]
-
 function getImageUrl(slide) {
-  const url = slide?.image?.url
+  const url = slide?.image?.url || slide?.image_url
   if (!url) return null
   if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (url.startsWith('/')) return url
   return `${STRAPI_URL}${url}`
 }
 
 function normaliseSlide(item) {
   return {
-    image: getImageUrl(item) || '/banner/banner10.png',
+    image: getImageUrl(item),
     title: item.title || '',
     subtitle: item.subtitle || '',
   }
 }
 
 export default function HeroSlider() {
-  const [slides, setSlides] = useState(FALLBACK_SLIDES)
+  const [slides, setSlides] = useState([])
+  const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState(0)
   const timerRef = useRef(null)
 
@@ -36,18 +29,20 @@ export default function HeroSlider() {
     getHeroSlides()
       .then((res) => {
         const data = res?.data?.data || []
-        if (data.length > 0) {
-          setSlides(data.map(normaliseSlide))
-        }
-        // If CMS empty, keep fallback slides
+        setSlides(data.map(normaliseSlide).filter((slide) => slide.image))
       })
-      .catch(() => {
-        // Keep fallback slides on error
-      })
+      .catch(() => setSlides([]))
+      .finally(() => setLoading(false))
   }, [])
 
-  const next = () => setCurrent(c => (c + 1) % slides.length)
-  const prev = () => setCurrent(c => (c - 1 + slides.length) % slides.length)
+  const next = () => {
+    if (slides.length <= 1) return
+    setCurrent((c) => (c + 1) % slides.length)
+  }
+  const prev = () => {
+    if (slides.length <= 1) return
+    setCurrent((c) => (c - 1 + slides.length) % slides.length)
+  }
 
   useEffect(() => {
     if (slides.length <= 1) return
@@ -63,7 +58,18 @@ export default function HeroSlider() {
 
       {/* ── Slide images ── */}
       <div className="relative h-[220px] sm:h-[320px] md:h-[460px] lg:h-[490px]">
-        {slides.map((slide, idx) => (
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-[#002b5e] to-[#001f3d] text-white">
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="text-sm font-medium tracking-wide">Loading CMS banners...</span>
+            </div>
+          </div>
+        ) : slides.length === 0 ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-[#002b5e] to-[#001f3d] text-white">
+            <span className="text-sm font-medium tracking-wide">No banner slides are published in the CMS.</span>
+          </div>
+        ) : slides.map((slide, idx) => (
           <div
             key={idx}
             className={`absolute inset-0 transition-opacity duration-1000 ${idx === current ? 'opacity-100' : 'opacity-0'}`}
@@ -82,13 +88,17 @@ export default function HeroSlider() {
         ))}
       </div>
 
-        {/* ── Arrows ── */}
-        <button onClick={prev} className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-[#FF6600] text-white p-1.5 sm:p-2.5 rounded-full transition-colors z-10" aria-label="Previous slide">
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button onClick={next} className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-[#FF6600] text-white p-1.5 sm:p-2.5 rounded-full transition-colors z-10" aria-label="Next slide">
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
-        </button>
+        {slides.length > 1 && (
+          <>
+            {/* ── Arrows ── */}
+            <button onClick={prev} className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-[#FF6600] text-white p-1.5 sm:p-2.5 rounded-full transition-colors z-10" aria-label="Previous slide">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button onClick={next} className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-[#FF6600] text-white p-1.5 sm:p-2.5 rounded-full transition-colors z-10" aria-label="Next slide">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </>
+        )}
 
       <NewsTicker />
 

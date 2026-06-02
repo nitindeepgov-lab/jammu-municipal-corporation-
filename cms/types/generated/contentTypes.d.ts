@@ -607,7 +607,8 @@ export interface ApiHeroSlideHeroSlide extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    image: Schema.Attribute.Media<'images'>;
+    image_url: Schema.Attribute.String;
     is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

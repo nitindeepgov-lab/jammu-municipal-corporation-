@@ -2,11 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { getNewsTickerItems } from "../../services/strapiApi";
 import { logError } from "../../utils/errorLogger";
 
-// Fallback items shown while loading or if the API is unavailable
-const FALLBACK_ITEMS = [{ text: "Loading latest news...", href: "#" }];
-
 export default function NewsTicker() {
-  const [newsItems, setNewsItems] = useState(FALLBACK_ITEMS);
+  const [newsItems, setNewsItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const [animKey, setAnimKey] = useState(0);
   const timerRef = useRef(null);
@@ -30,8 +28,9 @@ export default function NewsTicker() {
       })
       .catch((err) => {
         logError("NewsTicker", err);
-        // Keep fallback — news ticker stays functional
-      });
+        setNewsItems([]);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const goTo = (idx) => {
@@ -42,6 +41,7 @@ export default function NewsTicker() {
   const prev = () => goTo((current - 1 + newsItems.length) % newsItems.length);
 
   useEffect(() => {
+    if (newsItems.length <= 1) return;
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setCurrent((c) => {
@@ -52,6 +52,14 @@ export default function NewsTicker() {
     }, 4500);
     return () => clearInterval(timerRef.current);
   }, [current, newsItems.length]);
+
+  if (loading) {
+    return null;
+  }
+
+  if (newsItems.length === 0) {
+    return null;
+  }
 
   const item = newsItems[current];
   const linkProps =

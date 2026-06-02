@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getOfficials } from "../services/strapiApi";
+import { STRAPI_URL } from "../config/api";
 
 export default function Officials() {
   const [officials, setOfficials] = useState([]);
@@ -82,7 +83,7 @@ export default function Officials() {
                     <div className="w-28 h-28 rounded-full bg-gray-100 p-1 border border-gray-200 overflow-hidden">
                       {officer.picture?.url ? (
                         <img
-                          src={officer.picture.url}
+                          src={officer.picture.url.startsWith("http") ? officer.picture.url : `${STRAPI_URL}${officer.picture.url}`}
                           alt={officer.name}
                           className="w-full h-full object-cover rounded-full"
                         />

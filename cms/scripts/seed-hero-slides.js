@@ -70,9 +70,9 @@ async function main() {
       const docId = Math.random().toString(36).substring(2, 16);
       
       await client.query(
-        `INSERT INTO hero_slides (document_id, title, subtitle, image_url, "order", created_at, updated_at, published_at) 
-         VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), NOW())`,
-        [docId, slide.title, slide.subtitle, slide.image_url, slide.order]
+        `INSERT INTO hero_slides (document_id, title, subtitle, image_url, "order", is_active, created_at, updated_at, published_at) 
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW(), NOW())`,
+        [docId, slide.title, slide.subtitle, slide.image_url, slide.order, true]
       );
       console.log(`✅ Seeded slide: "${slide.title}"`);
       inserted++;

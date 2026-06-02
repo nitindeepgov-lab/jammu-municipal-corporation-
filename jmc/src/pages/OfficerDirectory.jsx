@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import SubpageTemplate from "../components/SubpageTemplate";
-import { getOfficials } from "../services/strapiApi";
+import { getOfficials, getCouncillors } from "../services/strapiApi";
 import { STRAPI_URL } from "../config/api";
-import localData from "../assets/councillorData";
 import { 
   Search, 
   Mail, 
@@ -14,6 +13,7 @@ export default function OfficerDirectory() {
   const [officers, setOfficers] = useState([]);
   const [councillors, setCouncillors] = useState([]);
   const [loadingOfficers, setLoadingOfficers] = useState(true);
+  const [loadingCouncillors, setLoadingCouncillors] = useState(true);
   const [activeTab, setActiveTab] = useState("admin"); // 'admin' | 'sanitation' | 'enforcement' | 'works' | 'councillors'
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -29,6 +29,7 @@ export default function OfficerDirectory() {
 
   useEffect(() => {
     setLoadingOfficers(true);
+    setLoadingCouncillors(true);
     
     // Fetch administrative officials
     getOfficials()
@@ -41,20 +42,14 @@ export default function OfficerDirectory() {
       .finally(() => setLoadingOfficers(false));
 
     // Fetch councillors list
-    import("../services/strapiApi").then(({ getCouncillors }) => {
-      getCouncillors()
-        .then((res) => {
-          const data = res?.data?.data || [];
-          if (data.length > 0) {
-            setCouncillors(data);
-          } else {
-            setCouncillors(localData);
-          }
-        })
-        .catch(() => {
-          setCouncillors(localData);
-        });
-    });
+    getCouncillors()
+      .then((res) => {
+        setCouncillors(res?.data?.data || []);
+      })
+      .catch(() => {
+        setCouncillors([]);
+      })
+      .finally(() => setLoadingCouncillors(false));
   }, []);
 
   const getStaffCategory = (designation = "") => {
@@ -250,6 +245,15 @@ export default function OfficerDirectory() {
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
                 {loadingOfficers && activeTab !== "councillors" && officers.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-slate-200 border-t-[#003366] rounded-full animate-spin" />
+                        <span>Loading directory data...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : loadingCouncillors && activeTab === "councillors" ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-slate-400">
                       <div className="flex items-center justify-center gap-2">
