@@ -296,10 +296,10 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
             <div className="hidden lg:flex items-center ml-4">
               <Link
                 to="/employee-corner"
-                className={`flex items-center px-4 py-1.5 rounded-lg text-[13px] font-bold tracking-wide transition-all duration-200 border whitespace-nowrap shadow-sm
+                className={`flex items-center px-4 py-1.5 rounded-lg text-[13px] font-bold tracking-wide transition-all duration-200 border border-white whitespace-nowrap shadow-sm bg-white text-[#002B5E] hover:bg-slate-100 hover:text-[#002B5E]/90
                   ${location.pathname === "/employee-corner"
-                    ? "bg-white text-[#002B5E] border-white shadow-inner"
-                    : "bg-white/5 text-slate-200 hover:text-white hover:bg-white/15 border-white/10 hover:border-white/20"
+                    ? "shadow-inner bg-slate-50"
+                    : ""
                   }`}
               >
                 <svg
