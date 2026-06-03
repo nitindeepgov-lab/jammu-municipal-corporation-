@@ -61,7 +61,7 @@ const IMPORTANT_LINKS = [
   },
   {
     name: "Tenders",
-    href: "https://jmc.jk.gov.in/tenders.aspx",
+    href: "/notices",
     icon: FileText,
   },
 ];

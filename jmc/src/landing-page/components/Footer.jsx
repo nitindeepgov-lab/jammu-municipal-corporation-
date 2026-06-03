@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import {
   getVisitorCount,
   incrementVisitorCount,
+  getFooterLinks,
 } from "../../services/strapiApi";
 import { logError } from "../../utils/errorLogger";
 
 let hasIncrementedVisitorCount = false;
 
-const footerNavLinks = [
+// ── Static nav links (bottom policy bar — always static, not CMS-managed) ───
+
+const STATIC_NAV_LINKS = [
   { name: "Home", to: "/" },
   { name: "About Us", to: "/about" },
   { name: "Feedback", to: "/feedback" },
@@ -24,29 +27,35 @@ const footerNavLinks = [
   { name: "Terms & Conditions", to: "/terms-conditions" },
 ];
 
-const footerColumns = [
+// ── Static column fallback (used only when CMS is unreachable) ───────────────
+
+const STATIC_COLUMNS = [
   {
     title: "Quick Links",
     links: [
-      { name: "About JMC", to: "/about" },
-      { name: "About Jammu City", to: "/information/about-jammu-city" },
-      { name: "Photo Gallery", to: "/gallery" },
-      { name: "Tenders", to: "/notices" },
-      { name: "Public Notices", to: "/notices" },
-      { name: "E-Newsletter", to: "/notices" },
-      { name: "RTI", to: "/rti" },
+      { name: "About JMC", url: "/about", is_external: false },
+      {
+        name: "About Jammu City",
+        url: "/information/about-jammu-city",
+        is_external: false,
+      },
+      { name: "Photo Gallery", url: "/gallery", is_external: false },
+      { name: "Tenders", url: "/notices", is_external: false },
+      { name: "Public Notices", url: "/notices", is_external: false },
+      { name: "E-Newsletter", url: "/notices", is_external: false },
+      { name: "RTI", url: "/rti", is_external: false },
     ],
   },
   {
     title: "Citizen Services",
     links: [
-      { name: "Pay Online", to: "/pay-online" },
-      { name: "Register a Complaint", to: "/feedback" },
-      { name: "Apply for Rehri License", to: "/egov" },
-      { name: "Building Permission", to: "/egov" },
-      { name: "Birth / Death Certificate", to: "/egov" },
-      { name: "Trade License", to: "/egov" },
-      { name: "E-Tendering", to: "/egov" },
+      { name: "Pay Online", url: "/pay-online", is_external: false },
+      { name: "Register a Complaint", url: "/feedback", is_external: false },
+      { name: "Apply for Rehri License", url: "/egov", is_external: false },
+      { name: "Building Permission", url: "/egov", is_external: false },
+      { name: "Birth / Death Certificate", url: "https://serviceonline.gov.in/jammu/", is_external: true },
+      { name: "Trade License", url: "/egov", is_external: false },
+      { name: "E-Tendering", url: "/egov", is_external: false },
     ],
   },
   {
@@ -54,50 +63,112 @@ const footerColumns = [
     links: [
       {
         name: "Achievements",
-        href: "https://jmc.jk.gov.in/forms/achievement1.pdf",
+        url: "/footer/achievement1.pdf",
+        is_external: true,
       },
-      { name: "Smart City Projects", to: "/smart-city" },
-      { name: "Swachh Bharat Mission", to: "/swachh-mission" },
-      { name: "Council Updates", to: "/notices" },
-      { name: "E-Governance Portal", to: "/egov" },
-      { name: "Polythene Control", to: "/information/polythene-control" },
-      { name: "Commissioner's Desk", to: "/commissioner" },
+      { name: "Smart City Projects", url: "/smart-city", is_external: false },
+      {
+        name: "Swachh Bharat Mission",
+        url: "/swachh-mission",
+        is_external: false,
+      },
+      { name: "Council Updates", url: "/notices", is_external: false },
+      { name: "E-Governance Portal", url: "/egov", is_external: false },
+      {
+        name: "Polythene Control",
+        url: "/information/polythene-control",
+        is_external: false,
+      },
+      { name: "Commissioner's Desk", url: "/commissioner", is_external: false },
     ],
   },
 ];
 
+// Ordered column definitions — drives display order and column titles
+const COLUMN_DEFS = [
+  { section: "quick-links", title: "Quick Links" },
+  { section: "citizen-services", title: "Citizen Services" },
+  { section: "information", title: "Information" },
+];
+
+// ── Helper: group flat CMS link array by section ─────────────────────────────
+
+function buildColumnsFromCMS(items) {
+  // Group items by section
+  const bySection = {};
+  for (const item of items) {
+    if (!bySection[item.section]) bySection[item.section] = [];
+    bySection[item.section].push(item);
+  }
+
+  // Map to column structure, preserving order defined in COLUMN_DEFS
+  return COLUMN_DEFS.map(({ section, title }) => ({
+    title,
+    links: bySection[section] ?? [],
+  })).filter((col) => col.links.length > 0);
+}
+
+// ── FooterLink renderer ───────────────────────────────────────────────────────
+
 function FooterLink({ link }) {
   const cls =
     "text-gray-400 text-[13px] hover:text-[#FF6600] transition-colors duration-200";
-  if (link.to)
+
+  if (link.is_external || link.url?.startsWith("http")) {
     return (
-      <Link to={link.to} className={cls}>
+      <a
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cls}
+      >
         {link.name}
-      </Link>
+      </a>
     );
+  }
+
   return (
-    <a
-      href={link.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cls}
-    >
+    <Link to={link.url} className={cls}>
       {link.name}
-    </a>
+    </Link>
   );
 }
 
+// ── Column skeleton while loading ─────────────────────────────────────────────
+
+function ColumnSkeleton() {
+  return (
+    <>
+      {COLUMN_DEFS.map((_, idx) => (
+        <div key={idx}>
+          <div className="h-4 bg-white/5 rounded animate-pulse w-24 mb-4" />
+          <ul className="space-y-2.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <li key={i}>
+                <span className="inline-block h-3 bg-white/5 rounded animate-pulse w-28" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </>
+  );
+}
+
+// ── Main Footer component ─────────────────────────────────────────────────────
+
 export default function Footer() {
   const [visitorCount, setVisitorCount] = useState(null);
+  // null = loading | array = ready (either CMS data or static fallback)
+  const [columns, setColumns] = useState(null);
 
+  // ── Visitor counter ───────────────────────────────────────────────────────
   useEffect(() => {
     let isActive = true;
 
     const applyCount = (count) => {
       if (!isActive) return;
-      if (Number.isFinite(count)) {
-        setVisitorCount(count);
-      }
+      if (Number.isFinite(count)) setVisitorCount(count);
     };
 
     const loadVisitorCount = async () => {
@@ -111,7 +182,6 @@ export default function Footer() {
       } catch (error) {
         logError("VisitorCount", error);
       }
-
       try {
         const res = await getVisitorCount();
         applyCount(res?.data?.count);
@@ -121,7 +191,60 @@ export default function Footer() {
     };
 
     loadVisitorCount();
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
+  // ── Footer column links from CMS ─────────────────────────────────────────
+  useEffect(() => {
+    let isActive = true;
+
+    const loadFooterLinks = async () => {
+      try {
+        console.log("[Footer] 🔄 Fetching footer links from CMS...");
+        const res = await getFooterLinks();
+        if (!isActive) return;
+
+        // Strapi v5 response: { data: [ { id, documentId, name, url, ... } ], meta: {...} }
+        const items = Array.isArray(res?.data?.data)
+          ? res.data.data
+          : Array.isArray(res?.data)
+            ? res.data // fallback in case axios unwraps differently
+            : [];
+
+        console.log(
+          `[Footer] ✅ Fetched ${items.length} footer links from CMS:`,
+          items,
+        );
+
+        if (items.length === 0) {
+          // CMS returned no active column links → use static fallback
+          console.warn(
+            "[Footer] ⚠️  No active footer links in CMS, using static fallback",
+          );
+          setColumns(STATIC_COLUMNS);
+          return;
+        }
+
+        const built = buildColumnsFromCMS(items);
+        console.log("[Footer] 📋 Built columns from CMS:", built);
+        setColumns(built.length > 0 ? built : STATIC_COLUMNS);
+      } catch (error) {
+        console.error("[Footer] ❌ Error loading footer links:", error.message);
+        console.error("[Footer] Full error object:", error);
+        if (error.response) {
+          console.error("[Footer] API Response status:", error.response.status);
+          console.error("[Footer] API Response data:", error.response.data);
+        }
+        logError("FooterLinks", error);
+        if (!isActive) return;
+        console.warn("[Footer] Using static fallback due to error");
+        setColumns(STATIC_COLUMNS); // Silent fallback on any error
+      }
+    };
+
+    loadFooterLinks();
     return () => {
       isActive = false;
     };
@@ -239,10 +362,10 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Main footer */}
+      {/* Main footer body */}
       <div className="max-w-[1200px] mx-auto px-4 py-10">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-6">
-          {/* Brand column — takes 2 cols on md */}
+          {/* Brand column — spans 2 cols on md */}
           <div className="col-span-2">
             <div className="flex items-center gap-3 mb-5">
               <img
@@ -331,49 +454,42 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Link columns */}
-          {footerColumns.map((col, idx) => (
-            <div key={idx}>
-              <h4 className="font-semibold text-[13px] text-white uppercase tracking-wider mb-4 pb-2 border-b border-[#FF6600]/30 flex items-center gap-2">
-                <span className="w-1 h-4 bg-[#FF6600] rounded-full inline-block" />
-                {col.title}
-              </h4>
-              <ul className="space-y-2.5">
-                {col.links.map((link, lidx) => (
-                  <li key={lidx}>
-                    <FooterLink link={link} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* CMS-managed link columns — skeleton while loading */}
+          {columns === null ? (
+            <ColumnSkeleton />
+          ) : (
+            columns.map((col, idx) => (
+              <div key={idx}>
+                <h4 className="font-semibold text-[13px] text-white uppercase tracking-wider mb-4 pb-2 border-b border-[#FF6600]/30 flex items-center gap-2">
+                  <span className="w-1 h-4 bg-[#FF6600] rounded-full inline-block" />
+                  {col.title}
+                </h4>
+                <ul className="space-y-2.5">
+                  {col.links.map((link, lidx) => (
+                    <li key={link.documentId ?? lidx}>
+                      <FooterLink link={link} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Policy links row */}
+      {/* Bottom policy nav bar — always static */}
       <div className="border-t border-white/5">
         <div className="max-w-[1200px] mx-auto px-4 py-3">
           <nav className="flex flex-wrap justify-center gap-x-1 gap-y-1">
-            {footerNavLinks.map((link, idx) => (
+            {STATIC_NAV_LINKS.map((link, idx) => (
               <span key={idx} className="flex items-center">
-                {link.to ? (
-                  <Link
-                    to={link.to}
-                    className="text-gray-500 hover:text-gray-300 text-[11px] transition-colors px-1.5"
-                  >
-                    {link.name}
-                  </Link>
-                ) : (
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-gray-300 text-[11px] transition-colors px-1.5"
-                  >
-                    {link.name}
-                  </a>
-                )}
-                {idx < footerNavLinks.length - 1 && (
+                <Link
+                  to={link.to}
+                  className="text-gray-500 hover:text-gray-300 text-[11px] transition-colors px-1.5"
+                >
+                  {link.name}
+                </Link>
+                {idx < STATIC_NAV_LINKS.length - 1 && (
                   <span className="text-white/10 text-[10px]">|</span>
                 )}
               </span>
@@ -382,6 +498,7 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Copyright / version bar */}
       <div className="bg-[#060e1a] border-t border-white/5">
         <div className="max-w-[1200px] mx-auto px-4 py-5">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
