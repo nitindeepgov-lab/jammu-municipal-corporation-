@@ -134,7 +134,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
 
   // Beautiful modern styling classes
   const subLinkClass =
-    "block px-5 py-3 text-slate-600 hover:text-[#003366] hover:bg-slate-50 text-[13px] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:border-[#FF6600]";
+    "block px-5 py-3 text-slate-600 hover:text-[#003366] hover:bg-slate-50 text-[13px] font-bold transition-all duration-300 border-l-[3px] border-transparent hover:border-[#FF6600] hover:translate-x-1 transform";
   const mobileSubLinkClass =
     "flex items-center px-8 py-3.5 text-slate-300 hover:text-white hover:bg-white/5 text-[13px] border-b border-white/5 last:border-0 transition-colors";
 
@@ -146,7 +146,7 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
   return (
     <>
       {/* Main Navigation Bar */}
-      <nav className="bg-[#002B5E] sticky top-0 z-50 shadow-lg border-b-2 border-[#FF6600]">
+      <nav className="bg-gradient-to-r from-[#002B5E] via-[#003875] to-[#002B5E] sticky top-0 z-50 shadow-xl border-b-2 border-[#FF6600] backdrop-blur-md bg-opacity-95">
         <div className="max-w-[1300px] mx-auto px-4 lg:px-6">
           <div className="flex items-center justify-between lg:justify-start h-[48px]">
             {/* Mobile: Hamburger Button */}
@@ -292,25 +292,32 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
               })}
             </ul>
 
-            {/* Search Icon */}
-            <button
-              className="flex-shrink-0 hidden lg:flex items-center justify-center text-white/80 w-10 h-10 rounded-full hover:bg-white/10 hover:text-white transition-colors"
-              aria-label="Search"
-            >
-              <svg
-                className="w-4 h-4 shadow-sm"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* Employee Corner */}
+            <div className="hidden lg:flex items-center ml-4">
+              <Link
+                to="/employee-corner"
+                className={`flex items-center px-4 py-1.5 rounded-lg text-[13px] font-bold tracking-wide transition-all duration-200 border whitespace-nowrap shadow-sm
+                  ${location.pathname === "/employee-corner"
+                    ? "bg-white text-[#002B5E] border-white shadow-inner"
+                    : "bg-white/5 text-slate-200 hover:text-white hover:bg-white/15 border-white/10 hover:border-white/20"
+                  }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button>
+                <svg
+                  className="w-3.5 h-3.5 mr-2 opacity-80"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                Employee Corner
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
@@ -470,6 +477,32 @@ export default function Navigation({ mobileMenuOpen, setMobileMenuOpen }) {
               </li>
             );
           })}
+          {/* Custom Mobile Drawer Item: Employee Corner */}
+          <li className="border-b border-white/5 last:border-0">
+            <div className="flex items-stretch min-h-[52px]">
+              <Link
+                to="/employee-corner"
+                onClick={closeMobileMenu}
+                className={`flex-1 flex items-center px-6 py-3.5 text-sm font-medium transition-colors ${
+                  location.pathname === "/employee-corner"
+                    ? "bg-gradient-to-r from-[#FF6600]/10 to-transparent text-white border-l-2 border-[#FF6600]"
+                    : "text-slate-200 hover:bg-white/5 hover:text-white border-l-2 border-transparent"
+                }`}
+              >
+                <span
+                  className={`mr-3 text-lg leading-none ${
+                    location.pathname === "/employee-corner" ? "text-[#FF6600]" : "text-slate-500"
+                  }`}
+                >
+                  ·
+                </span>
+                Employee Corner
+                <span className="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FF6600] text-white animate-pulse">
+                  Portal
+                </span>
+              </Link>
+            </div>
+          </li>
         </ul>
 
         {/* Drawer Footer — Helpline */}

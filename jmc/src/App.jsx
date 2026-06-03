@@ -83,6 +83,13 @@ const WaterSupplyDivision = lazy(() => import("./pages/WaterSupplyDivision"));
 const HorticultureDepartment = lazy(() => import("./pages/HorticultureDepartment"));
 const OfficerDirectory = lazy(() => import("./pages/OfficerDirectory"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const EmployeeCorner = lazy(() => import("./pages/EmployeeCorner"));
+const SalaryCertificate = lazy(() => import("./pages/SalaryCertificate"));
+const PaySlip = lazy(() => import("./pages/PaySlip"));
+const PayStatement = lazy(() => import("./pages/PayStatement"));
+const FileDropbox = lazy(() => import("./pages/FileDropbox"));
+const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
+const FileMonitoring = lazy(() => import("./pages/FileMonitoring"));
 
 // Policy pages — loaded as a group
 const PolicyPages = lazy(() => import("./pages/PolicyPages"));
@@ -147,6 +154,13 @@ export default function App() {
             <Route path="/egov" element={<EGov />} />
             <Route path="/news/:id" element={<News />} />
             <Route path="/pay-online" element={<PayOnline />} />
+            <Route path="/employee-corner" element={<EmployeeCorner />} />
+            <Route path="/employee-corner/salary-certificate" element={<SalaryCertificate />} />
+            <Route path="/employee-corner/pay-slip" element={<PaySlip />} />
+            <Route path="/employee-corner/pay-statement" element={<PayStatement />} />
+            <Route path="/employee-corner/file-dropbox" element={<FileDropbox />} />
+            <Route path="/employee-corner/knowledge-base" element={<KnowledgeBase />} />
+            <Route path="/employee-corner/file-monitoring" element={<FileMonitoring />} />
             <Route path="/payment-status" element={<PaymentStatus />} />
             <Route path="/payment-result" element={<PaymentStatus />} />
             <Route path="/web-info-manager" element={<WebInfoManager />} />

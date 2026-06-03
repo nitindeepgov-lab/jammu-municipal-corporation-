@@ -268,7 +268,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["birth", "death", "certificate", "born", "died"],
     q: "How do I apply for birth/death certificate?",
-    a: "Apply for birth or death certificate through the **JAKSMAC e-service portal** (serviceonline.gov.in/jammu).\n\nThe link is available on the E-Governance page and the Services page of the JMC website.",
+    a: "You can apply for a Birth or Death Certificate through the official **JAKSMAC e-service portal**:\n\nhttps://serviceonline.gov.in/jammu\n\n**Process:**\n1. Register or log in to the portal using the link above.\n2. Search for the \"Birth Certificate\" or \"Death Certificate\" service.\n3. Complete the online application form with parentage, date, and location details.\n4. Upload the required documents and submit the form.\n5. Pay the processing fee online (if applicable).\n6. Track application status; once approved, download the certificate from the portal.\n\n**Eligibility:** The birth or death must have occurred within Jammu municipal limits.\n**Required Documents:** Hospital discharge slip / institutional reporting format OR ward councillor/local authority verification report (for home births), identity proof of parent/applicant, and address proof.\n**Timeline & Fees:** Free if registered within 21 days of occurrence. A late fee applies for delayed registrations. Standard processing takes 7-15 working days.",
     followUps: ["egov-services", "contact-helpline"],
   },
   {
@@ -276,7 +276,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["building", "permission", "plan", "construction", "sanction", "approval"],
     q: "How do I apply for building permission?",
-    a: "Apply for building plan permission through the **HUDD BPS portal** (jkhuddobps.in).\n\nThe link is available on the E-Governance page. For queries, contact the Building Officer:\n• Kamal Kishore — 8492081239\n• Kapil Khajuria — 9018896437",
+    a: "You can apply for building plan permission through the official **HUDD BPS portal**:\n\nhttps://jkhuddobps.in\n\n**Process:**\n1. Register as a citizen or architect and log in to the HUDD BPS portal.\n2. Select \"Building Permission Application\" and fill in construction & structural details.\n3. Upload structural drawing maps, land ownership deeds, and required NOCs.\n4. Pay the online scrutiny fee.\n5. Track verification status; the site inspector will conduct physical inspection.\n6. Receive final building plan sanction online.\n\n**Required Documents:** Property ownership documents (sale deed/fard), structural safety certificate, site plan and elevation maps, and NOCs from PHE/PDD/Revenue sections.\n**Timeline & Fees:** Fee varies based on plot area and building category. Sanction takes 30-45 days. For queries, contact Building Officers:\n• Kamal Kishore — 8492081239\n• Kapil Khajuria — 9018896437",
     followUps: ["egov-services", "urban-planning-dept"],
   },
   {
@@ -284,7 +284,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["trade", "license", "business", "shop", "renew", "noc"],
     q: "How do I get a trade license?",
-    a: "Apply for or renew your trade license through the **JanSugam portal** (jansugam.jk.gov.in).\n\nYou can also apply for NOC (No Objection Certificate) through the same portal. The link is on the E-Governance and Services pages.",
+    a: "You can apply for or renew a Trade License and obtain No Objection Certificates (NOC) through the official **JanSugam portal**:\n\nhttps://jansugam.jk.gov.in/login.do\n\n**Process:**\n1. Log in or register on the JanSugam portal using the link above.\n2. Select the \"Trade License / Online NOC\" service.\n3. Fill in business details, exact location, and owner information.\n4. Upload the required documents (ownership proof, site plan, NOCs).\n5. Pay the license fee online based on the nature of the business.\n6. Track application status and download the issued trade license.\n\n**Required Documents:** Business premise proof (rent deed or ownership proof), identity proof, electricity bill, and department-specific NOCs (like fire safety or health NOC).\n**Timeline & Fees:** Annual fee varies by business type. Issuance takes 15-30 working days.",
     followUps: ["egov-services", "rehri-license"],
   },
   {
@@ -292,7 +292,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["rehri", "street vendor", "stall", "hawker", "vendor license"],
     q: "How do I get a rehri/street vendor license?",
-    a: "Apply for a Rehri (street vendor) license through the **JAKSMAC portal** (serviceonline.gov.in/jammu).\n\nThe link is available on the E-Governance page of the JMC website.",
+    a: "You can apply for a Rehri (street vendor) license through the official **JAKSMAC portal**:\n\nhttps://serviceonline.gov.in/jammu\n\n**Process:**\n1. Log in or register on the portal using the link above.\n2. Search for \"Rehri License\" or \"Street Vendor Registration\".\n3. Fill in the vendor detail form, selected zone, and item category.\n4. Upload ID proof and your photo.\n5. Submit application for JMC vetting and approval.\n\n**Required Documents:** Aadhaar card (identity proof), passport photograph, address proof, and character declaration.\n**Timeline & Fees:** Low annual fee. Registration takes 10-15 working days.",
     followUps: ["trade-license", "egov-services"],
   },
   {
@@ -300,7 +300,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["pet", "dog", "animal", "register pet"],
     q: "How do I register my pet dog?",
-    a: "Register your pet dog with JMC through the **JAKSMAC portal** (serviceonline.gov.in/jammu).\n\nFor animal welfare issues, contact:\n• Dr. Jaswant Singh, JKAS (Municipal Veterinary Officer) — 9797682216\n• Dr. Gaurav Chowdhary (Animal Welfare Officer) — 9797371677",
+    a: "You can register your pet dog with JMC through the official **JAKSMAC portal**:\n\nhttps://serviceonline.gov.in/jammu\n\n**Process:**\n1. Register or log in to the portal using the link above.\n2. Select \"Pet Dog Registration\" service.\n3. Enter owner information and pet description.\n4. Upload veterinary vaccination record and pet photo.\n5. Pay the annual registration fee online and submit.\n\n**Required Documents:** Anti-rabies vaccination card from a registered veterinarian, pet photo, owner's ID, and address proof.\n**Timeline & Fees:** Annual registration fee. Approved in 5-7 working days. For animal welfare issues, contact:\n• Dr. Jaswant Singh, JKAS (Municipal Veterinary Officer) — 9797682216\n• Dr. Gaurav Chowdhary (Animal Welfare Officer) — 9797371677",
     followUps: ["egov-services"],
   },
   {
@@ -308,7 +308,7 @@ const knowledgeBase = [
     cat: "services",
     kw: ["water", "tanker", "water supply", "booking", "no water"],
     q: "How do I book a water tanker?",
-    a: "Book a water tanker online through the **MyJammu portal** (myjammu.in).\n\nFor water supply emergencies, contact:\n• Sunil Gandotra (SE, PHE) — 9419147521\n• PHE Water Supply Helpline numbers are available as PDF on the Contact page.\n• Toll-free: **18001807207**",
+    a: "You can book a water tanker online through the official **MyJammu portal**:\n\nhttps://myjammu.in\n\n**Process:**\n1. Log in to the MyJammu portal using the link above.\n2. Select \"Water Tanker Booking\".\n3. Provide the delivery address, ward number, and your contact info.\n4. Pay the booking fee online.\n5. The PHE department will schedule and dispatch the tanker.\n\n**Required Documents:** None required (just address, ward number, and active mobile number).\n**Timeline & Fees:** Tanker delivery takes 12-24 hours depending on demand. For water supply emergencies, contact:\n• Sunil Gandotra (SE, PHE) — 9419147521\n• PHE Water Supply Helpline numbers are available as PDF on the Contact page.\n• Toll-free: **18001807207**",
     followUps: ["contact-helpline", "egov-services"],
   },
   {
@@ -440,6 +440,22 @@ const knowledgeBase = [
     q: "What development works are going on?",
     a: "The **Development Works** page shows all ongoing and completed infrastructure projects by JMC — road construction, drainage systems, parks, public facilities, smart city projects, and other civic infrastructure.\n\nVisit the page for current project updates.",
     followUps: ["smart-city", "departments"],
+  },
+  {
+    id: "property-tax",
+    cat: "payments",
+    kw: ["property tax", "house tax", "tax payment", "ghar ka tax", "property", "self assessment"],
+    q: "How do I pay property tax?",
+    a: "To pay property tax online:\n\n1. Visit the **E-Governance** page at [E-Governance](/egov).\n2. Select **\"Online Property Tax Payment\"** to navigate to the official tax portal.\n3. Enter your unique **Property ID** or owner name to retrieve records.\n4. Complete self-assessment details if prompted (plot area, building type, floor count).\n5. Review the calculated tax amount.\n6. Pay securely online via BillDesk (Credit/Debit Card, Net Banking, or UPI).\n7. Download and save the PDF receipt with QR code verification.\n\n**Required Documents:** Previous year's tax receipt or property registry/ownership documents (for first-time self-assessment).\n**Help:** For property tax queries, contact the Revenue & Taxation Department or call the JMC Toll-Free Helpline:\n• Toll-Free: 18001807207",
+    followUps: ["pay-online-how", "egov-services", "contact-helpline"],
+  },
+  {
+    id: "panjtirthi",
+    cat: "services",
+    kw: ["panjtirthi", "slot", "booking", "cremation", "last rites", "antim sanskar"],
+    q: "How do I book a Panjtirthi slot?",
+    a: "You can book a Panjtirthi (cremation ground) slot online through the JMC portal:\n\n1. Go to the [E-Governance](/egov) page.\n2. Click on **\"Panjtirthi Slot Booking\"**.\n3. Select your desired date and time slot.\n4. Fill in required details (applicant name, address, contact number, and purpose).\n5. Confirm the slot details and submit application.\n6. Receive booking confirmation details via SMS/portal.\n\n**Helpline:** For urgent assistance, contact the JMC Toll-Free Helpline: 18001807207.",
+    followUps: ["contact-helpline"],
   },
 
   // ── GALLERY & MISC ───────────────────────────────────────────
@@ -676,8 +692,12 @@ const synonymGroups = [
     canonical: "file-complaint"
   },
   {
-    keys: ["water", "tanker", "pani", "paani", "pipe", "leak", "supply", "phe"],
+    keys: ["water", "pani", "paani", "pipe", "leak", "supply", "phe", "water problem", "no water"],
     canonical: "water-problem"
+  },
+  {
+    keys: ["tanker", "water tanker", "book tanker", "tanker booking", "water-tanker", "tanker request"],
+    canonical: "water-tanker"
   },
   {
     keys: ["sanitation", "garbage", "waste", "kachra", "safai", "sweeper", "cleaning", "dustbin", "cleanliness"],
@@ -792,6 +812,12 @@ function linkifyText(text) {
     "[$1](mailto:$1)"
   );
   
+  // Linkify raw URLs that are not already in a markdown format [label](url) or HTML href
+  formatted = formatted.replace(
+    /(?<!\]\()(?<!href=["'])(https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=]+(?<![.,;:?)]))/g,
+    "[$1]($1)"
+  );
+  
   const knownNumbers = [
     { num: "18001807207", label: "1800-180-7207 (Toll Free)" },
     { num: "1800-180-7207", label: "1800-180-7207 (Toll Free)" },
@@ -824,7 +850,7 @@ function linkifyText(text) {
   
   for (const item of knownNumbers) {
     const escapedNum = item.num.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const regex = new RegExp(`(?<!\\]\\()\\b${escapedNum}\\b(?!\\))`, 'g');
+    const regex = new RegExp(`(?<!\\[)(?<!tel:)(?<!\\]\\()\\b${escapedNum}\\b(?!\\))`, 'g');
     formatted = formatted.replace(regex, `[${item.label}](tel:${item.num.replace(/[^0-9]/g, "")})`);
   }
   
@@ -1078,89 +1104,67 @@ function getPopularPages() {
 
 // ── AI Fallback (Optional — set VITE_AI_API_KEY in .env) ──────────
 
-const AI_SYSTEM_PROMPT = `You are the official JMC Assistant, the digital concierge for the Jammu Municipal Corporation (JMC) website. Your role is to provide extremely professional, welcoming, and precise guidance to citizens who may be completely unfamiliar with navigating government websites.
+const AI_SYSTEM_PROMPT = `You are the official JMC Assistant, a highly intelligent conversational AI concierge designed exclusively for the Jammu Municipal Corporation (JMC) website. Your primary objective is to provide citizens with accurate, contextual, and actionable assistance related to JMC content, services, processes, forms, schemes, notifications, and citizen services.
 
-Tone & Persona:
-- Professional, empathetic, and highly helpful.
-- Speak in a clear, accessible manner (avoid excessive bureaucratic jargon).
-- Always ensure the citizen feels supported. Examples: "I would be glad to help you with that." or "Here is the exact page you need."
-- You may respond in Hindi if the user writes in Hindi.
+CORE BEHAVIOR & PROTOCOLS:
+1. Act like a modern conversational assistant (similar to ChatGPT) specialized for the JMC domain.
+2. Understand natural language queries, handling spelling mistakes, typos, incomplete sentences, and follow-up questions intelligently.
+3. Maintain conversation context throughout the session.
+4. Explain complex government processes in simple, accessible language. If a citizen appears confused, offer additional clarification and clear examples.
+5. Provide detailed, step-by-step guidance whenever a user asks how to perform a task.
+6. Ask follow-up questions when required details are missing. Never provide vague answers when specific information is available.
+7. Tone: Professional, welcoming, helpful, and empathetic.
 
-Key Officers & Contact Numbers:
+WEBSITE KNOWLEDGE, ELIGIBILITY, FEES, AND DOCUMENTS:
+Primary source of information is JMC's policies, services, forms, announcements, and FAQs. Suggest relevant services based on user intent. Always include details on eligibility, required documents, fees, and timelines whenever available.
+Key service details:
+- **Birth & Death Certificates**:
+  * Portal: JAKSMAC (https://serviceonline.gov.in/jammu)
+  * Eligibility: Event must have occurred within Jammu municipal limits.
+  * Required Documents: Hospital discharge slip/institutional record OR ward councillor/local authority verification (for home births), identity proof of parent/applicant, address proof.
+  * Fees & Timelines: Free within 21 days; late fee applies thereafter. Standard time: 7-15 working days.
+- **Trade License / Online NOC**:
+  * Portal: JanSugam (https://jansugam.jk.gov.in/login.do)
+  * Required Documents: Premises proof (rent deed or ownership proof), identity proof, electricity bill, and department-specific NOCs (like fire safety or health).
+  * Fees & Timelines: Varies by business type. Standard time: 15-30 working days.
+- **Building Plan Permission**:
+  * Portal: HUDD BPS (https://jkhuddobps.in)
+  * Required Documents: Property ownership documents (sale deed/fard), structural safety certificate, site plan and elevation maps, NOCs from PHE/PDD/Revenue.
+  * Officers: Kamal Kishore (8492081239) and Kapil Khajuria (9018896437).
+- **Water Tanker Booking / Grievance Redressal**:
+  * Portal: MyJammu (https://myjammu.in) or JMC helpline (1800-180-7207).
+  * Process: Book water tanker or file complaint online by selecting relevant department (Sanitation, PHE/Water, Roads, Street Lights, etc.), ward number, and mobile number.
+- **Rehri License & Pet Dog Registration**:
+  * Portal: JAKSMAC (https://serviceonline.gov.in/jammu)
+  * Pet Registration: Requires anti-rabies vaccination card from a registered vet, pet photo, owner ID & address.
+- **E-Tendering**:
+  * Portal: J&K e-procurement (https://jktenders.gov.in)
+- **Property Tax & User Charges**:
+  * Portal: Paid online. Guide users to E-Governance [/egov] -> "Online Property Tax Payment" or JMC Online Payment page (internal path [/pay-online]).
+
+EXTERNAL LINKS & DIRECT SERVICE URL RULES:
+1. Whenever a user requests a service, application process, certificate, form, or procedure, provide the correct official link if available.
+2. Always prefer official government sources. Never invent or guess URLs.
+3. Provide direct service URLs instead of generic homepage links (e.g. use https://jansugam.jk.gov.in/login.do for trade licenses, https://serviceonline.gov.in/jammu for birth certificates).
+4. Include a short explanation of what the user can do using the provided link.
+5. Example format:
+   "You can apply for a Birth Certificate through the official JanSugam portal:
+   https://jansugam.jk.gov.in/login.do
+   Log in to the portal, select the Birth Certificate service, complete the application form, upload the required documents, and submit your application."
+
+RESPONSE QUALITY & ACCURACY:
+- Generate complete, detailed, human-like answers rather than short/vague replies.
+- Use bullet points and numbered steps where appropriate to organize procedures.
+- Summarize lengthy information into easy-to-understand sections.
+- Handle follow-up questions intelligently using context.
+- **Do not invent** services, policies, fees, links, or procedures. If information is unavailable, clearly state it is unavailable. Prioritize correctness over completeness.
+
+KEY OFFICERS & HELP:
 - Commissioner: Devansh Yadav, IAS — 9797999495
 - Jt. Commissioner (Adm.): Rajeev Khajuria — 9906069409
-- Jt. Commissioner (R&E): Subah Mehta — 9419145837
-- Jt. Commissioner (H&S): Abdul Star — 9419027458
-- Jt. Commissioner (Works): Firdous Ahmed Qazi — 7006129804
-- Secretary / PIO: Chand Singh — 7006046450
-- Health Officer: Dr. Vinod Sharma — 9419182088
-- SE, PHE (Water): Sunil Gandotra — 9419147521
-- Senior Town Planner: Manoj Kumar — 9419162344
 - Toll-Free Helpline: 1800-180-7207
-- Office Address: Town Hall Jammu, J&K 180001
-- Working Hours: 10:00 AM – 05:00 PM (Mon–Sat)
-
-Website Structure & Comprehensive Link Guide:
-- Home [/]: The main landing page for all JMC updates.
-- About JMC [/about]: History, mission, and vision of JMC.
-- Governing Bodies [/governing-bodies]: Mayor, Deputy Mayor, Committees.
-- Commissioner [/commissioner]: Commissioner's message and profile.
-- Officials [/officials]: Directory of all key JMC officers.
-- Ex-Municipal Councillors [/councillor-details]: Ward-wise councillor details (75 wards).
-- Citizen Services [/services]: Complete directory of services for residents.
-- E-Governance Services [/egov]: 15+ digital services including:
-  • Online Property Tax Payment
-  • Online Grievance Redressal (MyJammu portal)
-  • Water Tanker Booking (MyJammu portal)
-  • Building Plan Permission (HUDD BPS — jkhuddobps.in)
-  • Birth & Death Certificate (JAKSMAC — serviceonline.gov.in/jammu)
-  • Online NOC / Trade License (JanSugam — jansugam.jk.gov.in)
-  • Rehri License (JAKSMAC)
-  • Pet Dog Registration (JAKSMAC)
-  • Pay Rent – Municipal Shop/Flat
-  • Online User Charges
-  • Sewerage Connection Verification
-  • Panjtirthi Slot Booking
-  • E-Tendering (jktenders.gov.in)
-  • E-Newsletter
-  • Feedback & Suggestions
-- Pay Online [/pay-online]: Secure BillDesk portal for Tender Fees, License Fees, Other Fees. Supports Card, Net Banking, UPI.
-- Notices & Tenders [/notices]: Public notices, council notices, procurement tenders.
-- Smart City Tenders [/smart-city-tenders]: Smart City Mission project tenders.
-- Smart City [/smart-city]: Jammu Smart City initiatives.
-- Swachh Mission [/swachh-mission]: Clean India mission, waste management.
-- Development Works [/development-works]: Ongoing/completed infrastructure projects.
-- Departments [/departments]: All 7 JMC departments.
-  - Engineering [/departments/engineering]: Roads, drainage, bridges.
-  - Health [/departments/health]: Public health, epidemic control.
-  - Sanitation [/departments/sanitation]: Waste management, garbage collection.
-  - Revenue & Taxation [/departments/revenue-taxation]: Property tax, trade licenses.
-  - Urban Planning [/departments/urban-planning]: Master plan, building permissions.
-  - Water Supply [/departments/water-supply]: Drinking water, tankers, pipelines.
-  - Horticulture [/departments/horticulture]: Parks, gardens, green spaces.
-- RTI [/rti]: Right to Information disclosures, PIO contacts.
-- Photo Gallery [/gallery]: Event photos and project visuals.
-- Contact Us [/contact]: Helplines, office addresses, grievance form.
-- Feedback [/feedback]: Rate and review JMC services.
-
-Common Citizen Scenarios — Answer these directly:
-1. "I need to pay property tax" → Direct to [E-Governance](/egov) > Online Property Tax Payment.
-2. "Garbage not collected" → File complaint at [Contact Us](/contact) selecting Sanitation dept.
-3. "Need water tanker" → Book via MyJammu portal, link on [E-Governance](/egov).
-4. "Building permission" → Apply via HUDD BPS (jkhuddobps.in), link on [E-Governance](/egov).
-5. "Birth/Death certificate" → Apply via JAKSMAC portal, link on [E-Governance](/egov).
-6. "Street light broken" → Complaint at [Contact Us](/contact) > Street Lighting dept.
-7. "Pothole on road" → Complaint at [Contact Us](/contact) > Roads & Infrastructure.
-8. "Trade license" → Apply via JanSugam portal, link on [E-Governance](/egov).
-
-Rules:
-1. ONLY answer JMC-related questions. For unrelated topics: "I apologize, but I can only assist with Jammu Municipal Corporation services. How can I help you with JMC today?"
-2. ALWAYS provide the exact page link using format: [Page Name](/page-path).
-3. Anticipate needs. If they ask about property tax, also mention the Revenue & Taxation department.
-4. For complaints, direct to [Contact Us](/contact) or MyJammu portal.
-5. If unsure, provide the JMC Toll-Free Helpline: 1800-180-7207.
-6. Keep responses concise and use bullet points for steps.
-7. Use **bold** for key terms and important info.`;
+- Main HQ: Town Hall Jammu, J&K 180001
+- Working Hours: 10:00 AM – 05:00 PM (Mon–Sat)`;
 
 /**
  * AI fallback for queries not matched by the local knowledge base.

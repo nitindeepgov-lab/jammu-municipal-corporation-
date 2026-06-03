@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import PageLayout from "./PageLayout";
 import {
   Home,
@@ -11,12 +12,12 @@ import {
   Building,
   Wrench,
   Camera,
-  Leaf,
   Info,
   Phone,
   MessageSquare,
   CreditCard,
   ExternalLink,
+  ChevronDown,
 } from "lucide-react";
 
 const PAGE_NAV = [
@@ -26,11 +27,20 @@ const PAGE_NAV = [
   { name: "Commissioner's Desk", to: "/commissioner", icon: Briefcase },
   { name: "E-Governance", to: "/egov", icon: Globe },
   { name: "Citizen Services", to: "/services", icon: FileText },
-  { name: "Orders & Circulars", to: "/notices", icon: Bell },
+  {
+    name: "Orders & Circulars",
+    to: "/notices",
+    icon: Bell,
+    children: [
+      { name: "General Tenders", to: "/notices?tab=tender" },
+      { name: "Smart City Tenders", to: "/smart-city-tenders" },
+    ],
+  },
   { name: "Smart City", to: "/smart-city", icon: Building },
   { name: "Development Works", to: "/development-works", icon: Wrench },
   { name: "Photo Gallery", to: "/gallery", icon: Camera },
   { name: "Officer Directory", to: "/officers-directory", icon: Users },
+  { name: "Employee Corner", to: "/employee-corner", icon: Briefcase },
   { name: "RTI", to: "/rti", icon: Info },
   { name: "Contact Us", to: "/contact", icon: Phone },
   { name: "Feedback", to: "/feedback", icon: MessageSquare },
@@ -44,22 +54,47 @@ const IMPORTANT_LINKS = [
     href: "https://jmc.jk.gov.in/OnlineGrievances.aspx",
     icon: MessageSquare,
   },
-
   {
-    name: "PDD E-Services",
-    href: "https://jmc.jk.gov.in/pddeservices.html",
-    icon: Globe,
+    name: "Web Information Manager",
+    to: "/web-info-manager",
+    icon: Users,
   },
   {
     name: "Tenders",
     href: "https://jmc.jk.gov.in/tenders.aspx",
     icon: FileText,
   },
-  { name: "Web Information Manager", to: "/web-info-manager", icon: Users },
 ];
 
 function Sidebar() {
   const location = useLocation();
+  const [expanded, setExpanded] = useState({});
+
+  // Auto-expand menu on mount if current page is parent or child
+  useEffect(() => {
+    const initial = {};
+    PAGE_NAV.forEach((item) => {
+      if (item.children) {
+        const isParentActive = location.pathname === item.to;
+        const isChildActive = item.children.some(
+          (child) =>
+            location.pathname + location.search === child.to ||
+            location.pathname === child.to.split("?")[0]
+        );
+        if (isParentActive || isChildActive) {
+          initial[item.name] = true;
+        }
+      }
+    });
+    setExpanded(initial);
+  }, [location]);
+
+  const toggleExpand = (name) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
 
   return (
     <aside className="space-y-6 sm:space-y-8">
@@ -73,37 +108,91 @@ function Sidebar() {
         <Globe className="absolute left-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
       </div>
 
-      {/* Navigation - Minimalist & Professional */}
+      {/* Navigation - Collapsible Dropdowns */}
       <nav aria-label="Section navigation">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-1">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-1 select-none">
           Menu
         </h2>
         <ul className="space-y-1">
           {PAGE_NAV.map((item) => {
-            const active = location.pathname === item.to;
+            const hasChildren = !!item.children;
+            const isParentActive = location.pathname === item.to;
+            const isChildActive =
+              hasChildren &&
+              item.children.some(
+                (child) =>
+                  location.pathname + location.search === child.to ||
+                  location.pathname === child.to.split("?")[0]
+              );
+            const active = isParentActive || isChildActive;
+            const isOpen = !!expanded[item.name];
             const Icon = item.icon;
+
             return (
-              <li key={item.to}>
-                <Link
-                  to={item.to}
-                  className={`group flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-semibold transition-all duration-200 ${
-                    active
-                      ? "bg-gray-50 text-[#002B5E]"
-                      : "text-gray-500 hover:text-[#002B5E] hover:bg-gray-50/50"
-                  }`}
-                >
-                  <Icon
-                    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
+              <li key={item.name} className="space-y-1">
+                <div className="flex items-center justify-between gap-1 group">
+                  <Link
+                    to={item.to}
+                    className={`flex-1 flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-semibold transition-all duration-200 ${
                       active
-                        ? "text-[#FF6600]"
-                        : "text-gray-300 group-hover:text-gray-400"
+                        ? "bg-slate-50 text-[#002B5E]"
+                        : "text-gray-500 hover:text-[#002B5E] hover:bg-gray-50/50"
                     }`}
-                  />
-                  <span className="flex-1">{item.name}</span>
-                  {active && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6600]"></div>
+                  >
+                    <Icon
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
+                        active
+                          ? "text-[#FF6600]"
+                          : "text-gray-300 group-hover:text-gray-400"
+                      }`}
+                    />
+                    <span className="flex-1 truncate">{item.name}</span>
+                    {active && !hasChildren && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#FF6600]"></div>
+                    )}
+                  </Link>
+
+                  {hasChildren && (
+                    <button
+                      onClick={() => toggleExpand(item.name)}
+                      className={`p-2 rounded-lg text-gray-400 hover:text-[#002B5E] hover:bg-gray-50 transition-all duration-350 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                      aria-label="Toggle submenu"
+                    >
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
                   )}
-                </Link>
+                </div>
+
+                {hasChildren && isOpen && (
+                  <ul className="pl-6 sm:pl-7 pr-2 py-1.5 space-y-1.5 border-l border-slate-100 ml-4 sm:ml-5">
+                    {item.children.map((child) => {
+                      const isChildActive =
+                        location.pathname + location.search === child.to ||
+                        location.pathname === child.to.split("?")[0];
+                      return (
+                        <li key={child.to}>
+                          <Link
+                            to={child.to}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] sm:text-[12px] font-bold transition-colors ${
+                              isChildActive
+                                ? "text-[#FF6600] font-semibold"
+                                : "text-gray-500 hover:text-[#002B5E] hover:bg-gray-50/50"
+                            }`}
+                          >
+                            <span
+                              className={`w-1 h-1 rounded-full ${
+                                isChildActive ? "bg-[#FF6600]" : "bg-gray-300"
+                              }`}
+                            />
+                            {child.name}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
               </li>
             );
           })}
@@ -112,7 +201,7 @@ function Sidebar() {
 
       {/* Quick Access - Refined */}
       <div className="space-y-4">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 px-1">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 px-1 select-none">
           Quick Access
         </h2>
         <div className="grid grid-cols-1 gap-2">
@@ -169,12 +258,22 @@ export default function SubpageTemplate({
 }) {
   return (
     <PageLayout>
-      {/* Clean & Professional Banner */}
-      <div className="bg-[#002B5E] relative overflow-hidden">
-        {/* Subtle Background Accent */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/[0.03] to-transparent"></div>
+      {/* Clean & Professional Banner with subtle gradient and modern vector accents */}
+      <div className="bg-gradient-to-br from-[#001a33] via-[#002B5E] to-[#004488] relative overflow-hidden shadow-inner">
+        {/* Soft decorative ambient glow circles */}
+        <div className="absolute -top-24 -left-20 w-72 h-72 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-orange-500/5 blur-3xl pointer-events-none" />
 
-        <div className="mx-auto w-[min(96%,1400px)] px-1.5 sm:px-4 py-7 sm:py-8 md:py-12 lg:py-14 relative">
+        {/* Subtle grid pattern background overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.025] pointer-events-none"
+          style={{
+            backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+
+        <div className="mx-auto w-[min(96%,1400px)] px-1.5 sm:px-4 py-8 sm:py-10 md:py-14 lg:py-16 relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-4">
               {/* Minimal Breadcrumb */}
@@ -216,10 +315,10 @@ export default function SubpageTemplate({
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white min-h-screen">
+      <div className="bg-[#f8fafc] min-h-screen">
         <div className="mx-auto w-[min(96%,1400px)] px-1.5 sm:px-4 py-8 sm:py-10 md:py-14 lg:py-16">
           <div className="flex flex-col xl:flex-row gap-8 sm:gap-10 lg:gap-14 xl:gap-16">
-            {/* Sidebar - Hidden on mobile (shown as floating card instead), visible on desktop */}
+            {/* Sidebar - Hidden on mobile, visible on desktop */}
             <div className="hidden lg:block w-full xl:w-72 flex-shrink-0 xl:sticky xl:top-6 xl:self-start">
               <Sidebar />
             </div>

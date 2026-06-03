@@ -16,7 +16,7 @@ export default function NewsTicker() {
         const items = (res.data?.data || []).map((item) => {
           const a = item.attributes || item;
           return {
-            text: a.text,
+            text: (a.text || "").replace(/^[♦•►■➔\s]+/, "").trim(),
             href: a.link || "#",
             isExternal: a.is_external !== false, // default true
           };
