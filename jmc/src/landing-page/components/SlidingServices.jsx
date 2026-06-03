@@ -64,13 +64,15 @@ const importantLinks = [
 ]
 
 function LinkItem({ link }) {
-  const cls = "flex items-center gap-3 text-sm text-gray-600 hover:text-[#003366] py-2.5 transition-colors group"
+  const cls = "flex items-center gap-3.5 text-xs sm:text-sm text-slate-600 hover:text-[#002B5E] hover:bg-slate-50/70 px-3 py-2 rounded-xl transition-all duration-200 group font-bold"
   const inner = (
     <>
-      <span className="text-gray-400 group-hover:text-[#FF6600] transition-colors">{link.icon}</span>
-      <span className="font-medium">{link.name}</span>
-      <svg className="w-3.5 h-3.5 ml-auto opacity-0 group-hover:opacity-50 transition-opacity text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+      <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-orange-50 group-hover:text-[#FF6600] transition-all duration-300 shrink-0">
+        {link.icon}
+      </div>
+      <span className="flex-1 truncate">{link.name}</span>
+      <svg className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-[#FF6600]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
       </svg>
     </>
   )
@@ -82,24 +84,28 @@ export default function SlidingServices() {
   const [mobileTab, setMobileTab] = useState('departments')
 
   return (
-    <section className="py-10 md:py-14 bg-white">
+    <section className="py-10 md:py-16 bg-[#f8fafc]">
       <div className="max-w-[1200px] mx-auto px-4">
 
         {/* Section Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-[#003366] tracking-tight">Directory</h2>
-          <p className="text-gray-500 text-sm mt-1">Browse departments, important links, and more.</p>
+        <div className="mb-10 text-left">
+          <h2 className="text-2xl md:text-3xl font-black text-[#002B5E] tracking-tight">
+            Municipal Directory
+          </h2>
+          <p className="text-gray-500 text-xs sm:text-sm mt-1.5 font-medium">
+            Browse departments, important civic links, and local information.
+          </p>
         </div>
 
         {/* Mobile Tab Switcher */}
-        <div className="flex md:hidden mb-5 bg-gray-100 rounded-lg p-1 gap-1">
+        <div className="flex md:hidden mb-6 bg-slate-100 rounded-xl p-1 gap-1 border border-slate-200">
           {['departments', 'links', 'about'].map(tab => (
             <button
               key={tab}
               onClick={() => setMobileTab(tab)}
-              className={`flex-1 py-2 text-xs font-semibold rounded-md transition-all ${
+              className={`flex-1 py-2.5 text-xs font-extrabold rounded-lg transition-all ${
                 mobileTab === tab
-                  ? 'bg-white text-[#003366] shadow-sm'
+                  ? 'bg-[#002B5E] text-white shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -108,88 +114,98 @@ export default function SlidingServices() {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* Directory Grid */}
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
 
           {/* Col 1: Departments */}
-          <div className={`md:block ${mobileTab === 'departments' ? 'block' : 'hidden'}`}>
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
-              <div className="w-1 h-5 bg-[#003366] rounded-full" />
-              <h3 className="font-bold text-[#003366] text-[15px] uppercase tracking-wide">Departments</h3>
+          <div className={`bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 md:block ${mobileTab === 'departments' ? 'block' : 'hidden'}`}>
+            <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
+              <div className="w-1 h-5 bg-[#002B5E] rounded-full" />
+              <h3 className="font-extrabold text-[#002B5E] text-sm uppercase tracking-wider">Departments</h3>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="space-y-1.5">
               {departments.map((dept, idx) => (
                 <LinkItem key={idx} link={dept} />
               ))}
             </div>
-            <Link
-              to="/departments"
-              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6600] hover:text-[#003366] transition-colors"
-            >
-              View all departments
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-              </svg>
-            </Link>
+            <div className="pt-4 border-t border-slate-50 mt-4">
+              <Link
+                to="/departments"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6600] hover:text-[#002B5E] transition-colors group"
+              >
+                View all departments
+                <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Col 2: Important Links */}
-          <div className={`md:block ${mobileTab === 'links' ? 'block' : 'hidden'}`}>
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+          <div className={`bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 md:block ${mobileTab === 'links' ? 'block' : 'hidden'}`}>
+            <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
               <div className="w-1 h-5 bg-[#FF6600] rounded-full" />
-              <h3 className="font-bold text-[#003366] text-[15px] uppercase tracking-wide">Important Links</h3>
+              <h3 className="font-extrabold text-[#002B5E] text-sm uppercase tracking-wider">Important Links</h3>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="space-y-1.5">
               {importantLinks.map((link, idx) => (
                 <LinkItem key={idx} link={link} />
               ))}
             </div>
-            <Link
-              to="/quick-links"
-              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6600] hover:text-[#003366] transition-colors"
-            >
-              View all links
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-              </svg>
-            </Link>
+            <div className="pt-4 border-t border-slate-50 mt-4">
+              <Link
+                to="/quick-links"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6600] hover:text-[#002B5E] transition-colors group"
+              >
+                View all links
+                <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Col 3: About Card */}
-          <div className={`md:block ${mobileTab === 'about' ? 'block' : 'hidden'}`}>
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+          <div className={`bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 md:block ${mobileTab === 'about' ? 'block' : 'hidden'}`}>
+            <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
               <div className="w-1 h-5 bg-green-600 rounded-full" />
-              <h3 className="font-bold text-[#003366] text-[15px] uppercase tracking-wide">About Jammu</h3>
+              <h3 className="font-extrabold text-[#002B5E] text-sm uppercase tracking-wider">About Jammu</h3>
             </div>
-            <div className="rounded-lg overflow-hidden border border-gray-100">
-              <div className="relative h-44 overflow-hidden">
+            
+            <div className="space-y-5">
+              {/* Image Frame */}
+              <div className="relative h-40 overflow-hidden rounded-xl shadow-sm group cursor-pointer">
                 <img
                   src="circle/circle.jpeg"
                   alt="Jammu City"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
                   onError={(e) => {
                     e.target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900'
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-4">
-                  <p className="text-white font-bold text-sm drop-shadow-sm">Jammu City</p>
+                  <p className="text-white font-extrabold text-sm drop-shadow-sm">Jammu City</p>
                 </div>
               </div>
-              <div className="p-5 bg-white">
-                <h3 className="font-bold text-[#003366] text-sm mb-2">Welcome to JMC</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
+              
+              <div className="space-y-3 text-left">
+                <h4 className="font-black text-[#002B5E] text-sm">Welcome to JMC</h4>
+                <p className="text-xs text-gray-500 leading-relaxed font-semibold">
                   Jammu, the winter capital of J&K Union Territory, is served by JMC for all civic
                   needs — from sanitation to infrastructure, property services to public health.
                 </p>
-                <Link
-                  to="/about"
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-[#FF6600] hover:text-[#003366] font-semibold transition-colors"
-                >
-                  Know more
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                  </svg>
-                </Link>
+                <div className="pt-2">
+                  <Link
+                    to="/about"
+                    className="inline-flex items-center gap-1.5 text-xs text-[#FF6600] hover:text-[#002B5E] font-bold transition-colors group"
+                  >
+                    Know more
+                    <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

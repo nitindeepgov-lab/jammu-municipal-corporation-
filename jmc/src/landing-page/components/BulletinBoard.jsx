@@ -16,7 +16,7 @@ export default function BulletinBoard() {
           (data || []).map((entry) => ({
             documentId: entry.documentId,
             release_date: entry.release_date,
-            title: entry.title,
+            title: (entry.title || "").replace(/^[♦•►■➔\s]+/, "").trim(),
             link: entry.link || null,
           })),
         );
