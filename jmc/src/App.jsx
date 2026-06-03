@@ -51,6 +51,7 @@ const Commissioner = lazy(() => import("./pages/Commissioner"));
 const GoverningBodies = lazy(() => import("./pages/GoverningBodies"));
 const Notices = lazy(() => import("./pages/Notices"));
 const Newsletter = lazy(() => import("./pages/Newsletter"));
+const NewsletterArchive = lazy(() => import("./pages/NewsletterArchive"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Services = lazy(() => import("./pages/Services"));
@@ -140,6 +141,7 @@ export default function App() {
             <Route path="/governing-bodies" element={<GoverningBodies />} />
             <Route path="/notices" element={<Notices />} />
             <Route path="/notices/orders-circulars/:id" element={<Newsletter />} />
+            <Route path="/newsletter" element={<NewsletterArchive />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/services" element={<Services />} />
