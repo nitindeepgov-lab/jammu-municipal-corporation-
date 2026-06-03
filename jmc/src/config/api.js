@@ -4,7 +4,7 @@
 
 export const PROD_STRAPI_URL =
   "https://jammu-municipal-corporation.onrender.com";
-const LOCAL_STRAPI_URL = "http://localhost:1337";
+const LOCAL_STRAPI_URL = "http://localhost:1338";
 
 // Validate and get Strapi URL
 const getStrapiUrl = () => {

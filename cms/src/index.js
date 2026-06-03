@@ -151,6 +151,7 @@ module.exports = {
         "api::photo-gallery.photo-gallery",
         "api::location.location",
         "api::event-activity.event-activity",
+        "api::footer-link.footer-link",
       ];
 
       const promises = [];
@@ -181,6 +182,88 @@ module.exports = {
       strapi.log.warn(
         `Skipping public permission sync during bootstrap: ${error.message}`,
       );
+    }
+
+    try {
+      // Auto-configure Footer Link content manager layout to prevent Admin UI crashes.
+      // Strapi v5's auto-generated layout builder can crash on enumeration fields
+      // if the stored layout config is missing proper metadata entries.
+      const flStore = strapi.db.query("strapi::core-store");
+      const flKey = "plugin_content_manager_configuration_content_types::api::footer-link.footer-link";
+
+      let flConfig = await flStore.findOne({ where: { key: flKey } });
+      const flValue = {
+        settings: {
+          bulkable: true,
+          filterable: true,
+          searchable: true,
+          pageSize: 100,
+          mainField: "name",
+          defaultSortBy: "name",
+          defaultSortOrder: "ASC",
+        },
+        layouts: {
+          list: ["name", "url", "section", "is_active", "order", "is_external"],
+          edit: [
+            [{ name: "name", size: 6 }, { name: "url", size: 6 }],
+            [{ name: "section", size: 4 }, { name: "order", size: 4 }, { name: "is_active", size: 4 }],
+            [{ name: "is_external", size: 6 }],
+          ],
+        },
+        metadatas: {
+          id: {
+            edit: { label: "ID", description: "", placeholder: "", visible: false, editable: false },
+            list: { label: "ID", searchable: true, sortable: true },
+          },
+          name: {
+            edit: { label: "Name", description: "", placeholder: "", visible: true, editable: true },
+            list: { label: "Name", searchable: true, sortable: true },
+          },
+          url: {
+            edit: { label: "URL", description: "", placeholder: "", visible: true, editable: true },
+            list: { label: "URL", searchable: true, sortable: true },
+          },
+          is_external: {
+            edit: { label: "Is External", description: "", placeholder: "", visible: true, editable: true },
+            list: { label: "Is External", searchable: true, sortable: true },
+          },
+          section: {
+            edit: { label: "Section", description: "", placeholder: "", visible: true, editable: true },
+            list: { label: "Section", searchable: true, sortable: true },
+          },
+          order: {
+            edit: { label: "Order", description: "", placeholder: "", visible: true, editable: true },
+            list: { label: "Order", searchable: true, sortable: true },
+          },
+          is_active: {
+            edit: { label: "Is Active", description: "", placeholder: "", visible: true, editable: true },
+            list: { label: "Is Active", searchable: true, sortable: true },
+          },
+          createdAt: {
+            edit: { label: "Created At", description: "", placeholder: "", visible: false, editable: false },
+            list: { label: "Created At", searchable: true, sortable: true },
+          },
+          updatedAt: {
+            edit: { label: "Updated At", description: "", placeholder: "", visible: false, editable: false },
+            list: { label: "Updated At", searchable: true, sortable: true },
+          },
+        },
+      };
+
+      if (flConfig) {
+        await flStore.update({
+          where: { id: flConfig.id },
+          data: { value: JSON.stringify(flValue) },
+        });
+      } else {
+        await flStore.create({
+          data: { key: flKey, value: JSON.stringify(flValue), type: "object" },
+        });
+      }
+
+      strapi.log.info("Successfully configured Footer Link admin layout.");
+    } catch (e) {
+      strapi.log.warn(`Soft skip auto-configuring Footer Link layout: ${e.message}`);
     }
   },
 };

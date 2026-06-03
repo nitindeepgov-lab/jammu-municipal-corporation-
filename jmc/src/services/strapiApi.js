@@ -353,7 +353,18 @@ export const deleteTender = (documentId) => {
   return api.delete(`/tenders/${documentId}`);
 };
 
-// ── Visitor Count ───────────────────────────────────────
+
+// ── Footer Links ─────────────────────────────────────────────
+
+/** Fetch active footer column links (quick-links / citizen-services / information) ordered by display order.
+ * Intentionally NOT cached so Strapi edits (rename, delete, disable) reflect on the next page load.
+ */
+export const getFooterLinks = () =>
+  api.get(
+    "/footer-links?sort=order:asc&filters[is_active][$eq]=true&filters[section][$ne]=nav&pagination[pageSize]=100",
+  );
+
+// ── Visitor Count ───────────────────────────────────────────
 
 /** Fetch the current global visitor count */
 export const getVisitorCount = () => api.get("/visitor-count/current");

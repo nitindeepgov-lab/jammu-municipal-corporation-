@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "footer_links",
+  "info": {
+    "singularName": "footer-link",
+    "pluralName": "footer-links",
+    "displayName": "Footer Link",
+    "description": "Manage all footer navigation links. Use section to place them in the right column and order to sort within each section. Toggle is_active to show or hide a link without deleting it."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "is_external": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "section": {
+      "type": "enumeration",
+      "enum": ["nav", "quick-links", "citizen-services", "information"],
+      "required": true,
+      "default": "nav"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "required": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    }
+  }
+}

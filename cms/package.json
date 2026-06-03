@@ -20,6 +20,8 @@
     "grant:officials": "node ./scripts/grant-officials-permissions.js",
     "grant:ministers": "node ./scripts/grant-ministers-permissions.js",
     "grant:hero-slides": "node ./scripts/grant-hero-slides-permissions.js",
+    "grant:footer-links": "node ./scripts/grant-footer-links-permissions.js",
+    "seed:footer-links": "node ./scripts/seed-footer-links.js",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
