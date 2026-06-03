@@ -1900,6 +1900,182 @@ const injectAdminStyles = () => {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
+
+    /* ═══════════════════════════════════════════
+       36. CONTENT MANAGER — ADVANCED POLISH
+       ═══════════════════════════════════════════ */
+    
+    /* ── Content Manager Tables & Cells ── */
+    [class*="DynamicTable"] th, [class*="DynamicTable"] td {
+      white-space: nowrap !important;
+      text-overflow: ellipsis !important;
+      overflow: hidden !important;
+      max-width: 250px !important;
+    }
+    /* Hover Row Animation & Left Border Accent */
+    [class*="DynamicTable"] tbody tr {
+      border-left: 3px solid transparent !important;
+      transition: all 0.2s ease !important;
+    }
+    [class*="DynamicTable"] tbody tr:hover {
+      border-left: 3px solid var(--jmc-blue) !important;
+      transform: translateX(1px) !important;
+    }
+    
+    /* ── Search & Filter Controls ── */
+    [class*="SearchInput"] input, [class*="SearchInput"] [class*="Input"] {
+      border-radius: var(--jmc-radius-sm) !important;
+      padding: 10px 14px 10px 38px !important;
+      font-size: 13.5px !important;
+      background: var(--jmc-surface) !important;
+      border: 1.5px solid var(--jmc-border) !important;
+      transition: all 0.25s var(--jmc-ease) !important;
+      width: 100% !important;
+      max-width: 380px !important;
+    }
+    [class*="SearchInput"] input:focus, [class*="SearchInput"] [class*="Input"]:focus-within {
+      border-color: var(--jmc-blue) !important;
+      box-shadow: 0 0 0 3px var(--jmc-blue-glow), var(--jmc-shadow-sm) !important;
+      max-width: 420px !important;
+    }
+    /* Filter Badges & Close Buttons */
+    [class*="FilterBadge"] {
+      background: rgba(0, 51, 102, 0.05) !important;
+      color: var(--jmc-blue) !important;
+      border: 1px solid rgba(0, 51, 102, 0.1) !important;
+      border-radius: var(--jmc-radius-xs) !important;
+      font-weight: 600 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      padding: 4px 10px !important;
+      transition: all 0.2s ease !important;
+    }
+    [class*="FilterBadge"]:hover {
+      background: rgba(0, 51, 102, 0.08) !important;
+    }
+
+    /* ── Edit Form Layout Max-Widths & Visual Hierarchy ── */
+    [class*="EditViewColumn"] form {
+      max-width: 100% !important;
+    }
+    [class*="EditViewColumn"] input:not([type="checkbox"]):not([type="radio"]),
+    [class*="EditViewColumn"] select {
+      max-width: 680px !important;
+      width: 100% !important;
+    }
+    [class*="EditViewColumn"] [class*="FieldWrapper"] {
+      margin-bottom: 24px !important;
+    }
+    [class*="EditViewColumn"] [class*="Label"] {
+      font-size: 13.5px !important;
+      margin-bottom: 8px !important;
+      color: var(--jmc-navy) !important;
+      font-weight: 700 !important;
+    }
+    
+    /* ── Component Pickers & Dynamic Zones ── */
+    [class*="ComponentPicker"], [class*="DynamicZone"] {
+      border: 2px dashed var(--jmc-border) !important;
+      background: #f8fafc !important;
+      border-radius: var(--jmc-radius) !important;
+      padding: 24px !important;
+      transition: all 0.25s var(--jmc-ease) !important;
+    }
+    [class*="ComponentPicker"]:hover, [class*="DynamicZone"]:hover {
+      border-color: var(--jmc-blue) !important;
+      background: rgba(0, 51, 102, 0.02) !important;
+    }
+    [class*="ComponentPicker"] button, [class*="DynamicZone"] button[class*="Add"] {
+      border-radius: var(--jmc-radius-sm) !important;
+      font-weight: 600 !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    /* ── Sticky Save & Publish Footer Action Bar ── */
+    [class*="StickyContainer"], [class*="sticky-bar"] {
+      position: sticky !important;
+      bottom: 0 !important;
+      z-index: 100 !important;
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(12px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+      border-top: 1px solid var(--jmc-border-light) !important;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04) !important;
+      padding: 16px 32px !important;
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+    }
+
+    /* ── Premium High-Fidelity Empty States ── */
+    [class*="EmptyBody"], [class*="NoContent"], .jmc-empty-state {
+      background: var(--jmc-surface) !important;
+      border: 1.5px dashed var(--jmc-border) !important;
+      border-radius: var(--jmc-radius-lg) !important;
+      padding: 60px 40px !important;
+      text-align: center !important;
+      max-width: 580px !important;
+      margin: 40px auto !important;
+      box-shadow: var(--jmc-shadow-xs) !important;
+      animation: modalEntrance 0.4s var(--jmc-ease-out) !important;
+    }
+    [class*="EmptyBody"] h3, [class*="NoContent"] h2 {
+      font-size: 17px !important;
+      font-weight: 750 !important;
+      color: var(--jmc-navy) !important;
+      margin-top: 16px !important;
+      margin-bottom: 8px !important;
+    }
+    [class*="EmptyBody"] p, [class*="NoContent"] p {
+      font-size: 13.5px !important;
+      color: var(--jmc-text-secondary) !important;
+      max-width: 380px !important;
+      margin: 0 auto 24px !important;
+      line-height: 1.6 !important;
+    }
+
+    /* ── Interactive Focus / Outline (Accessibility) ── */
+    input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
+      outline: 2.5px solid var(--jmc-blue) !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 4px var(--jmc-blue-glow) !important;
+    }
+
+    /* ── Content Manager Responsiveness Overrides ── */
+    @media (max-width: 1024px) {
+      [class*="EditViewLayout"], [class*="edit-view-layout"] {
+        flex-direction: column !important;
+        gap: 24px !important;
+      }
+      [class*="EditViewColumn"], [class*="ContentBox"] {
+        width: 100% !important;
+        padding: 20px !important;
+      }
+      [class*="RightSide"], [class*="InformationBoxWrapper"] {
+        width: 100% !important;
+        border-left: none !important;
+        border-top: 1px solid var(--jmc-border-light) !important;
+        padding-top: 24px !important;
+        background: transparent !important;
+      }
+    }
+    @media (max-width: 640px) {
+      [class*="HeaderLayout"] {
+        padding: 16px 20px !important;
+      }
+      [class*="ContentLayout"], [class*="ActionLayout"] {
+        padding: 16px 20px !important;
+      }
+      [class*="StickyContainer"], [class*="sticky-bar"] {
+        padding: 12px 20px !important;
+        flex-direction: column-reverse !important;
+        align-items: stretch !important;
+      }
+      [class*="StickyContainer"] button, [class*="sticky-bar"] button {
+        width: 100% !important;
+      }
+    }
   `;
   document.head.appendChild(style);
 
