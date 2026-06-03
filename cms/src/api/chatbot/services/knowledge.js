@@ -38,6 +38,23 @@ const pageRoutes = {
   disclaimer:         { path: "/disclaimer",               label: "Disclaimer" },
   accessibility:      { path: "/accessibility",            label: "Accessibility" },
   "terms-conditions": { path: "/terms-conditions",         label: "Terms & Conditions" },
+  
+  // New employee corner subpage paths
+  "employee-corner":    { path: "/employee-corner",                    label: "Employee Corner" },
+  "salary-certificate":  { path: "/employee-corner/salary-certificate",  label: "Salary Certificate" },
+  "pay-slip":            { path: "/employee-corner/pay-slip",            label: "Pay Slip" },
+  "pay-statement":       { path: "/employee-corner/pay-statement",       label: "Pay Statement" },
+  "file-dropbox":        { path: "/employee-corner/file-dropbox",        label: "File Dropbox" },
+  "knowledge-base":      { path: "/employee-corner/knowledge-base",      label: "Knowledge Base" },
+  "file-monitoring":     { path: "/employee-corner/file-monitoring",     label: "File Monitoring" },
+  
+  // Missing pages paths
+  "officers-directory":  { path: "/officers-directory",                  label: "Officer Directory" },
+  "web-info-manager":    { path: "/web-info-manager",                    label: "Web Information Manager" },
+  "smart-city-initiatives": { path: "/smart-city-initiatives",           label: "Smart City Initiatives" },
+  "payment-status":      { path: "/payment-status",                      label: "Payment Status" },
+  "hyperlink-policy":    { path: "/hyperlink-policy",                    label: "Hyperlink Policy" },
+  "copyright-policy":    { path: "/copyright-policy",                    label: "Copyright Policy" },
 };
 
 // ── Keyword → route aliases (for fuzzy nav matching) ─────────────
@@ -57,7 +74,7 @@ const navAliases = [
   { kw: ["rti", "right to information", "disclosure", "information officer", "pio"],                     route: "rti" },
   { kw: ["swachh", "swachh bharat", "clean india", "swachh mission", "clean city"],                      route: "swachh-mission" },
   { kw: ["egov", "e-governance", "digital services", "e governance", "egovernance", "online services"],  route: "egov" },
-  { kw: ["pay", "payment", "pay online", "fee", "pay fee", "online payment", "bill", "pay bill"],       route: "pay-online" },
+  { kw: ["pay", "payment", "pay online", "fee", "pay fee", "online payment", "bill", "pay bill", "payment form"], route: "pay-online" },
   { kw: ["sitemap", "site map", "all pages", "full map"],                                                route: "sitemap" },
   { kw: ["quick links", "quick link", "shortcuts"],                                                      route: "quick-links" },
   { kw: ["councillor", "councilor", "ward", "councillors", "ward member", "council member"],             route: "councillor-details" },
@@ -76,12 +93,154 @@ const navAliases = [
   { kw: ["accessibility", "accessible"],                                                                 route: "accessibility" },
   { kw: ["terms", "conditions", "terms and conditions"],                                                 route: "terms-conditions" },
   { kw: ["complaint", "grievance", "complain", "lodge complaint"],                                       route: "contact" },
+  
+  // New aliases matching Employee Corner and miscellaneous pages
+  { kw: ["employee corner", "staff portal", "employee portal", "employee", "staff"],                     route: "employee-corner" },
+  { kw: ["salary certificate", "salary bill", "salary sheet", "certificate of salary"],                  route: "salary-certificate" },
+  { kw: ["pay slip", "payslip", "salary slip", "monthly pay slip"],                                      route: "pay-slip" },
+  { kw: ["pay statement", "salary statement", "annual salary", "tax statement"],                         route: "pay-statement" },
+  { kw: ["file dropbox", "dropbox", "upload file", "file upload", "submit file"],                        route: "file-dropbox" },
+  { kw: ["knowledge base", "knowledgebase", "employee manual", "sops", "circular archives"],              route: "knowledge-base" },
+  { kw: ["file monitoring", "track file", "file status", "file tracker", "file check"],                  route: "file-monitoring" },
+  { kw: ["officer directory", "officer list", "telephone directory", "phonebook", "directory"],           route: "officers-directory" },
+  { kw: ["web information manager", "web info manager", "wim"],                                          route: "web-info-manager" },
+  { kw: ["smart city initiatives", "initiatives", "smart city projects"],                                route: "smart-city-initiatives" },
+  { kw: ["payment status", "check payment", "verify transaction", "payment transaction", "verify pay"], route: "payment-status" },
+  { kw: ["hyperlink policy", "hyperlink"],                                                               route: "hyperlink-policy" },
+  { kw: ["copyright policy", "copyright"],                                                               route: "copyright-policy" },
 ];
 
 // ── Knowledge Entries ────────────────────────────────────────────
 // Each entry: { id, cat, kw[], q, a, followUps[], route? }
 
 const knowledgeBase = [
+  // ── EMPLOYEE CORNER & INTRANET ───────────────────────────────
+  {
+    id: "employee-corner",
+    cat: "employee",
+    kw: ["employee corner", "employee", "staff portal", "staff tools", "intranet", "officials portal", "login official", "operator login", "redirect admin"],
+    q: "What is the Employee Corner?",
+    a: "The **Employee Corner** is a dedicated intranet portal for Jammu Municipal Corporation staff. It provides official tools and links including:\n\n• **Salary Certificate** — request and view salary statements\n• **Pay Slip** — generate monthly pay slips\n• **Pay Statement** — view annual breakdown for tax assessment\n• **File Dropbox** — upload administrative files securely\n• **Knowledge Base** — access SOPs, manuals, and JMC guidelines\n• **File Monitoring** — track active file movement and workflows\n• **Official & Operator Logins** — redirects directly to the Strapi CMS administrative console at `/admin`.\n\nYou can access it at [Employee Corner](/employee-corner).",
+    followUps: ["salary-certificate", "pay-slip", "file-dropbox", "file-monitoring"],
+    route: "employee-corner"
+  },
+  {
+    id: "salary-certificate",
+    cat: "employee",
+    kw: ["salary certificate", "salary", "certificate of salary", "cpis id", "employee code"],
+    q: "How do I get my Salary Certificate?",
+    a: "JMC employees can generate their official Salary Certificate online:\n\n1. Visit the [Salary Certificate](/employee-corner/salary-certificate) page.\n2. Enter your **Employee Code / CPIS ID** (e.g., JMC12345).\n3. Choose the Month and Financial Year.\n4. Click **Generate** to view a printable worksheet showing Gross Earnings, Deductions (GPF, GIS, Tax, etc.), and Net Salary.\n5. Click the print button to save/print the official JMC certificate.",
+    followUps: ["pay-slip", "pay-statement", "employee-corner"],
+    route: "salary-certificate"
+  },
+  {
+    id: "pay-slip",
+    cat: "employee",
+    kw: ["pay slip", "payslip", "salary slip", "monthly slip"],
+    q: "How do I download my monthly Pay Slip?",
+    a: "JMC employees can download monthly pay slips directly:\n\n1. Go to the [Pay Slip](/employee-corner/pay-slip) page.\n2. Provide your **Employee Code / CPIS ID** and select the month/year.\n3. Click **Generate Pay Slip**.\n4. The system will retrieve your salary statement matching the JMC payroll records, ready for download or printing.",
+    followUps: ["salary-certificate", "pay-statement", "employee-corner"],
+    route: "pay-slip"
+  },
+  {
+    id: "pay-statement",
+    cat: "employee",
+    kw: ["pay statement", "salary statement", "annual salary", "tax breakups"],
+    q: "How do I download my annual Pay Statement?",
+    a: "To download your annual salary statement for tax filings and GPF assessment:\n\n1. Go to the [Pay Statement](/employee-corner/pay-statement) page.\n2. Enter your **Employee Code / CPIS ID** and select the Financial Year (e.g., 2025-2026).\n3. Click **Fetch Statement** to view a month-by-month table of earnings, allowances, and tax/GPF deductions.",
+    followUps: ["salary-certificate", "pay-slip", "employee-corner"],
+    route: "pay-statement"
+  },
+  {
+    id: "file-dropbox",
+    cat: "employee",
+    kw: ["dropbox", "file dropbox", "upload file", "submit file", "file upload"],
+    q: "How do I upload files to the Dropbox?",
+    a: "JMC staff can upload administrative documents using the uploader:\n\n1. Go to the [File Dropbox](/employee-corner/file-dropbox) page.\n2. Drag and drop your file or click inside the upload box to browse your device.\n3. The file will be queued and uploaded securely to the JMC repository, appearing in your local uploads log.",
+    followUps: ["file-monitoring", "employee-corner"],
+    route: "file-dropbox"
+  },
+  {
+    id: "knowledge-base",
+    cat: "employee",
+    kw: ["knowledge base", "knowledgebase", "sops", "manuals", "guidelines", "rules"],
+    q: "Where is the JMC Employee Knowledge Base?",
+    a: "You can find JMC SOPs, manuals, circular archives, and guidelines in the [Knowledge Base](/employee-corner/knowledge-base).\n\nYou can search files, filter by categories (SOPs, Circulars, Manuals), and download PDFs directly.",
+    followUps: ["employee-corner", "file-dropbox"],
+    route: "knowledge-base"
+  },
+  {
+    id: "file-monitoring",
+    cat: "employee",
+    kw: ["file monitoring", "track file", "file tracking number", "file movement", "workflow tracking"],
+    q: "How do I track active files and approvals?",
+    a: "You can track the movement of active files through JMC administrative sections:\n\n1. Go to the [File Monitoring](/employee-corner/file-monitoring) page.\n2. Enter your **File Tracking Number** (e.g., JMC/2026/SEC/104).\n3. Click **Track File** to view an interactive timeline of approvals (Draft -> Accounts -> Establishment -> Legal -> Commissioner's Desk) showing current section and transit details.",
+    followUps: ["employee-corner", "file-dropbox"],
+    route: "file-monitoring"
+  },
+
+  // ── CITIZEN E-GOVERNANCE FALBACKS ────────────────────────────
+  {
+    id: "sewerage-verification",
+    cat: "egov",
+    kw: ["sewerage connection", "sewer connection", "verify sewerage", "sewer connection check", "sewer verification"],
+    q: "How do I verify my sewerage connection status?",
+    a: "You can verify your JMC sewerage connection permission status online through the official portal:\n\nhttps://jmc.jk.gov.in/sewconnectverify.aspx\n\nSimply enter your application number or ward details to check connection validity.",
+    followUps: ["egov-services", "water-tanker"]
+  },
+  {
+    id: "shop-rent",
+    cat: "egov",
+    kw: ["municipal shop rent", "shop rent", "flat rent", "municipal flat rent", "pay rent", "jmc rent"],
+    q: "How do I pay rent for JMC shops or flats?",
+    a: "To pay monthly rent for municipal shops or residential flats, use the official JMC Other Fee portal:\n\nhttps://jmc.jk.gov.in/OtherFee.aspx\n\nSelect the department and asset type to complete payment securely.",
+    followUps: ["pay-online-how", "egov-services"]
+  },
+  {
+    id: "user-charges",
+    cat: "egov",
+    kw: ["user charges", "sanitation charges", "garbage collection charges", "user fees", "safai fee"],
+    q: "How do I pay municipal user charges / sanitation fees?",
+    a: "You can pay sanitation user charges online through our portal:\n\n1. Go to the [Payment Form](/pay-online) page.\n2. Select **\"Other Fee\"**.\n3. Choose **Health Section** or **Revenue Section**.\n4. Input **\"Sanitation User Charges\"** as the Type of Fee and fill in your details.\n5. Pay online securely via BillDesk.",
+    followUps: ["pay-online-how", "egov-services"]
+  },
+  {
+    id: "web-info-manager",
+    cat: "general",
+    kw: ["web information manager", "web info manager", "wim", "who manages website"],
+    q: "Who is the Web Information Manager?",
+    a: "The Jammu Municipal Corporation website is maintained and managed under the supervision of the designated Web Information Manager. You can view contacts and responsibilities on the [Web Information Manager](/web-info-manager) page.",
+    followUps: ["contact-helpline", "officer-contacts"],
+    route: "web-info-manager"
+  },
+  {
+    id: "smart-city-initiatives",
+    cat: "projects",
+    kw: ["smart city initiatives", "smart city projects", "city projects", "initiatives list"],
+    q: "What are the active Smart City initiatives in Jammu?",
+    a: "Jammu Smart City covers several IT, infrastructure, beautification, and transport initiatives (like e-buses, smart parking, vertical gardens, and public Wi-Fi). You can browse the complete list of projects on the [Smart City Initiatives](/smart-city-initiatives) page.",
+    followUps: ["smart-city", "development-works"],
+    route: "smart-city-initiatives"
+  },
+  {
+    id: "payment-status",
+    cat: "payments",
+    kw: ["check payment status", "verify transaction status", "transaction status", "check receipt status"],
+    q: "How do I verify the status of a payment transaction?",
+    a: "If you have initiated a payment and want to verify its status or re-download the receipt, you can visit the [Payment Status](/payment-status) page. Enter your Order ID to retrieve transaction results directly from the BillDesk server.",
+    followUps: ["pay-online-how", "payment-failed"],
+    route: "payment-status"
+  },
+  {
+    id: "officers-directory",
+    cat: "contact",
+    kw: ["officer directory", "phone list", "officer numbers", "telephone numbers"],
+    q: "Where is the JMC Officer Directory?",
+    a: "The complete directory of all JMC department heads, executive engineers, health officers, and administrative staff is available on the [Officer Directory](/officers-directory) page. It lists names, designations, emails, and direct phone lines.",
+    followUps: ["officer-contacts", "contact-helpline"],
+    route: "officers-directory"
+  },
+
   // ── GENERAL ──────────────────────────────────────────────────
   {
     id: "what-is-jmc",
@@ -260,8 +419,9 @@ const knowledgeBase = [
     cat: "egov",
     kw: ["e-governance", "digital", "online service", "portal", "egov"],
     q: "What e-governance services are available?",
-    a: "JMC offers **15 digital services** through its E-Governance page:\n\n1. **Online Property Tax Payment**\n2. **Online Grievance Redressal** (MyJammu)\n3. **Water Tanker Booking** (MyJammu)\n4. **Building Plan Permission** (HUDD BPS)\n5. **Birth & Death Certificate** (JAKSMAC)\n6. **Online NOC / Trade License** (JanSugam)\n7. **Rehri License** (JAKSMAC)\n8. **Pet Dog Registration** (JAKSMAC)\n9. **Pay Rent – Municipal Shop/Flat**\n10. **Online User Charges**\n11. **Sewerage Connection Verification**\n12. **Panjtirthi Slot Booking**\n13. **E-Tendering** (jktenders.gov.in)\n14. **E-Newsletter**\n15. **Feedback & Suggestions**",
+    a: "JMC offers **15 digital services** through its E-Governance page:\n\n1. **Online Property Tax Payment** (https://jmc.jk.gov.in/propertytax.aspx or internal [Payment Form](/pay-online))\n2. **Online Grievance Redressal** (https://myjammu.in/grievance/GrievanceDepartment)\n3. **Water Tanker Booking** (https://myjammu.in/)\n4. **Building Plan Permission** (https://jkhuddobps.in/)\n5. **Birth & Death Certificate** (https://serviceonline.gov.in/jammu/)\n6. **Online NOC / Trade License** (https://jansugam.jk.gov.in/)\n7. **Rehri License** (https://serviceonline.gov.in/jammu/)\n8. **Pet Dog Registration** (https://serviceonline.gov.in/jammu/)\n9. **Pay Rent – Municipal Shop/Flat** (https://jmc.jk.gov.in/OtherFee.aspx)\n10. **Online User Charges** (internal [Payment Form](/pay-online))\n11. **Sewerage Connection Verification** (https://jmc.jk.gov.in/sewconnectverify.aspx)\n12. **Panjtirthi Slot Booking** (https://jmc.jk.gov.in/index.html)\n13. **E-Tendering** (https://jktenders.gov.in/)\n14. **E-Newsletter** (https://jmc.jk.gov.in/newsletter.aspx)\n15. **Feedback & Suggestions** (https://jmc.jk.gov.in/feedback.aspx)\n\nYou can access the complete listings page at [E-Governance](/egov).",
     followUps: ["birth-death-cert", "building-permission", "trade-license"],
+    route: "egov"
   },
   {
     id: "birth-death-cert",
@@ -486,25 +646,6 @@ const knowledgeBase = [
     followUps: [],
   },
 
-  // ── PROPERTY TAX ────────────────────────────────────────────
-  {
-    id: "property-tax",
-    cat: "payments",
-    kw: ["property tax", "house tax", "tax payment", "ghar ka tax", "property", "self assessment"],
-    q: "How do I pay property tax?",
-    a: "To pay property tax online:\n\n1. Go to the **E-Governance** page\n2. Click on **\"Online Property Tax Payment\"**\n3. You'll be redirected to the JMC property tax portal\n4. Enter your property details / ID\n5. Review the assessed amount\n6. Pay via card, net banking, or UPI\n\nFor property tax queries, contact the **Revenue & Taxation Department**.\n\n📞 **Helpline:** 18001807207",
-    followUps: ["pay-online-how", "egov-services", "contact-helpline"],
-  },
-
-  // ── PANJTIRTHI BOOKING ──────────────────────────────────────
-  {
-    id: "panjtirthi",
-    cat: "services",
-    kw: ["panjtirthi", "slot", "booking", "cremation", "last rites", "antim sanskar"],
-    q: "How do I book a Panjtirthi slot?",
-    a: "Book a Panjtirthi (cremation ground) slot online through the JMC portal:\n\n1. Go to the **E-Governance** page\n2. Click **\"Panjtirthi Slot Booking\"**\n3. Fill your details and select a date/time slot\n4. Confirm the booking\n\nFor urgent requirements, call the **Toll-Free Helpline: 18001807207**.",
-    followUps: ["contact-helpline"],
-  },
 
   // ── ROAD DAMAGE ─────────────────────────────────────────────
   {
@@ -716,7 +857,7 @@ const synonymGroups = [
     canonical: "trade-license"
   },
   {
-    keys: ["birth", "death", "certificate", "born", "died", "janam", "janm", "mrityu"],
+    keys: ["birth certificate", "death certificate", "birth cert", "death cert", "born", "died", "janam", "janm", "mrityu", "birth", "death"],
     canonical: "birth-death-cert"
   },
   {
@@ -730,6 +871,32 @@ const synonymGroups = [
   {
     keys: ["tender", "notice", "bid", "contractor", "nit"],
     canonical: "tenders"
+  },
+  
+  // New synonym groups for employee corner subpages
+  {
+    keys: ["salary certificate", "salary bill", "salary sheet", "certificate of salary", "cpis"],
+    canonical: "salary-certificate"
+  },
+  {
+    keys: ["pay slip", "payslip", "salary slip", "monthly slip", "pay slip download"],
+    canonical: "pay-slip"
+  },
+  {
+    keys: ["pay statement", "salary statement", "annual salary", "tax statement", "tax breakup"],
+    canonical: "pay-statement"
+  },
+  {
+    keys: ["file monitoring", "track file", "file status", "file tracker", "file check", "file progress"],
+    canonical: "file-monitoring"
+  },
+  {
+    keys: ["file dropbox", "dropbox", "upload file", "file upload", "submit file"],
+    canonical: "file-dropbox"
+  },
+  {
+    keys: ["knowledge base", "knowledgebase", "sops", "manuals", "guidelines"],
+    canonical: "knowledge-base"
   }
 ];
 
@@ -997,22 +1164,34 @@ function matchDestination(dest) {
   let bestScore = 0;
 
   for (const alias of navAliases) {
-    let score = 0;
+    let maxKwScore = 0;
     for (const kw of alias.kw) {
+      let kwScore = 0;
       const kwLower = kw.toLowerCase();
-      // Full phrase match inside dest
-      if (dest.includes(kwLower)) {
-        score += kwLower.split(/\s+/).length * 5;
+      // Full phrase match inside dest (on word boundaries)
+      const hasPhrase = new RegExp(`\\b${kwLower.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i').test(dest);
+      if (hasPhrase) {
+        kwScore += kwLower.split(/\s+/).length * 5;
       }
       // Token-level matching
       for (const tok of destTokens) {
-        if (kwLower === tok) score += 4;
-        else if (tok.length >= 3 && kwLower.includes(tok)) score += 2;
-        else if (tok.length >= 3 && tok.includes(kwLower)) score += 2;
+        if (kwLower === tok) {
+          kwScore += 4;
+        } else if (tok.length >= 3 && kwLower.includes(tok)) {
+          kwScore += 2;
+        } else if (tok.length >= 3 && tok.includes(kwLower)) {
+          // Prevent substring matches in the middle of a token for short acronyms/keywords (e.g. 'rti' inside 'certificate')
+          if (tok.startsWith(kwLower) || tok.endsWith(kwLower) || kwLower.length >= 4) {
+            kwScore += 2;
+          }
+        }
+      }
+      if (kwScore > maxKwScore) {
+        maxKwScore = kwScore;
       }
     }
-    if (score > bestScore) {
-      bestScore = score;
+    if (maxKwScore > bestScore) {
+      bestScore = maxKwScore;
       bestRoute = alias.route;
     }
   }
