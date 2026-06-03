@@ -23,15 +23,7 @@ export default function EmployeeCorner() {
     : "https://jammu-municipal-corporation.onrender.com/admin";
 
   const EMPLOYEE_TOOLS = [
-    {
-      name: "Webmail",
-      description: "Access official Jammu & Kashmir government e-mail services.",
-      icon: Mail,
-      type: "external",
-      href: "https://mail.jk.gov.in",
-      bgClass: "bg-blue-50 text-blue-600 border-blue-100",
-      hoverBgClass: "hover:bg-blue-50/50 hover:border-blue-300",
-    },
+
     {
       name: "Official Login",
       description: "Sign in to the JMC Administrative and Municipal dashboard.",
@@ -41,15 +33,7 @@ export default function EmployeeCorner() {
       bgClass: "bg-teal-50 text-teal-600 border-teal-100",
       hoverBgClass: "hover:bg-teal-50/50 hover:border-teal-300",
     },
-    {
-      name: "Operator Login",
-      description: "Access portal for operators, counter clerks, and data agents.",
-      icon: Key,
-      type: "external",
-      href: adminUrl,
-      bgClass: "bg-indigo-50 text-indigo-600 border-indigo-100",
-      hoverBgClass: "hover:bg-indigo-50/50 hover:border-indigo-300",
-    },
+
     {
       name: "Birth Certificate",
       description: "Verify, issue, and manage birth & death registration certificates.",
