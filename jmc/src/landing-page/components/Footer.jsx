@@ -63,8 +63,7 @@ const STATIC_COLUMNS = [
     links: [
       {
         name: "Achievements",
-        url: "/footer/achievement1.pdf",
-        is_external: true,
+        href: "https://jmc.jk.gov.in/forms/achievement1.pdf",
       },
       { name: "Smart City Projects", url: "/smart-city", is_external: false },
       {
