@@ -773,6 +773,39 @@ export interface ApiNewsTickerNewsTicker extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiNewsletterNewsletter extends Struct.CollectionTypeSchema {
+  collectionName: 'newsletters';
+  info: {
+    description: 'Monthly JMC newsletters and publications.';
+    displayName: '\uD83D\uDCF0 JMC Newsletter';
+    pluralName: 'newsletters';
+    singularName: 'newsletter';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    document: Schema.Attribute.Media<'files' | 'images'>;
+    link: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::newsletter.newsletter'
+    > &
+      Schema.Attribute.Private;
+    month: Schema.Attribute.String & Schema.Attribute.Required;
+    pdf: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    year: Schema.Attribute.Integer & Schema.Attribute.Required;
+  };
+}
+
 export interface ApiNoticeNotice extends Struct.CollectionTypeSchema {
   collectionName: 'notices';
   info: {
@@ -937,6 +970,7 @@ export interface ApiSmartCityTenderSmartCityTender
     description: Schema.Attribute.RichText;
     document: Schema.Attribute.Media<'files'>;
     estimated_cost: Schema.Attribute.String;
+    link: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1600,6 +1634,7 @@ declare module '@strapi/strapi' {
       'api::location.location': ApiLocationLocation;
       'api::minister.minister': ApiMinisterMinister;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
+      'api::newsletter.newsletter': ApiNewsletterNewsletter;
       'api::notice.notice': ApiNoticeNotice;
       'api::office-location.office-location': ApiOfficeLocationOfficeLocation;
       'api::official.official': ApiOfficialOfficial;

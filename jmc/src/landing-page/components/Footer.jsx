@@ -114,6 +114,8 @@ function FooterLink({ link }) {
   const cls =
     "text-gray-400 text-[13px] hover:text-[#FF6600] transition-colors duration-200";
 
+  if (!link.url) return null;
+
   if (link.is_external || link.url?.startsWith("http")) {
     return (
       <a
