@@ -21,6 +21,10 @@
       "required": true,
       "unique": true
     },
+    "link": {
+      "type": "string",
+      "required": false
+    },
     "category": {
       "type": "string",
       "required": true

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
 import { getSmartCityTenders } from "../services/strapiApi";
+import { STRAPI_URL } from "../config/api";
 import { logError } from "../utils/errorLogger";
 
 const STATUS_COLORS = {
@@ -35,6 +36,12 @@ export default function SmartCityTenders() {
       .then((res) => {
         const items = (res.data?.data || []).map((item) => {
           const a = item.attributes || item;
+          let href = a.link || "#";
+          if (a.document?.data?.attributes?.url) {
+            href = `${STRAPI_URL}${a.document.data.attributes.url}`;
+          } else if (a.document?.url) {
+            href = `${STRAPI_URL}${a.document.url}`;
+          }
           return {
             id: a.tender_id || item.id,
             title: a.title,
@@ -45,6 +52,7 @@ export default function SmartCityTenders() {
             closingDate: a.closing_date || "",
             estimatedCost: a.estimated_cost || "",
             description: a.description || "",
+            href,
           };
         });
         setTenders(items);
@@ -308,7 +316,7 @@ export default function SmartCityTenders() {
 
                   <div className="p-5">
                     {/* Header Row */}
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <span className="text-[10px] font-mono font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded">
@@ -323,10 +331,25 @@ export default function SmartCityTenders() {
                             {tender.category}
                           </span>
                         </div>
-                        <h3 className="text-sm font-semibold text-[#003366] leading-relaxed group-hover:text-[#0055a4] transition-colors">
+                        <a
+                          href={tender.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-semibold text-[#003366] leading-relaxed hover:text-[#FF6600] hover:underline transition-colors block"
+                        >
                           • {tender.title}
-                        </h3>
+                        </a>
                       </div>
+                      {tender.href && tender.href !== "#" && (
+                        <a
+                          href={tender.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sm:self-center flex-shrink-0 border border-[#FF6600] text-[#FF6600] hover:bg-[#FF6600] hover:text-white text-xs px-3 py-1 rounded-lg transition-colors font-bold uppercase tracking-wider"
+                        >
+                          View
+                        </a>
+                      )}
                     </div>
 
                     {/* Meta Row */}

@@ -42,7 +42,7 @@ const STATIC_COLUMNS = [
       { name: "Photo Gallery", url: "/gallery", is_external: false },
       { name: "Tenders", url: "/notices", is_external: false },
       { name: "Public Notices", url: "/notices", is_external: false },
-      { name: "E-Newsletter", url: "/notices", is_external: false },
+      { name: "E-Newsletter", url: "/newsletter", is_external: false },
       { name: "RTI", url: "/rti", is_external: false },
     ],
   },

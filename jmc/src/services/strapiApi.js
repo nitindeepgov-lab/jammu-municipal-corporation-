@@ -372,4 +372,12 @@ export const getVisitorCount = () => api.get("/visitor-count/current");
 /** Increment and return the global visitor count */
 export const incrementVisitorCount = () => api.post("/visitor-count/increment");
 
+// ── Newsletters ─────────────────────────────────────────────
+
+/** Fetch all newsletters ordered by year and month */
+export const getNewsletters = () =>
+  getCached("newsletters-all", () =>
+    api.get("/newsletters?populate=*&pagination[pageSize]=250")
+  );
+
 export default api;
