@@ -8,22 +8,32 @@
   font-weight: 400;
 }
 
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ── Prevent horizontal overflow on ALL screens ── */
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
 body {
+  overflow-x: hidden;
   margin: 0;
   min-width: 320px;
   background-color: #ffffff;
   color: #333333;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
@@ -31,6 +41,24 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #003366;
   border-radius: 4px;
+}
+
+/* ── Responsive table utility ── */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-responsive table {
+  min-width: 600px;
+  width: 100%;
+}
+
+/* ── Mobile-safe dropdown panel ── */
+.mobile-safe-panel {
+  max-width: calc(100vw - 16px) !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
 }
 
 /* Marquee animation */
@@ -102,3 +130,17 @@ body.ac-highlight-links a {
   text-decoration: underline !important;
   outline: 1px solid #000 !important;
 }
+
+/* ── Responsive images ── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Prevent text overflow in tables on mobile ── */
+@media (max-width: 640px) {
+  td, th {
+    word-break: break-word;
+  }
+}
+
