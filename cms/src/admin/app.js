@@ -2241,58 +2241,230 @@ const injectAdminStyles = () => {
     characterData: false,
   });
 
-  /* ── SubNav sidebar JS enhancements ── */
-  const enhanceSubNav = debounce(() => {
-    const subNavEl = document.querySelector('[class*="SubNav"]');
-    if (!subNavEl || subNavEl.dataset.jmcEnhanced) return;
-    subNavEl.dataset.jmcEnhanced = "1";
+  /* ── Content Manager Sidebar — DOM-based styling (Strapi v5 uses hashed sc- classes) ── */
+  const JMC_SIDEBAR_ID = 'jmc-cm-sidebar-styled';
 
-    // Staggered entrance animation for all nav links
-    const navLinks = subNavEl.querySelectorAll('a');
-    const enterStyle = document.createElement('style');
-    enterStyle.textContent = `
-      @keyframes jmcNavItemIn {
-        0% { opacity: 0; transform: translateX(-10px); }
-        100% { opacity: 1; transform: translateX(0); }
+  const injectSidebarKeyframes = () => {
+    if (document.getElementById('jmc-sidebar-kf')) return;
+    const kf = document.createElement('style');
+    kf.id = 'jmc-sidebar-kf';
+    kf.textContent = `
+      @keyframes jmcNavIn {
+        from { opacity: 0; transform: translateX(-8px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes jmcSidebarFadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
       }
     `;
-    document.head.appendChild(enterStyle);
-    navLinks.forEach((link, i) => {
-      link.style.opacity = '0';
-      link.style.animation = `jmcNavItemIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 28}ms forwards`;
+    document.head.appendChild(kf);
+  };
+
+  const styleLink = (link, isActive, index) => {
+    const base = `
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding: 9px 14px !important;
+      margin: 2px 8px !important;
+      border-radius: 10px !important;
+      font-size: 13px !important;
+      font-weight: ${isActive ? '700' : '500'} !important;
+      text-decoration: none !important;
+      letter-spacing: 0.01em !important;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;
+      border: 1px solid ${isActive ? 'transparent' : 'transparent'} !important;
+      cursor: pointer !important;
+      min-height: 38px !important;
+      position: relative !important;
+      overflow: hidden !important;
+      animation: jmcNavIn 0.3s cubic-bezier(0.16,1,0.3,1) ${index * 30}ms both !important;
+    `;
+    if (isActive) {
+      link.style.cssText = base + `
+        background: linear-gradient(135deg, #003366 0%, #004d99 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(0,51,102,0.28), 0 1px 4px rgba(0,51,102,0.15) !important;
+      `;
+    } else {
+      link.style.cssText = base + `
+        background: transparent !important;
+        color: #475569 !important;
+        box-shadow: none !important;
+      `;
+      link.addEventListener('mouseenter', () => {
+        link.style.background = '#ffffff';
+        link.style.color = '#003366';
+        link.style.boxShadow = '0 2px 10px rgba(0,51,102,0.08), 0 1px 3px rgba(0,0,0,0.04)';
+        link.style.border = '1px solid #e0e7f0';
+        link.style.transform = 'translateX(3px)';
+      }, { passive: true });
+      link.addEventListener('mouseleave', () => {
+        link.style.background = 'transparent';
+        link.style.color = '#475569';
+        link.style.boxShadow = 'none';
+        link.style.border = '1px solid transparent';
+        link.style.transform = 'translateX(0)';
+      }, { passive: true });
+    }
+  };
+
+  const enhanceSidebar = debounce(() => {
+    // Find the Content Manager sidebar: look for the aside/nav that contains
+    // links to /content-manager/collection-types/
+    const allLinks = Array.from(document.querySelectorAll('a[href*="content-manager"]'));
+    if (!allLinks.length) return;
+
+    // Find the sidebar container by walking up from a CM link
+    const sampleLink = allLinks.find(l => l.href.includes('collection-types') || l.href.includes('single-types'));
+    if (!sampleLink) return;
+
+    // Walk up to find a scrollable sidebar-like container
+    let sidebar = sampleLink.parentElement;
+    for (let i = 0; i < 8 && sidebar; i++) {
+      const rect = sidebar.getBoundingClientRect();
+      // Sidebar is typically tall, narrow, on the left
+      if (rect.width > 160 && rect.width < 380 && rect.height > 300) break;
+      sidebar = sidebar.parentElement;
+    }
+    if (!sidebar || sidebar.id === JMC_SIDEBAR_ID) return;
+
+    // Don't re-process if already done
+    if (sidebar.dataset.jmcSb === '1') return;
+    sidebar.dataset.jmcSb = '1';
+
+    injectSidebarKeyframes();
+
+    // Style the sidebar container itself
+    sidebar.style.cssText = `
+      background: #f7f8fc !important;
+      border-right: 1px solid #e2e8f0 !important;
+      min-width: 244px !important;
+      max-width: 244px !important;
+      padding: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      scrollbar-width: thin !important;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.05) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      animation: jmcSidebarFadeIn 0.4s ease both !important;
+    `;
+
+    // Style all collection-type / single-type links
+    const cmLinks = Array.from(sidebar.querySelectorAll('a[href*="content-manager"]'));
+    cmLinks.forEach((link, i) => {
+      const isActive = link.getAttribute('aria-current') === 'page'
+        || link.classList.contains('active')
+        || window.location.href.includes(link.getAttribute('href') || '___');
+      styleLink(link, isActive, i);
     });
 
-    // Inject a bottom footer strip into SubNav
+    // Style section header labels (COLLECTION TYPES / SINGLE TYPES)
+    // These are typically <p> or <span> tags containing those words
+    sidebar.querySelectorAll('p, span, div').forEach(el => {
+      const txt = (el.textContent || '').trim().toUpperCase();
+      if ((txt === 'COLLECTION TYPES' || txt === 'SINGLE TYPES') && el.children.length === 0) {
+        el.style.cssText = `
+          font-size: 9px !important;
+          font-weight: 800 !important;
+          letter-spacing: 0.14em !important;
+          color: #94a3b8 !important;
+          text-transform: uppercase !important;
+          padding: 16px 16px 5px 16px !important;
+          margin: 0 !important;
+          display: block !important;
+        `;
+      }
+    });
+
+    // Style the top header area (first child that isn't a link list)
+    const firstChild = sidebar.firstElementChild;
+    if (firstChild && !firstChild.querySelector('a[href*="content-manager"]')) {
+      firstChild.style.cssText = `
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        background: rgba(255,255,255,0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid #e8ecf3 !important;
+        padding: 14px 14px 12px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+      `;
+      // Style any h2/h3/title within it
+      firstChild.querySelectorAll('h1,h2,h3,h4,span,p').forEach(el => {
+        if (el.children.length === 0 && el.textContent.trim().length > 0) {
+          el.style.fontSize = '11px';
+          el.style.fontWeight = '800';
+          el.style.letterSpacing = '0.08em';
+          el.style.color = '#003366';
+          el.style.textTransform = 'uppercase';
+        }
+      });
+      // Style search input if present
+      firstChild.querySelectorAll('input').forEach(inp => {
+        inp.style.cssText = `
+          border-radius: 10px !important;
+          background: #f0f2f8 !important;
+          border: 1.5px solid transparent !important;
+          padding: 8px 12px !important;
+          font-size: 12.5px !important;
+          width: 100% !important;
+          color: #0f172a !important;
+          transition: all 0.2s ease !important;
+          box-sizing: border-box !important;
+        `;
+        inp.addEventListener('focus', () => {
+          inp.style.background = '#fff';
+          inp.style.borderColor = '#003366';
+          inp.style.boxShadow = '0 0 0 3px rgba(0,51,102,0.1)';
+        }, { passive: true });
+        inp.addEventListener('blur', () => {
+          inp.style.background = '#f0f2f8';
+          inp.style.borderColor = 'transparent';
+          inp.style.boxShadow = 'none';
+        }, { passive: true });
+      });
+    }
+
+    // Inject branded footer at bottom of sidebar
     if (!document.getElementById('jmc-subnav-footer')) {
       const footer = document.createElement('div');
       footer.id = 'jmc-subnav-footer';
       footer.style.cssText = `
         margin-top: auto;
         padding: 14px 16px 18px;
-        border-top: 1px solid #edf0f5;
+        border-top: 1px solid #e8ecf3;
         display: flex;
         align-items: center;
         gap: 10px;
-        background: #f8f9fc;
+        background: #f7f8fc;
+        flex-shrink: 0;
       `;
       footer.innerHTML = `
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#003366,#004d99);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
         <div style="min-width:0;">
-          <div style="font-size:11px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">JMC Content Hub</div>
+          <div style="font-size:11px;font-weight:700;color:#0f172a;letter-spacing:-0.01em;">JMC Content Hub</div>
           <div style="font-size:10px;color:#94a3b8;margin-top:1px;">Jammu Municipal Corp.</div>
         </div>
       `;
-      subNavEl.appendChild(footer);
+      sidebar.appendChild(footer);
     }
-  }, 400);
+  }, 350);
 
-  // Run on DOM changes so it picks up when SubNav mounts
-  const subNavObserver = new MutationObserver(enhanceSubNav);
+  // Observe DOM mutations to catch when the sidebar mounts (SPA navigation)
+  const subNavObserver = new MutationObserver(enhanceSidebar);
   subNavObserver.observe(document.body, { childList: true, subtree: true });
-  // Also run immediately in case already mounted
-  enhanceSubNav();
+  enhanceSidebar();
+
+  // Re-apply on route change (hash or pushState)
+  window.addEventListener('popstate', enhanceSidebar);
+  const origPush = history.pushState.bind(history);
+  history.pushState = (...args) => { origPush(...args); setTimeout(enhanceSidebar, 300); };
 };
 
 /* ═══════════════════════════════════════════════════════════
