@@ -47,7 +47,12 @@ module.exports = {
 
       // Force list view columns to be exactly: id, customerName, orderId, transactionId
       value.layouts = value.layouts || {};
-      value.layouts.list = ["id", "customerName", "orderId", "transactionId"];
+      value.layouts.list = [
+        { name: "id", size: 1 },
+        { name: "customerName", size: 3 },
+        { name: "orderId", size: 3 },
+        { name: "transactionId", size: 5 },
+      ];
 
       // Force Edit View layout to show only the 8 core readable fields
       value.layouts.edit = [
@@ -203,7 +208,14 @@ module.exports = {
           defaultSortOrder: "ASC",
         },
         layouts: {
-          list: ["name", "url", "section", "is_active", "order", "is_external"],
+          list: [
+            { name: "name", size: 3 },
+            { name: "url", size: 3 },
+            { name: "section", size: 2 },
+            { name: "is_active", size: 1 },
+            { name: "order", size: 1 },
+            { name: "is_external", size: 2 },
+          ],
           edit: [
             [{ name: "name", size: 6 }, { name: "url", size: 6 }],
             [{ name: "section", size: 4 }, { name: "order", size: 4 }, { name: "is_active", size: 4 }],
