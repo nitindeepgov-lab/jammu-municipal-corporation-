@@ -123,7 +123,7 @@ export default function TopBar() {
               </svg>
             </button>
             {searchOpen && (
-              <div className="absolute top-full right-0 bg-white shadow-lg p-3 z-[9999] w-64 mt-px">
+              <div className="absolute top-full right-0 bg-white shadow-lg p-3 z-[9999] mt-px" style={{ width: 'min(256px, calc(100vw - 16px))' }}>
                 <div className="flex gap-2">
                   <input type="search" placeholder="Search..." autoFocus className="flex-1 border border-gray-300 px-2 py-1.5 text-gray-800 text-sm rounded" />
                   <button className="bg-[#FF6600] text-white px-3 py-1.5 text-sm rounded hover:bg-[#e65c00]">Go</button>
@@ -173,7 +173,7 @@ export default function TopBar() {
             </button>
 
             {accessOpen && (
-              <div className="absolute top-full right-0 bg-white shadow-2xl z-[9999] mt-px border border-gray-200" style={{ width: '320px' }}>
+              <div className="absolute top-full right-0 bg-white shadow-2xl z-[9999] mt-px border border-gray-200 mobile-safe-panel" style={{ width: 'min(320px, calc(100vw - 16px))' }}>
                 {/* Panel header */}
                 <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
                   <h3 className="text-gray-800 font-semibold text-sm">Accessibility Tools</h3>

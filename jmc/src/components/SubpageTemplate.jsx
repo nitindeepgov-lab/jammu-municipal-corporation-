@@ -306,7 +306,7 @@ export default function SubpageTemplate({
               </nav>
 
               {/* Refined Title */}
-              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] break-words">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1] break-words">
                 {title}
               </h1>
             </div>
@@ -317,7 +317,7 @@ export default function SubpageTemplate({
       {/* Main Content Area */}
       <div className="bg-[#f8fafc] min-h-screen">
         <div className="mx-auto w-[min(96%,1400px)] px-1.5 sm:px-4 py-8 sm:py-10 md:py-14 lg:py-16">
-          <div className="flex flex-col xl:flex-row gap-8 sm:gap-10 lg:gap-14 xl:gap-16">
+          <div className="flex flex-col xl:flex-row gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
             {/* Sidebar - Hidden on mobile, visible on desktop */}
             <div className="hidden lg:block w-full xl:w-72 flex-shrink-0 xl:sticky xl:top-6 xl:self-start">
               <Sidebar />

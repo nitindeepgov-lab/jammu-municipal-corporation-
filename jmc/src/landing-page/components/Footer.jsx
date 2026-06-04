@@ -265,7 +265,7 @@ export default function Footer() {
       {/* Contact strip */}
       <div className="bg-[#003366]">
         <div className="max-w-[1200px] mx-auto px-4 py-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
               {
                 label: "Address",
@@ -366,9 +366,9 @@ export default function Footer() {
 
       {/* Main footer body */}
       <div className="max-w-[1200px] mx-auto px-4 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-6">
-          {/* Brand column — spans 2 cols on md */}
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 md:gap-6">
+          {/* Brand column — full width on mobile, spans 2 cols on md */}
+          <div className="col-span-1 sm:col-span-2">
             <div className="flex items-center gap-3 mb-5">
               <img
                 src="/logo.jpeg"
