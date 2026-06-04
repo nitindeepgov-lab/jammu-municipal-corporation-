@@ -36,7 +36,7 @@ const FOOTER_LINKS = [
   { name: 'Photo Gallery',         url: '/gallery',                        is_external: false, section: 'quick-links', order: 3, is_active: true },
   { name: 'Tenders',               url: '/notices',                        is_external: false, section: 'quick-links', order: 4, is_active: true },
   { name: 'Public Notices',        url: '/notices',                        is_external: false, section: 'quick-links', order: 5, is_active: true },
-  { name: 'E-Newsletter',          url: '/notices',                        is_external: false, section: 'quick-links', order: 6, is_active: true },
+  { name: 'E-Newsletter',          url: '/newsletter',                     is_external: false, section: 'quick-links', order: 6, is_active: true },
   { name: 'RTI',                   url: '/rti',                            is_external: false, section: 'quick-links', order: 7, is_active: true },
 
   // ── Citizen Services column ─────────────────────────────────

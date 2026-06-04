@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import SubpageTemplate from '../components/SubpageTemplate'
+import { getNewsletters } from '../services/strapiApi'
+import { STRAPI_URL } from '../config/api'
 
 /* ─────────────────────────────────────────────
    Full newsletter archive — scraped from
@@ -8,7 +10,7 @@ import SubpageTemplate from '../components/SubpageTemplate'
 ───────────────────────────────────────────── */
 const BASE = 'https://jmc.jk.gov.in/adminjmcpanel/newsletter/'
 
-const newsletters = [
+const STATIC_NEWSLETTERS = [
   // 2025
   { year: 2025, month: 'April',     pdf: '1520255015119.pdf' },
   { year: 2025, month: 'March',     pdf: '1520254014977.pdf' },
@@ -117,7 +119,6 @@ const newsletters = [
   { year: 2016, month: 'May',       pdf: '152016050723.pdf' },
   { year: 2016, month: 'April',     pdf: '152016040582.pdf' },
   { year: 2016, month: 'March',     pdf: '152016030441.pdf' },
-  { year: 2016, month: 'February',  pdf: '152016020300.pdf' },
   { year: 2016, month: 'January',   pdf: '152016010159.pdf' },
 ]
 
@@ -149,13 +150,53 @@ const PALETTES = [
 ]
 
 function getPalette(month) {
-  return PALETTES[(MONTH_NUM[month] - 1) % PALETTES.length]
+  const m = month || 'January'
+  return PALETTES[(MONTH_NUM[m] - 1) % PALETTES.length]
+}
+
+function getNewsletterUrl(item) {
+  // Support Strapi V4/V5 formats for Media Upload
+  if (item.document?.url) {
+    return item.document.url.startsWith('http') ? item.document.url : `${STRAPI_URL}${item.document.url}`
+  }
+  if (item.document?.data?.attributes?.url) {
+    const url = item.document.data.attributes.url
+    return url.startsWith('http') ? url : `${STRAPI_URL}${url}`
+  }
+  // Support custom link
+  if (item.link) {
+    return item.link
+  }
+  // Support legacy filename
+  if (item.pdf) {
+    return `${BASE}${item.pdf}`
+  }
+  return '#'
+}
+
+/* ── Skeleton Card while loading ── */
+function SkeletonCard() {
+  return (
+    <div className="animate-pulse flex flex-col rounded-xl overflow-hidden border border-slate-100 bg-white">
+      <div className="h-28 bg-slate-100" />
+      <div className="flex items-center justify-between px-3 py-2.5 bg-white">
+        <div className="space-y-1.5 w-full">
+          <div className="h-3 bg-slate-100 rounded w-2/3" />
+          <div className="h-2.5 bg-slate-100 rounded w-1/3" />
+        </div>
+        <div className="w-7 h-7 rounded-lg bg-slate-50 shrink-0 ml-2" />
+      </div>
+      <div className="px-3 pb-2.5">
+        <div className="h-4 bg-slate-100 rounded-full w-8" />
+      </div>
+    </div>
+  )
 }
 
 /* ── Single Newsletter Card ── */
 function NewsletterCard({ item, isLatest }) {
   const { from, to } = getPalette(item.month)
-  const url = `${BASE}${item.pdf}`
+  const url = getNewsletterUrl(item)
 
   return (
     <a
@@ -185,7 +226,7 @@ function NewsletterCard({ item, isLatest }) {
         {/* Month */}
         <div>
           <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest">{item.year}</p>
-          <p className="text-white font-black text-2xl leading-none tracking-tight">{MONTH_SHORT[item.month]}</p>
+          <p className="text-white font-black text-2xl leading-none tracking-tight">{MONTH_SHORT[item.month] || 'JAN'}</p>
         </div>
       </div>
 
@@ -218,15 +259,62 @@ function NewsletterCard({ item, isLatest }) {
 
 /* ── Main Page ── */
 export default function NewsletterArchive() {
+  const [newsletters, setNewsletters] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    getNewsletters()
+      .then(res => {
+        if (!active) return
+        const raw = res.data?.data || res.data || []
+        const items = raw.map(x => {
+          const attrs = x.attributes || x
+          return {
+            id: x.id,
+            year: attrs.year,
+            month: attrs.month,
+            pdf: attrs.pdf,
+            link: attrs.link,
+            document: attrs.document
+          }
+        })
+        setNewsletters(items.length > 0 ? items : STATIC_NEWSLETTERS)
+      })
+      .catch(err => {
+        console.error('Error fetching newsletters from CMS:', err)
+        if (active) {
+          setNewsletters(STATIC_NEWSLETTERS)
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  // Sort newsletters: newest year first, then newest month first
+  const sorted = useMemo(() => {
+    return [...newsletters].sort((a, b) => {
+      if (b.year !== a.year) return b.year - a.year
+      const ma = MONTH_NUM[a.month] || 1
+      const mb = MONTH_NUM[b.month] || 1
+      return mb - ma
+    })
+  }, [newsletters])
+
   const years = useMemo(() => (
-    [...new Set(newsletters.map(n => n.year))].sort((a, b) => b - a)
-  ), [])
+    [...new Set(sorted.map(n => n.year))].sort((a, b) => b - a)
+  ), [sorted])
 
   const [activeYear, setActiveYear] = useState('all')
   const [search, setSearch] = useState('')
 
   const filtered = useMemo(() => {
-    let list = newsletters
+    let list = sorted
     if (activeYear !== 'all') list = list.filter(n => n.year === Number(activeYear))
     if (search.trim()) {
       const q = search.toLowerCase()
@@ -236,7 +324,9 @@ export default function NewsletterArchive() {
       )
     }
     return list
-  }, [activeYear, search])
+  }, [sorted, activeYear, search])
+
+  const latestNewsletter = sorted[0]
 
   return (
     <SubpageTemplate
@@ -254,11 +344,15 @@ export default function NewsletterArchive() {
           <div className="flex flex-wrap gap-4 mt-3">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#FF6600]" />
-              <span className="text-xs font-semibold text-gray-500">{newsletters.length}+ Issues Published</span>
+              <span className="text-xs font-semibold text-gray-500">
+                {loading ? '...' : `${newsletters.length}+ Issues Published`}
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#002B5E]" />
-              <span className="text-xs font-semibold text-gray-500">{years.length} Years Covered (2016–Present)</span>
+              <span className="text-xs font-semibold text-gray-500">
+                {loading ? '...' : `${years.length} Years Covered (${years[years.length - 1]}–Present)`}
+              </span>
             </div>
           </div>
         </div>
@@ -314,7 +408,7 @@ export default function NewsletterArchive() {
                   onClick={() => setSearch('')}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12"/>
                   </svg>
                 </button>
@@ -322,13 +416,22 @@ export default function NewsletterArchive() {
             </div>
 
             <span className="text-[11px] text-slate-400 font-semibold shrink-0 hidden sm:block">
-              {filtered.length} issue{filtered.length !== 1 ? 's' : ''}
+              {loading ? '...' : `${filtered.length} issue${filtered.length !== 1 ? 's' : ''}`}
             </span>
           </div>
         </div>
 
         {/* ── Grid / Empty State ── */}
-        {filtered.length === 0 ? (
+        {loading ? (
+          /* Premium loading skeleton grid */
+          <div className="bg-white rounded shadow-sm p-5">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+              {Array.from({ length: 12 }).map((_, idx) => (
+                <SkeletonCard key={idx} />
+              ))}
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="bg-white rounded shadow-sm p-12 text-center">
             <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
               <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -361,11 +464,11 @@ export default function NewsletterArchive() {
                     </span>
                   </div>
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                    {items.map((item, idx) => (
+                    {items.map(item => (
                       <NewsletterCard
                         key={`${item.year}-${item.month}`}
                         item={item}
-                        isLatest={newsletters.indexOf(item) === 0}
+                        isLatest={item === latestNewsletter}
                       />
                     ))}
                   </div>
@@ -381,7 +484,7 @@ export default function NewsletterArchive() {
                 <NewsletterCard
                   key={`${item.year}-${item.month}`}
                   item={item}
-                  isLatest={newsletters.indexOf(item) === 0}
+                  isLatest={item === latestNewsletter}
                 />
               ))}
             </div>

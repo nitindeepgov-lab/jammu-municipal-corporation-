@@ -1,7 +1,21 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SubpageTemplate from "../components/SubpageTemplate";
+import { getSmartCityTenders } from "../services/strapiApi";
+import { STRAPI_URL } from "../config/api";
+import { logError } from "../utils/errorLogger";
 
-const initiatives = [
+const ICON_MAP = {
+  Junctions: "🛣️",
+  Parking: "🅿️",
+  Lighting: "💡",
+  "IT & Payments": "💳",
+  Mobility: "🚴",
+  Advertising: "📺",
+  Sanitation: "🚽",
+};
+
+const STATIC_FALLBACK_INITIATIVES = [
   {
     id: "junction-improvements",
     title:
@@ -53,7 +67,53 @@ const initiatives = [
   },
 ];
 
+function getInitiativeIcon(category) {
+  return ICON_MAP[category] || "📋";
+}
+
 export default function SmartCityInitiatives() {
+  const [initiatives, setInitiatives] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    getSmartCityTenders()
+      .then((res) => {
+        if (!active) return;
+        const raw = res.data?.data || res.data || [];
+        const items = raw.map((item) => {
+          const a = item.attributes || item;
+          let href = a.link || "#";
+          if (a.document?.data?.attributes?.url) {
+            href = `${STRAPI_URL}${a.document.data.attributes.url}`;
+          } else if (a.document?.url) {
+            href = `${STRAPI_URL}${a.document.url}`;
+          }
+          return {
+            id: a.tender_id || item.id || Math.random(),
+            title: a.title,
+            category: a.category || "General",
+            url: href,
+            icon: getInitiativeIcon(a.category),
+          };
+        });
+        setInitiatives(items.length > 0 ? items : STATIC_FALLBACK_INITIATIVES);
+      })
+      .catch((err) => {
+        logError("SmartCityInitiatives", err);
+        if (active) {
+          setInitiatives(STATIC_FALLBACK_INITIATIVES);
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <SubpageTemplate
       title="Smart City Initiatives"
@@ -76,25 +136,37 @@ export default function SmartCityInitiatives() {
           </p>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="py-16 text-center bg-white rounded-lg shadow-sm border border-slate-100">
+            <div className="inline-block w-8 h-8 border-3 border-slate-200 border-t-[#003366] rounded-full animate-spin mb-3" />
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">
+              Loading Initiatives…
+            </p>
+          </div>
+        )}
+
         {/* Initiatives List */}
-        <div className="space-y-4">
-          {initiatives.map((initiative) => (
-            <a
-              key={initiative.id}
-              href={initiative.url || "#"}
-              target={initiative.url ? "_blank" : undefined}
-              rel={initiative.url ? "noopener noreferrer" : undefined}
-              className="block bg-white rounded-lg shadow-sm p-5 hover:shadow-lg hover:bg-blue-50/30 transition-all border-l-4 border-transparent hover:border-[#FF6600]"
-            >
-              <div className="flex gap-4 items-start">
-                <div className="text-2xl flex-shrink-0">{initiative.icon}</div>
-                <p className="text-[#0066CC] text-md leading-relaxed font-light hover:font-normal transition-all">
-                  {initiative.title}
-                </p>
-              </div>
-            </a>
-          ))}
-        </div>
+        {!loading && (
+          <div className="space-y-4">
+            {initiatives.map((initiative, idx) => (
+              <a
+                key={initiative.id || idx}
+                href={initiative.url || "#"}
+                target={initiative.url && initiative.url !== "#" ? "_blank" : undefined}
+                rel={initiative.url && initiative.url !== "#" ? "noopener noreferrer" : undefined}
+                className="block bg-white rounded-lg shadow-sm p-5 hover:shadow-lg hover:bg-blue-50/30 transition-all border-l-4 border-transparent hover:border-[#FF6600]"
+              >
+                <div className="flex gap-4 items-start">
+                  <div className="text-2xl flex-shrink-0">{initiative.icon}</div>
+                  <p className="text-[#0066CC] text-md leading-relaxed font-light hover:font-normal transition-all">
+                    {initiative.title}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="bg-blue-50 rounded-lg p-6 border border-blue-100">
