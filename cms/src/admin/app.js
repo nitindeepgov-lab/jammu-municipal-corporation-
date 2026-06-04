@@ -730,165 +730,253 @@ const injectAdminStyles = () => {
     .jmc-login-styled { /* marker class */ }
 
     /* ═══════════════════════════════════════════
-       16. CONTENT-TYPE SIDEBAR (SubNav) — Premium
+       16. CONTENT-TYPE SIDEBAR (SubNav) — Premium Redesign
+       Glass morphism header · Gradient active states · Categorized layout
        ═══════════════════════════════════════════ */
+
+    /* ── Sidebar container ── */
     [class*="SubNav"] {
-      background: linear-gradient(180deg, #ffffff 0%, #fafbfd 100%) !important;
-      border-right: 1px solid var(--jmc-border-light) !important;
-      min-width: 230px !important;
+      background: #f8f9fc !important;
+      border-right: 1px solid #e4e8ef !important;
+      min-width: 248px !important;
+      max-width: 248px !important;
       padding: 0 !important;
       overflow-y: auto !important;
-      box-shadow: 1px 0 8px rgba(0,0,0,0.03) !important;
+      overflow-x: hidden !important;
+      scrollbar-width: thin !important;
+      scrollbar-color: rgba(0,51,102,0.12) transparent !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.04), 1px 0 0 #e4e8ef !important;
     }
+    [class*="SubNav"]::-webkit-scrollbar { width: 4px; }
+    [class*="SubNav"]::-webkit-scrollbar-track { background: transparent; }
+    [class*="SubNav"]::-webkit-scrollbar-thumb { background: rgba(0,51,102,0.12); border-radius: 4px; }
+    [class*="SubNav"]::-webkit-scrollbar-thumb:hover { background: rgba(0,51,102,0.22); }
 
-    /* SubNav header area — title bar */
+    /* ── Sticky glass header inside SubNav ── */
     [class*="SubNav"] > div:first-child {
       position: sticky !important;
       top: 0 !important;
-      z-index: 2 !important;
-      background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%) !important;
-      border-bottom: 1px solid var(--jmc-border-light) !important;
-      padding: 16px 16px 12px !important;
-    }
-    [class*="SubNav"] > div:first-child h2 {
-      font-size: 15px !important;
-      font-weight: 700 !important;
-      letter-spacing: -0.01em !important;
-      color: var(--jmc-text-primary) !important;
-      text-transform: none !important;
-      padding: 0 !important;
-      margin: 0 0 8px !important;
+      z-index: 10 !important;
+      background: rgba(255,255,255,0.92) !important;
+      backdrop-filter: blur(12px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+      border-bottom: 1px solid #e8ecf3 !important;
+      padding: 18px 16px 14px !important;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
     }
 
-    /* SubNav links — refined with smooth hover */
-    [class*="SubNav"] a {
-      border-radius: 8px !important;
-      margin: 2px 10px !important;
-      padding: 9px 12px !important;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      font-size: 13.5px !important;
-      font-weight: 500 !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      min-height: 38px !important;
-      color: var(--jmc-text-secondary) !important;
-      position: relative !important;
-    }
-    [class*="SubNav"] a:hover {
-      background: linear-gradient(135deg, #f0f4ff, #f5f7fb) !important;
-      color: var(--jmc-blue) !important;
-      transform: translateX(3px) !important;
-    }
-    [class*="SubNav"] a:hover svg {
-      color: var(--jmc-blue) !important;
-    }
-    [class*="SubNav"] a[aria-current="page"] {
-      background: linear-gradient(135deg, rgba(0, 51, 102, 0.08), rgba(0, 51, 102, 0.03)) !important;
-      color: var(--jmc-blue) !important;
-      font-weight: 600 !important;
-      box-shadow: inset 3px 0 0 var(--jmc-blue) !important;
-    }
-    [class*="SubNav"] a[aria-current="page"] svg {
-      color: var(--jmc-blue) !important;
-    }
-    [class*="SubNav"] a svg {
-      width: 16px !important;
-      height: 16px !important;
-      flex-shrink: 0 !important;
-      color: var(--jmc-text-dim) !important;
-      transition: color 0.2s ease !important;
-    }
-
-    /* Section headers — with accent line */
-    [class*="SubNav"] h2, [class*="SubNav"] h3 {
-      font-size: 10px !important;
-      text-transform: uppercase !important;
-      letter-spacing: 0.12em !important;
-      color: var(--jmc-text-dim) !important;
+    /* Header title "Content Manager" */
+    [class*="SubNav"] > div:first-child h2,
+    [class*="SubNav"] > div:first-child > p {
+      font-size: 11px !important;
       font-weight: 800 !important;
-      padding: 20px 16px 8px 14px !important;
-      margin: 0 !important;
+      letter-spacing: 0.1em !important;
+      color: #003366 !important;
+      text-transform: uppercase !important;
+      padding: 0 !important;
+      margin: 0 0 10px !important;
       display: flex !important;
       align-items: center !important;
       gap: 8px !important;
     }
-    [class*="SubNav"] h2::before, [class*="SubNav"] h3::before {
+    [class*="SubNav"] > div:first-child h2::before,
+    [class*="SubNav"] > div:first-child > p::before {
       content: '' !important;
-      width: 3px !important;
-      height: 12px !important;
-      background: var(--jmc-blue) !important;
+      display: inline-block !important;
+      width: 18px !important;
+      height: 3px !important;
+      background: linear-gradient(90deg, #003366, #FF6600) !important;
       border-radius: 2px !important;
       flex-shrink: 0 !important;
     }
-    /* First section header (inside sticky area) */
-    [class*="SubNav"] > div:first-child h2::before {
-      display: none !important;
-    }
 
-    /* Counter badges — refined pill */
-    [class*="SubNav"] [class*="Badge"],
-    [class*="SubNav"] [class*="badge"] {
-      background: linear-gradient(135deg, #eef2ff, #e8ecf8) !important;
-      color: var(--jmc-blue) !important;
-      font-size: 10px !important;
-      min-width: 24px !important;
-      height: 20px !important;
-      border-radius: 10px !important;
-      font-weight: 700 !important;
-      border: 1px solid rgba(0, 51, 102, 0.08) !important;
-    }
-
-    /* Search input — elevated */
+    /* ── Search input inside header ── */
+    [class*="SubNav"] input[type="search"],
+    [class*="SubNav"] input[type="text"],
     [class*="SubNav"] input {
-      border-radius: 8px !important;
-      font-size: 13px !important;
-      background: var(--jmc-bg) !important;
-      border: 1px solid var(--jmc-border-light) !important;
+      border-radius: 10px !important;
+      font-size: 12.5px !important;
+      font-weight: 500 !important;
+      background: #f0f2f8 !important;
+      border: 1.5px solid transparent !important;
       margin: 0 !important;
-      padding: 8px 12px !important;
-      transition: all 0.2s ease !important;
+      padding: 9px 12px 9px 34px !important;
+      width: 100% !important;
+      transition: all 0.25s ease !important;
+      color: #0f172a !important;
     }
     [class*="SubNav"] input:focus {
-      background: var(--jmc-surface) !important;
-      border-color: var(--jmc-blue) !important;
-      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.08), 0 2px 8px rgba(0,0,0,0.04) !important;
+      background: #ffffff !important;
+      border-color: #003366 !important;
+      box-shadow: 0 0 0 3px rgba(0,51,102,0.1), 0 2px 8px rgba(0,0,0,0.06) !important;
+      outline: none !important;
     }
     [class*="SubNav"] input::placeholder {
-      color: var(--jmc-text-dim) !important;
-      font-size: 12.5px !important;
+      color: #94a3b8 !important;
+      font-size: 12px !important;
+    }
+    /* Search icon wrapper */
+    [class*="SubNav"] [class*="SearchInput"],
+    [class*="SubNav"] [class*="search"] {
+      position: relative !important;
     }
 
-    /* SubNav responsive */
+    /* ── Section category labels (COLLECTION TYPES, SINGLE TYPES) ── */
+    [class*="SubNav"] h2:not(:first-child),
+    [class*="SubNav"] h3,
+    [class*="SubNav"] > div:not(:first-child) > p,
+    [class*="SubNav"] [class*="Header"] {
+      font-size: 9.5px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.14em !important;
+      color: #94a3b8 !important;
+      font-weight: 800 !important;
+      padding: 18px 18px 6px 16px !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 0 !important;
+    }
+
+    /* Count badge next to section title */
+    [class*="SubNav"] [class*="Badge"],
+    [class*="SubNav"] [class*="badge"] {
+      background: #eef2ff !important;
+      color: #3730a3 !important;
+      font-size: 9.5px !important;
+      min-width: 20px !important;
+      height: 18px !important;
+      border-radius: 9px !important;
+      font-weight: 800 !important;
+      border: 1px solid rgba(55,48,163,0.1) !important;
+      padding: 0 7px !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    /* ── Nav items — premium pill style ── */
+    [class*="SubNav"] a {
+      border-radius: 10px !important;
+      margin: 1.5px 10px !important;
+      padding: 9px 14px !important;
+      transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 11px !important;
+      min-height: 38px !important;
+      color: #475569 !important;
+      position: relative !important;
+      overflow: hidden !important;
+      border: 1px solid transparent !important;
+      text-decoration: none !important;
+      letter-spacing: 0.005em !important;
+    }
+
+    /* Emoji / icon that Strapi prepends */
+    [class*="SubNav"] a > span:first-child,
+    [class*="SubNav"] a > svg:first-child {
+      font-size: 15px !important;
+      width: 20px !important;
+      min-width: 20px !important;
+      text-align: center !important;
+      flex-shrink: 0 !important;
+      transition: transform 0.22s ease !important;
+    }
+    [class*="SubNav"] a svg {
+      width: 15px !important;
+      height: 15px !important;
+      flex-shrink: 0 !important;
+      color: #94a3b8 !important;
+      transition: all 0.22s ease !important;
+    }
+
+    /* ── Hover state ── */
+    [class*="SubNav"] a:hover {
+      background: #ffffff !important;
+      color: #003366 !important;
+      border-color: #e0e7f0 !important;
+      box-shadow: 0 2px 10px rgba(0,51,102,0.07), 0 1px 3px rgba(0,0,0,0.04) !important;
+      transform: translateX(2px) !important;
+    }
+    [class*="SubNav"] a:hover > span:first-child,
+    [class*="SubNav"] a:hover svg {
+      transform: scale(1.1) !important;
+      color: #003366 !important;
+    }
+
+    /* ── Active / selected state — gradient pill ── */
+    [class*="SubNav"] a[aria-current="page"],
+    [class*="SubNav"] a[class*="active"] {
+      background: linear-gradient(135deg, #003366 0%, #004d99 100%) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      border-color: transparent !important;
+      box-shadow: 0 4px 14px rgba(0,51,102,0.25), 0 1px 4px rgba(0,51,102,0.15) !important;
+      transform: translateX(0) !important;
+      letter-spacing: 0.01em !important;
+    }
+    [class*="SubNav"] a[aria-current="page"]::before {
+      display: none !important;
+    }
+    [class*="SubNav"] a[aria-current="page"] svg,
+    [class*="SubNav"] a[class*="active"] svg {
+      color: rgba(255,255,255,0.85) !important;
+    }
+    [class*="SubNav"] a[aria-current="page"] > span:first-child {
+      transform: none !important;
+    }
+    /* Active item right accent — subtle glow orb */
+    [class*="SubNav"] a[aria-current="page"]::after {
+      content: '' !important;
+      position: absolute !important;
+      right: -20px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      width: 40px !important;
+      height: 40px !important;
+      background: radial-gradient(circle, rgba(255,102,0,0.25) 0%, transparent 70%) !important;
+      border-radius: 50% !important;
+      pointer-events: none !important;
+    }
+
+    /* ── Divider between sections ── */
+    [class*="SubNav"] hr,
+    [class*="SubNav"] [class*="divider"] {
+      border: none !important;
+      border-top: 1px solid #edf0f5 !important;
+      margin: 8px 16px !important;
+    }
+
+    /* ── Bottom padding ── */
+    [class*="SubNav"] > div:last-child {
+      padding-bottom: 20px !important;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      [class*="SubNav"] {
+        min-width: 210px !important;
+        max-width: 210px !important;
+      }
+    }
     @media (max-width: 768px) {
       [class*="SubNav"] {
-        min-width: 190px !important;
+        min-width: 0 !important;
+        max-width: none !important;
       }
       [class*="SubNav"] a {
         font-size: 12.5px !important;
         padding: 8px 12px !important;
         margin: 1px 6px !important;
       }
-    }
-
-    /* ── SubNav colored dot indicators ── */
-    [class*="SubNav"] a::before {
-      content: '' !important;
-      width: 6px !important; height: 6px !important;
-      border-radius: 50% !important;
-      background: var(--jmc-border) !important;
-      flex-shrink: 0 !important;
-      transition: all 0.25s ease !important;
-    }
-    [class*="SubNav"] a:hover::before {
-      background: var(--jmc-blue) !important;
-      box-shadow: 0 0 8px rgba(0, 51, 102, 0.35) !important;
-      transform: scale(1.3) !important;
-    }
-    [class*="SubNav"] a[aria-current="page"]::before {
-      background: var(--jmc-blue) !important;
-      box-shadow: 0 0 8px rgba(0, 51, 102, 0.4) !important;
-      width: 7px !important; height: 7px !important;
     }
 
     /* ═══════════════════════════════════════════
@@ -2152,6 +2240,59 @@ const injectAdminStyles = () => {
     subtree: true,
     characterData: false,
   });
+
+  /* ── SubNav sidebar JS enhancements ── */
+  const enhanceSubNav = debounce(() => {
+    const subNavEl = document.querySelector('[class*="SubNav"]');
+    if (!subNavEl || subNavEl.dataset.jmcEnhanced) return;
+    subNavEl.dataset.jmcEnhanced = "1";
+
+    // Staggered entrance animation for all nav links
+    const navLinks = subNavEl.querySelectorAll('a');
+    const enterStyle = document.createElement('style');
+    enterStyle.textContent = `
+      @keyframes jmcNavItemIn {
+        0% { opacity: 0; transform: translateX(-10px); }
+        100% { opacity: 1; transform: translateX(0); }
+      }
+    `;
+    document.head.appendChild(enterStyle);
+    navLinks.forEach((link, i) => {
+      link.style.opacity = '0';
+      link.style.animation = `jmcNavItemIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 28}ms forwards`;
+    });
+
+    // Inject a bottom footer strip into SubNav
+    if (!document.getElementById('jmc-subnav-footer')) {
+      const footer = document.createElement('div');
+      footer.id = 'jmc-subnav-footer';
+      footer.style.cssText = `
+        margin-top: auto;
+        padding: 14px 16px 18px;
+        border-top: 1px solid #edf0f5;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8f9fc;
+      `;
+      footer.innerHTML = `
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#003366,#004d99);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div style="min-width:0;">
+          <div style="font-size:11px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">JMC Content Hub</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:1px;">Jammu Municipal Corp.</div>
+        </div>
+      `;
+      subNavEl.appendChild(footer);
+    }
+  }, 400);
+
+  // Run on DOM changes so it picks up when SubNav mounts
+  const subNavObserver = new MutationObserver(enhanceSubNav);
+  subNavObserver.observe(document.body, { childList: true, subtree: true });
+  // Also run immediately in case already mounted
+  enhanceSubNav();
 };
 
 /* ═══════════════════════════════════════════════════════════

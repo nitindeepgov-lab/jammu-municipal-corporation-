@@ -41,7 +41,7 @@ const navLinks = [
       },
       {
         name: "Municipal Commissioner, JMC",
-        to: "/governing-bodies?Commissioner",
+        to: "/commissioner",
       },
     ],
   },
