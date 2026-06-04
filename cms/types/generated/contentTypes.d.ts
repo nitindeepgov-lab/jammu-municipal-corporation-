@@ -592,6 +592,44 @@ export interface ApiEventActivityEventActivity
   };
 }
 
+export interface ApiFooterLinkFooterLink extends Struct.CollectionTypeSchema {
+  collectionName: 'footer_links';
+  info: {
+    description: 'Manage all footer navigation links. Use section to place them in the right column and order to sort within each section. Toggle is_active to show or hide a link without deleting it.';
+    displayName: 'Footer Link';
+    pluralName: 'footer-links';
+    singularName: 'footer-link';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    is_external: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::footer-link.footer-link'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    section: Schema.Attribute.Enumeration<
+      ['nav', 'quick-links', 'citizen-services', 'information']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'nav'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface ApiHeroSlideHeroSlide extends Struct.CollectionTypeSchema {
   collectionName: 'hero_slides';
   info: {
@@ -732,6 +770,39 @@ export interface ApiNewsTickerNewsTicker extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiNewsletterNewsletter extends Struct.CollectionTypeSchema {
+  collectionName: 'newsletters';
+  info: {
+    description: 'Monthly JMC newsletters and publications.';
+    displayName: '\uD83D\uDCF0 JMC Newsletter';
+    pluralName: 'newsletters';
+    singularName: 'newsletter';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    document: Schema.Attribute.Media<'files' | 'images'>;
+    link: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::newsletter.newsletter'
+    > &
+      Schema.Attribute.Private;
+    month: Schema.Attribute.String & Schema.Attribute.Required;
+    pdf: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    year: Schema.Attribute.Integer & Schema.Attribute.Required;
   };
 }
 
@@ -899,6 +970,7 @@ export interface ApiSmartCityTenderSmartCityTender
     description: Schema.Attribute.RichText;
     document: Schema.Attribute.Media<'files'>;
     estimated_cost: Schema.Attribute.String;
+    link: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1557,10 +1629,12 @@ declare module '@strapi/strapi' {
       'api::bulletin-board.bulletin-board': ApiBulletinBoardBulletinBoard;
       'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
       'api::event-activity.event-activity': ApiEventActivityEventActivity;
+      'api::footer-link.footer-link': ApiFooterLinkFooterLink;
       'api::hero-slide.hero-slide': ApiHeroSlideHeroSlide;
       'api::location.location': ApiLocationLocation;
       'api::minister.minister': ApiMinisterMinister;
       'api::news-ticker.news-ticker': ApiNewsTickerNewsTicker;
+      'api::newsletter.newsletter': ApiNewsletterNewsletter;
       'api::notice.notice': ApiNoticeNotice;
       'api::office-location.office-location': ApiOfficeLocationOfficeLocation;
       'api::official.official': ApiOfficialOfficial;
