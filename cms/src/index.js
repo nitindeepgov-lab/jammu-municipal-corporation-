@@ -152,6 +152,8 @@ module.exports = {
         "api::location.location",
         "api::event-activity.event-activity",
         "api::footer-link.footer-link",
+        "api::newsletter.newsletter",
+        "api::office-location.office-location",
       ];
 
       const promises = [];

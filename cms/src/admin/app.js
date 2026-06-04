@@ -1373,11 +1373,17 @@ const injectAdminStyles = () => {
     /* ═══════════════════════════════════════════
        29. DASHBOARD — Premium Redesign
        ═══════════════════════════════════════════ */
+    .dashboard-active main {
+      display: block !important;
+      width: 100% !important;
+      position: relative !important;
+    }
     .dashboard-active main > *:not(#custom-jmc-dashboard) {
       display: none !important;
     }
     #custom-jmc-dashboard {
       display: block !important;
+      width: 100% !important;
     }
 
     #custom-jmc-dashboard {
@@ -2311,24 +2317,9 @@ const injectAdminStyles = () => {
   };
 
   const enhanceSidebar = debounce(() => {
-    // Find the Content Manager sidebar: look for the aside/nav that contains
-    // links to /content-manager/collection-types/
-    const allLinks = Array.from(document.querySelectorAll('a[href*="content-manager"]'));
-    if (!allLinks.length) return;
-
-    // Find the sidebar container by walking up from a CM link
-    const sampleLink = allLinks.find(l => l.href.includes('collection-types') || l.href.includes('single-types'));
-    if (!sampleLink) return;
-
-    // Walk up to find a scrollable sidebar-like container
-    let sidebar = sampleLink.parentElement;
-    for (let i = 0; i < 8 && sidebar; i++) {
-      const rect = sidebar.getBoundingClientRect();
-      // Sidebar is typically tall, narrow, on the left
-      if (rect.width > 160 && rect.width < 380 && rect.height > 300) break;
-      sidebar = sidebar.parentElement;
-    }
-    if (!sidebar || sidebar.id === JMC_SIDEBAR_ID) return;
+    // Directly target Content Manager or Settings sub-navigation sidebars
+    const sidebar = document.querySelector('nav[aria-label="Content Manager"], nav[aria-label="Settings"]');
+    if (!sidebar) return;
 
     // Don't re-process if already done
     if (sidebar.dataset.jmcSb === '1') return;
