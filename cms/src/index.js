@@ -76,7 +76,8 @@ module.exports = {
 
       // Define standard attributes metadata to hide technical fields and make all fields read-only
       const attributes = [
-        "id", "orderId", "bdOrderId", "transactionId", "amount", "status",
+        "id", "documentId", "createdAt", "updatedAt", "publishedAt", "createdBy", "updatedBy",
+        "orderId", "bdOrderId", "transactionId", "amount", "status",
         "customerName", "customerMobile", "customerEmail", "feeType",
         "additionalInfo", "rawResponse", "previousStatus", "statusChangedBy",
         "statusChangedAt", "adminNotes", "refundId", "refundAmount",
@@ -197,70 +198,100 @@ module.exports = {
       const flKey = "plugin_content_manager_configuration_content_types::api::footer-link.footer-link";
 
       let flConfig = await flStore.findOne({ where: { key: flKey } });
-      const flValue = {
-        settings: {
-          bulkable: true,
-          filterable: true,
-          searchable: true,
-          pageSize: 100,
-          mainField: "name",
-          defaultSortBy: "name",
-          defaultSortOrder: "ASC",
+      
+      let flValue;
+      if (flConfig && flConfig.value) {
+        flValue = JSON.parse(flConfig.value);
+      } else {
+        flValue = {
+          settings: {},
+          layouts: {},
+          metadatas: {},
+        };
+      }
+
+      flValue.settings = {
+        ...flValue.settings,
+        bulkable: true,
+        filterable: true,
+        searchable: true,
+        pageSize: 100,
+        mainField: "name",
+        defaultSortBy: "name",
+        defaultSortOrder: "ASC",
+      };
+
+      flValue.layouts = {
+        ...flValue.layouts,
+        list: [
+          { name: "name", size: 3 },
+          { name: "url", size: 3 },
+          { name: "section", size: 2 },
+          { name: "is_active", size: 1 },
+          { name: "order", size: 1 },
+          { name: "is_external", size: 2 },
+        ],
+        edit: [
+          [{ name: "name", size: 6 }, { name: "url", size: 6 }],
+          [{ name: "section", size: 4 }, { name: "order", size: 4 }, { name: "is_active", size: 4 }],
+          [{ name: "is_external", size: 6 }],
+        ],
+      };
+
+      const targetMetadatas = {
+        id: {
+          edit: { label: "ID", description: "", placeholder: "", visible: false, editable: false },
+          list: { label: "ID", searchable: true, sortable: true },
         },
-        layouts: {
-          list: [
-            { name: "name", size: 3 },
-            { name: "url", size: 3 },
-            { name: "section", size: 2 },
-            { name: "is_active", size: 1 },
-            { name: "order", size: 1 },
-            { name: "is_external", size: 2 },
-          ],
-          edit: [
-            [{ name: "name", size: 6 }, { name: "url", size: 6 }],
-            [{ name: "section", size: 4 }, { name: "order", size: 4 }, { name: "is_active", size: 4 }],
-            [{ name: "is_external", size: 6 }],
-          ],
+        name: {
+          edit: { label: "Name", description: "", placeholder: "", visible: true, editable: true },
+          list: { label: "Name", searchable: true, sortable: true },
         },
-        metadatas: {
-          id: {
-            edit: { label: "ID", description: "", placeholder: "", visible: false, editable: false },
-            list: { label: "ID", searchable: true, sortable: true },
-          },
-          name: {
-            edit: { label: "Name", description: "", placeholder: "", visible: true, editable: true },
-            list: { label: "Name", searchable: true, sortable: true },
-          },
-          url: {
-            edit: { label: "URL", description: "", placeholder: "", visible: true, editable: true },
-            list: { label: "URL", searchable: true, sortable: true },
-          },
-          is_external: {
-            edit: { label: "Is External", description: "", placeholder: "", visible: true, editable: true },
-            list: { label: "Is External", searchable: true, sortable: true },
-          },
-          section: {
-            edit: { label: "Section", description: "", placeholder: "", visible: true, editable: true },
-            list: { label: "Section", searchable: true, sortable: true },
-          },
-          order: {
-            edit: { label: "Order", description: "", placeholder: "", visible: true, editable: true },
-            list: { label: "Order", searchable: true, sortable: true },
-          },
-          is_active: {
-            edit: { label: "Is Active", description: "", placeholder: "", visible: true, editable: true },
-            list: { label: "Is Active", searchable: true, sortable: true },
-          },
-          createdAt: {
-            edit: { label: "Created At", description: "", placeholder: "", visible: false, editable: false },
-            list: { label: "Created At", searchable: true, sortable: true },
-          },
-          updatedAt: {
-            edit: { label: "Updated At", description: "", placeholder: "", visible: false, editable: false },
-            list: { label: "Updated At", searchable: true, sortable: true },
-          },
+        url: {
+          edit: { label: "URL", description: "", placeholder: "", visible: true, editable: true },
+          list: { label: "URL", searchable: true, sortable: true },
+        },
+        is_external: {
+          edit: { label: "Is External", description: "", placeholder: "", visible: true, editable: true },
+          list: { label: "Is External", searchable: true, sortable: true },
+        },
+        section: {
+          edit: { label: "Section", description: "", placeholder: "", visible: true, editable: true },
+          list: { label: "Section", searchable: true, sortable: true },
+        },
+        order: {
+          edit: { label: "Order", description: "", placeholder: "", visible: true, editable: true },
+          list: { label: "Order", searchable: true, sortable: true },
+        },
+        is_active: {
+          edit: { label: "Is Active", description: "", placeholder: "", visible: true, editable: true },
+          list: { label: "Is Active", searchable: true, sortable: true },
+        },
+        createdAt: {
+          edit: { label: "Created At", description: "", placeholder: "", visible: false, editable: false },
+          list: { label: "Created At", searchable: true, sortable: true },
+        },
+        updatedAt: {
+          edit: { label: "Updated At", description: "", placeholder: "", visible: false, editable: false },
+          list: { label: "Updated At", searchable: true, sortable: true },
         },
       };
+
+      flValue.metadatas = flValue.metadatas || {};
+      for (const [key, val] of Object.entries(targetMetadatas)) {
+        flValue.metadatas[key] = val;
+      }
+
+      // Ensure system keys are present to prevent undefined.list crashes in the admin UI
+      const systemKeys = ["documentId", "createdBy", "updatedBy", "publishedAt"];
+      for (const sysKey of systemKeys) {
+        if (!flValue.metadatas[sysKey]) {
+          flValue.metadatas[sysKey] = {
+            edit: { label: sysKey, description: "", placeholder: "", visible: false, editable: false },
+            list: { label: sysKey, searchable: true, sortable: true },
+          };
+        }
+      }
 
       if (flConfig) {
         await flStore.update({
