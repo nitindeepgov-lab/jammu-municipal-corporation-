@@ -419,7 +419,7 @@ const knowledgeBase = [
     cat: "egov",
     kw: ["e-governance", "digital", "online service", "portal", "egov"],
     q: "What e-governance services are available?",
-    a: "JMC offers **15 digital services** through its E-Governance page:\n\n1. **Online Property Tax Payment** (https://jmc.jk.gov.in/propertytax.aspx or internal [Payment Form](/pay-online))\n2. **Online Grievance Redressal** (https://myjammu.in/grievance/GrievanceDepartment)\n3. **Water Tanker Booking** (https://myjammu.in/)\n4. **Building Plan Permission** (https://jkhuddobps.in/)\n5. **Birth & Death Certificate** (https://serviceonline.gov.in/jammu/)\n6. **Online NOC / Trade License** (https://jansugam.jk.gov.in/)\n7. **Rehri License** (https://serviceonline.gov.in/jammu/)\n8. **Pet Dog Registration** (https://serviceonline.gov.in/jammu/)\n9. **Pay Rent – Municipal Shop/Flat** (https://jmc.jk.gov.in/OtherFee.aspx)\n10. **Online User Charges** (internal [Payment Form](/pay-online))\n11. **Sewerage Connection Verification** (https://jmc.jk.gov.in/sewconnectverify.aspx)\n12. **Panjtirthi Slot Booking** (https://jmc.jk.gov.in/index.html)\n13. **E-Tendering** (https://jktenders.gov.in/)\n14. **E-Newsletter** (https://jmc.jk.gov.in/newsletter.aspx)\n15. **Feedback & Suggestions** (https://jmc.jk.gov.in/feedback.aspx)\n\nYou can access the complete listings page at [E-Governance](/egov).",
+    a: "JMC offers **15 digital services** through its E-Governance page:\n\n1. **Online Property Tax Payment** (https://jmc.jk.gov.in/propertytax.aspx or internal [Payment Form](/pay-online))\n2. **Online Grievance Redressal** (https://myjammu.in/grievance/GrievanceDepartment)\n3. **Water Tanker Booking** (https://myjammu.in/)\n4. **Online Building Plan Permission** (https://obps.jk.gov.in/BPAMSClient/Home.aspx#)\n5. **Birth & Death Certificate** (https://jansugam.jk.gov.in/)\n6. **Online NOC / Trade License** (https://jansugam.jk.gov.in/)\n7. **Rehri License** (https://jansugam.jk.gov.in/)\n8. **Pet Dog Registration** (https://jansugam.jk.gov.in/)\n9. **Pay Rent – Municipal Shop/Flat** (https://jmc.jk.gov.in/OtherFee.aspx)\n10. **Online User Charges** (internal [Payment Form](/pay-online))\n11. **Sewerage Connection Verification** (https://jmc.jk.gov.in/sewconnectverify.aspx)\n12. **Panjtirthi Slot Booking** (https://jmc.jk.gov.in/index.html)\n13. **E-Tendering** (https://jktenders.gov.in/)\n14. **E-Newsletter** (https://jmc.jk.gov.in/newsletter.aspx)\n15. **Feedback & Suggestions** (https://jmc.jk.gov.in/feedback.aspx)\n\nYou can access the complete listings page at [E-Governance](/egov).",
     followUps: ["birth-death-cert", "building-permission", "trade-license"],
     route: "egov"
   },
@@ -428,7 +428,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["birth", "death", "certificate", "born", "died"],
     q: "How do I apply for birth/death certificate?",
-    a: "You can apply for a Birth or Death Certificate through the official **JAKSMAC e-service portal**:\n\nhttps://serviceonline.gov.in/jammu\n\n**Process:**\n1. Register or log in to the portal using the link above.\n2. Search for the \"Birth Certificate\" or \"Death Certificate\" service.\n3. Complete the online application form with parentage, date, and location details.\n4. Upload the required documents and submit the form.\n5. Pay the processing fee online (if applicable).\n6. Track application status; once approved, download the certificate from the portal.\n\n**Eligibility:** The birth or death must have occurred within Jammu municipal limits.\n**Required Documents:** Hospital discharge slip / institutional reporting format OR ward councillor/local authority verification report (for home births), identity proof of parent/applicant, and address proof.\n**Timeline & Fees:** Free if registered within 21 days of occurrence. A late fee applies for delayed registrations. Standard processing takes 7-15 working days.",
+    a: "You can apply for a Birth or Death Certificate through the official **JanSugam Portal**:\n\nhttps://jansugam.jk.gov.in/\n\n**Process:**\n1. Register or log in to the portal using the link above.\n2. Search for the \"Birth Certificate\" or \"Death Certificate\" service.\n3. Complete the online application form with parentage, date, and location details.\n4. Upload the required documents and submit the form.\n5. Pay the processing fee online (if applicable).\n6. Track application status; once approved, download the certificate from the portal.\n\n**Eligibility:** The birth or death must have occurred within Jammu municipal limits.\n**Required Documents:** Hospital discharge slip / institutional reporting format OR ward councillor/local authority verification report (for home births), identity proof of parent/applicant, and address proof.\n**Timeline & Fees:** Free if registered within 21 days of occurrence (According to the staff working in Birth/Death certificate section fee of Rs. 40 paid by the user or applicant after successful verification of the application. There is no provision for the late fee for registered within 21 days or later). Standard processing takes 7-15 working days.\n\nYes there is provision for late fee for REGISTRATION OF PRE RECORDS. But thats a different process.",
     followUps: ["egov-services", "contact-helpline"],
   },
   {
@@ -436,7 +436,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["building", "permission", "plan", "construction", "sanction", "approval"],
     q: "How do I apply for building permission?",
-    a: "You can apply for building plan permission through the official **HUDD BPS portal**:\n\nhttps://jkhuddobps.in\n\n**Process:**\n1. Register as a citizen or architect and log in to the HUDD BPS portal.\n2. Select \"Building Permission Application\" and fill in construction & structural details.\n3. Upload structural drawing maps, land ownership deeds, and required NOCs.\n4. Pay the online scrutiny fee.\n5. Track verification status; the site inspector will conduct physical inspection.\n6. Receive final building plan sanction online.\n\n**Required Documents:** Property ownership documents (sale deed/fard), structural safety certificate, site plan and elevation maps, and NOCs from PHE/PDD/Revenue sections.\n**Timeline & Fees:** Fee varies based on plot area and building category. Sanction takes 30-45 days. For queries, contact Building Officers:\n• Kamal Kishore — 8492081239\n• Kapil Khajuria — 9018896437",
+    a: "You can apply for building plan permission through the official **Auto Scrutiny Based Online Building Permission & CLU Portal (OBPS Portal)**:\n\nhttps://obps.jk.gov.in/BPAMSClient/Home.aspx\n\n**Process:**\n1. Go to the SIGN IN option, register as a USER, and log in.\n2. Select \"Building Permission Application\".\n3. Upload structural drawings and land ownership deeds.\n4. Pay the online Application Fee.\n5. Site inspector will conduct physical inspection.\n6. Receive final building plan sanction online.\n\n**Required Documents:** Property ownership documents (sale deed/fard), structural safety certificate (may or may not be required), site plan and elevation maps, and NOCs from PHE/PDD/Revenue sections (not necessary).\n**Timeline & Fees:** Fee varies based on plot area and building category. Sanction takes 30 days. For queries, contact Building Officers:\n• Kamal Kishore — 8492081239\n• Kapil Khajuria — 9018896437",
     followUps: ["egov-services", "urban-planning-dept"],
   },
   {
@@ -452,7 +452,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["rehri", "street vendor", "stall", "hawker", "vendor license"],
     q: "How do I get a rehri/street vendor license?",
-    a: "You can apply for a Rehri (street vendor) license through the official **JAKSMAC portal**:\n\nhttps://serviceonline.gov.in/jammu\n\n**Process:**\n1. Log in or register on the portal using the link above.\n2. Search for \"Rehri License\" or \"Street Vendor Registration\".\n3. Fill in the vendor detail form, selected zone, and item category.\n4. Upload ID proof and your photo.\n5. Submit application for JMC vetting and approval.\n\n**Required Documents:** Aadhaar card (identity proof), passport photograph, address proof, and character declaration.\n**Timeline & Fees:** Low annual fee. Registration takes 10-15 working days.",
+    a: "You can apply for a Rehri (street vendor) license through the official **JanSugam Portal**:\n\nhttps://jansugam.jk.gov.in/login.do\n\n**Process:**\n1. Log in or register on the JanSugam portal using the link above.\n2. Search for \"Rehri License\" or \"Street Vendor Registration\".\n3. Fill in the vendor detail form, selected zone, and item category.\n4. Upload ID proof and your photo.\n5. Submit application for JMC vetting and approval.\n\n**Required Documents:** Aadhaar card (identity proof), passport photograph, address proof, and character declaration.\n**Timeline & Fees:** Low annual fee. Registration takes 10-15 working days.",
     followUps: ["trade-license", "egov-services"],
   },
   {
@@ -460,7 +460,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["pet", "dog", "animal", "register pet"],
     q: "How do I register my pet dog?",
-    a: "You can register your pet dog with JMC through the official **JAKSMAC portal**:\n\nhttps://serviceonline.gov.in/jammu\n\n**Process:**\n1. Register or log in to the portal using the link above.\n2. Select \"Pet Dog Registration\" service.\n3. Enter owner information and pet description.\n4. Upload veterinary vaccination record and pet photo.\n5. Pay the annual registration fee online and submit.\n\n**Required Documents:** Anti-rabies vaccination card from a registered veterinarian, pet photo, owner's ID, and address proof.\n**Timeline & Fees:** Annual registration fee. Approved in 5-7 working days. For animal welfare issues, contact:\n• Dr. Jaswant Singh, JKAS (Municipal Veterinary Officer) — 9797682216\n• Dr. Gaurav Chowdhary (Animal Welfare Officer) — 9797371677",
+    a: "You can register your pet dog with JMC through the official **JanSugam Portal**:\n\nhttps://jansugam.jk.gov.in/login.do\n\n**Process:**\n1. Register or log in to the JanSugam portal using the link above.\n2. Select \"Pet Dog Registration\" service.\n3. Enter owner information and pet description.\n4. Upload veterinary vaccination record and pet photo.\n5. Pay the annual registration fee online and submit.\n\n**Required Documents:** Anti-rabies vaccination card from a registered veterinarian, pet photo, owner's ID, and address proof.\n**Timeline & Fees:** Annual registration fee. Approved in 5-7 working days. For animal welfare issues, contact:\n• Dr. Jaswant Singh, JKAS (Municipal Veterinary Officer) — 9797682216\n• Dr. Gaurav Chowdhary (Animal Welfare Officer) — 9797371677",
     followUps: ["egov-services"],
   },
   {
@@ -694,6 +694,70 @@ const knowledgeBase = [
     a: "Shikayat (complaint) karne ke liye:\n\n1. **Contact Us** page par jaayein\n2. Form bharein — apna naam, mobile, ward number\n3. **Department** chunein (Pani, Safai, Sadak, etc.)\n4. Submit karein\n\nYa seedha call karein: **18001807207** (Toll-Free)\n\n**MyJammu portal** par bhi online shikayat kar sakte hain.",
     followUps: ["file-complaint", "contact-helpline"],
   },
+  {
+    id: "jmc-newsletter",
+    cat: "news",
+    kw: ["e-newsletter", "newsletter", "monthly newsletter", "april 2025 newsletter", "latest news", "news update", "what is new"],
+    q: "What is in the latest JMC E-Newsletter (April 2025)?",
+    a: "The JMC E-Newsletter for April 2025 covers the following key highlights and events:\n\n• **Sainik Colony Visit** — MLA Dr. Narender Singh and Commissioner Dr. Devansh Yadav met residents and handed over 50 street lights to address civic issues.\n• **Baisakhi & Tawi Arti** — Celebrated with grandeur at Suryaputri Tawi River Front, inaugurated by Hon'ble LG Manoj Sinha, featuring a traditional wrestling competition (Swachh Dangal) and daily Tawi Aarti.\n• **Plantation Drive** — Organized at Tawi Ghat to commemorate Dr. B.R. Ambedkar's 135th Birth Anniversary.\n• **Kot Bhalwal Dump Site** — Bioremediation trial reviewed to process 3,500 MT of waste per day and convert it into a green park.\n• **Emergency Helpline** — Active monitoring of storm/rain with emergency helpline numbers: `94697 48042` and `94193 72824`.\n• **Public Toilet Complex** — Foundation laid opposite Hanuman Mandir (Ward No. 13) near Jewel Chowk to make Jammu ODF.\n• **Street Light Repairs** — EESL directed to expedite 5,000 additional lights and 850 high-intensity 190W lights.\n• **Animal Birth Control (ABC)** — Official visits to Roop Nagar and SPCA Chowadhi centers to scale up stray dog sterilization.",
+    followUps: ["helpline-emergency", "tawi-riverfront-events", "kot-bhalwal-bioremediation", "animal-birth-control"],
+  },
+  {
+    id: "helpline-emergency",
+    cat: "news",
+    kw: ["emergency helpline", "rain helpline", "storm helpline", "disaster helpline", "emergency number", "rain storm help"],
+    q: "What are the JMC emergency helpline numbers for rain and storms?",
+    a: "In view of heavy rains and storm forecasts, Jammu Municipal Corporation has issued a high alert (particularly for Zones 1, 2, and 3) and provided two dedicated emergency helpline numbers for citizen assistance:\n\n• 📱 **94697 48042**\n• 📱 **94193 72824**\n\nResidents are advised to stay indoors during severe weather and report any fallen trees, poles, or infrastructure damage to these numbers.",
+    followUps: ["contact-helpline", "jmc-newsletter"],
+  },
+  {
+    id: "sainik-colony-visit",
+    cat: "news",
+    kw: ["sainik colony", "sainik colony lights", "narender singh"],
+    q: "What was the JMC visit to Sainik Colony about?",
+    a: "MLA Dr. Narender Singh and JMC Commissioner Dr. Devansh Yadav visited Sainik Colony to meet the Sainik Colony Management Committee. They discussed key civic issues such as drinking water supply, street lighting, drainage systems, and local park development. Additionally, JMC handed over **50 street lights** to enhance security and visibility in the area.",
+    followUps: ["street-light-repairs-eesl", "jmc-newsletter"],
+  },
+  {
+    id: "tawi-riverfront-events",
+    cat: "news",
+    kw: ["tawi riverfront", "tawi river front", "tawi aarti", "baisakhi", "swachh dangal", "suryaputri"],
+    q: "What events and cultural programs are held at Suryaputri Tawi Riverfront?",
+    a: "The Suryaputri Tawi River Front hosts major cultural and spiritual events, including:\n\n• **Baisakhi Celebrations** — Inaugurated by Hon'ble LG Shri Manoj Sinha, featuring cultural splendor, traditional wrestling (Swachh Dangal), and community festivities.\n• **Tawi Aarti** — A grand spiritual ceremony performed at Tawi Ghat (starting at 6:00 PM). It is now established as a regular feature, especially during the annual Amarnath Ji Yatra, to boost tourism and local riverbank businesses.\n• **Plantation Drives** — Organizing green initiatives, including drives to commemorate the birth anniversary of Dr. B.R. Ambedkar.",
+    followUps: ["jmc-newsletter", "contact-helpline"],
+  },
+  {
+    id: "kot-bhalwal-bioremediation",
+    cat: "news",
+    kw: ["kot bhalwal", "bhalwal dump", "bioremediation", "legacy waste", "waste site", "manure"],
+    q: "What is JMC doing at the Kot Bhalwal dump site?",
+    a: "JMC Commissioner Dr. Devansh Yadav reviewed a trial of an advanced bioremediation process at the **Kot Bhalwal dump site** to treat legacy waste and reclaim land. \n\n• **Machinery**: Warrior 1200, Screens, and Komtrack 1800 are deployed.\n• **Capacity**: Combined processing capacity of approximately **3,500 metric tonnes (MT) of waste per day**.\n• **Goal**: Segregate non-biodegradable waste (polythene, stones), convert organic waste into manure, clear the site, and transform it into a lush green park.",
+    followUps: ["garbage-issue", "jmc-newsletter"],
+  },
+  {
+    id: "toilet-complex-hanuman-mandir",
+    cat: "news",
+    kw: ["public toilet", "hanuman mandir toilet", "toilet complex", "jewel chowk toilet", "odf city"],
+    q: "Where is the new public toilet complex being built in Jammu?",
+    a: "JMC Commissioner Dr. Devansh Yadav laid the foundation stone for a new public toilet complex below the bridge opposite **Hanuman Mandir (Ward No. 13)**. \n\n• **Facility**: Includes 2 bathrooms and 8 toilets.\n• **Location**: Near a bus stand, Super Speciality hospital, and en-route to Jewel Chowk (benefitting commuters, patients, and Amarnath Yatra pilgrims).\n• **ODF Mission**: Part of a larger JMC project to construct **16 public toilet complexes** across Jammu city with a total project cost of approximately **Rs. 1.5 crore** to make Jammu an Open Defecation Free (ODF) city.",
+    followUps: ["sanitation-dept", "jmc-newsletter"],
+  },
+  {
+    id: "street-light-repairs-eesl",
+    cat: "news",
+    kw: ["street light repair", "eesl lights", "high intensity lights", "190-watt lights"],
+    q: "What is the status of JMC street light repairs and EESL operations?",
+    a: "JMC Commissioner Dr. Devansh Yadav conducted field visits to review the street light repairs done by EESL (Energy Efficiency Services Limited). \n\nKey updates:\n• JMC warned electric wing and EESL officials regarding the pace of work.\n• EESL has been directed to expedite the provision of **5,000 additional street lights**.\n• **850 high-intensity 190-watt street lights** are being installed to improve visibility and safety in darker areas of Jammu.",
+    followUps: ["sainik-colony-visit", "jmc-newsletter"],
+  },
+  {
+    id: "animal-birth-control",
+    cat: "news",
+    kw: ["animal birth control", "abc program", "stray dog sterilization", "roop nagar animal", "spca chowadhi"],
+    q: "What is the status of the JMC Animal Birth Control (ABC) program?",
+    a: "Commissioner Secretary Mandeep Kaur and JMC Commissioner Dr. Devansh Yadav inspected animal care centers to review the ABC program:\n\n• **Roop Nagar Animal Care Centre** — Inspected ongoing sterilization operations and treatment records for sick/injured stray animals.\n• **SPCA Centre at Chowadhi** — Reviewed civil works for the upcoming ABC Centre to significantly boost sterilization capacity and stray dog population management across the city.",
+    followUps: ["pet-registration", "jmc-newsletter"],
+  },
 ];
 
 // ── Greetings & Conversational Responses ───────────────────────
@@ -897,6 +961,26 @@ const synonymGroups = [
   {
     keys: ["knowledge base", "knowledgebase", "sops", "manuals", "guidelines"],
     canonical: "knowledge-base"
+  },
+  {
+    keys: ["e-newsletter", "newsletter", "monthly newsletter", "april 2025 newsletter", "latest news", "news update", "what is new"],
+    canonical: "jmc-newsletter"
+  },
+  {
+    keys: ["emergency helpline", "rain helpline", "storm helpline", "disaster helpline", "emergency number", "rain storm help"],
+    canonical: "helpline-emergency"
+  },
+  {
+    keys: ["tawi riverfront", "tawi river front", "tawi aarti", "baisakhi", "swachh dangal", "suryaputri"],
+    canonical: "tawi-riverfront-events"
+  },
+  {
+    keys: ["kot bhalwal", "bhalwal dump", "bioremediation", "legacy waste", "waste site", "manure"],
+    canonical: "kot-bhalwal-bioremediation"
+  },
+  {
+    keys: ["animal birth control", "abc program", "stray dog sterilization", "roop nagar animal", "spca chowadhi"],
+    canonical: "animal-birth-control"
   }
 ];
 
@@ -1298,33 +1382,41 @@ WEBSITE KNOWLEDGE, ELIGIBILITY, FEES, AND DOCUMENTS:
 Primary source of information is JMC's policies, services, forms, announcements, and FAQs. Suggest relevant services based on user intent. Always include details on eligibility, required documents, fees, and timelines whenever available.
 Key service details:
 - **Birth & Death Certificates**:
-  * Portal: JAKSMAC (https://serviceonline.gov.in/jammu)
+  * Portal: JanSugam (https://jansugam.jk.gov.in/)
   * Eligibility: Event must have occurred within Jammu municipal limits.
   * Required Documents: Hospital discharge slip/institutional record OR ward councillor/local authority verification (for home births), identity proof of parent/applicant, address proof.
-  * Fees & Timelines: Free within 21 days; late fee applies thereafter. Standard time: 7-15 working days.
+  * Fees & Timelines: Free within 21 days. Processing fee of Rs. 40 paid after successful verification of the application. No late fee applies for registration within 21 days or later (except for registration of pre records, which is a different process). Standard time: 7-15 working days.
 - **Trade License / Online NOC**:
   * Portal: JanSugam (https://jansugam.jk.gov.in/login.do)
   * Required Documents: Premises proof (rent deed or ownership proof), identity proof, electricity bill, and department-specific NOCs (like fire safety or health).
   * Fees & Timelines: Varies by business type. Standard time: 15-30 working days.
 - **Building Plan Permission**:
-  * Portal: HUDD BPS (https://jkhuddobps.in)
-  * Required Documents: Property ownership documents (sale deed/fard), structural safety certificate, site plan and elevation maps, NOCs from PHE/PDD/Revenue.
+  * Portal: OBPS Portal (https://obps.jk.gov.in/BPAMSClient/Home.aspx)
+  * Required Documents: Property ownership documents (sale deed/fard), structural safety certificate (may or may not be required), site plan and elevation maps, NOCs from PHE/PDD/Revenue (not necessary).
   * Officers: Kamal Kishore (8492081239) and Kapil Khajuria (9018896437).
 - **Water Tanker Booking / Grievance Redressal**:
   * Portal: MyJammu (https://myjammu.in) or JMC helpline (1800-180-7207).
   * Process: Book water tanker or file complaint online by selecting relevant department (Sanitation, PHE/Water, Roads, Street Lights, etc.), ward number, and mobile number.
 - **Rehri License & Pet Dog Registration**:
-  * Portal: JAKSMAC (https://serviceonline.gov.in/jammu)
+  * Portal: JanSugam (https://jansugam.jk.gov.in/login.do)
   * Pet Registration: Requires anti-rabies vaccination card from a registered vet, pet photo, owner ID & address.
 - **E-Tendering**:
   * Portal: J&K e-procurement (https://jktenders.gov.in)
 - **Property Tax & User Charges**:
   * Portal: Paid online. Guide users to E-Governance [/egov] -> "Online Property Tax Payment" or JMC Online Payment page (internal path [/pay-online]).
+- **JMC E-Newsletter (April 2025) & Recent Updates**:
+  * Sainik Colony: MLA Dr. Narender Singh and Commissioner Yadav visited, met committee, and handed over 50 street lights to address civic issues.
+  * Suryaputri Tawi Riverfront Baisakhi & Tawi Arti: Grand Baisakhi celebrations inaugurated by LG Manoj Sinha with Swachh Dangal (wrestling). Tawi Arti (6:00 PM) is now a regular feature, especially during the annual Amarnath Ji Yatra, to boost tourism and riverbank business. Plantation drive at left bank of Tawi Riverfront for Dr. B.R. Ambedkar's 135th Birth Anniversary.
+  * Kot Bhalwal Dump Site: Advanced bioremediation trial reviewed (using Warrior 1200, Screens, Komtrack 1800) processing 3,500 MT of legacy waste per day to reclaim land and build a green park.
+  * Emergency Helplines for Heavy Rain/Storm: Zones 1, 2, and 3 are on high alert. Helplines: 9469748042 and 9419372824.
+  * Public Toilet Complex: Foundation laid below bridge opposite Hanuman Mandir (Ward No. 13), near Jewel Chowk (2 bathrooms, 8 toilets) as part of a Rs. 1.5 crore plan to build 16 complexes to make Jammu ODF.
+  * Street Light Repairs: EESL warned regarding pace; directed to expedite 5,000 additional lights and 850 high-intensity 190W lights.
+  * Animal Birth Control (ABC): Visits to Roop Nagar Animal Care Centre and SPCA Chowadhi to scale up stray dog sterilization.
 
 EXTERNAL LINKS & DIRECT SERVICE URL RULES:
 1. Whenever a user requests a service, application process, certificate, form, or procedure, provide the correct official link if available.
 2. Always prefer official government sources. Never invent or guess URLs.
-3. Provide direct service URLs instead of generic homepage links (e.g. use https://jansugam.jk.gov.in/login.do for trade licenses, https://serviceonline.gov.in/jammu for birth certificates).
+3. Provide direct service URLs instead of generic homepage links (e.g. use https://jansugam.jk.gov.in/login.do for trade licenses, https://jansugam.jk.gov.in/ for birth certificates).
 4. Include a short explanation of what the user can do using the provided link.
 5. Example format:
    "You can apply for a Birth Certificate through the official JanSugam portal:

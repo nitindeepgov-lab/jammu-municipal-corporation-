@@ -24,7 +24,7 @@ const supplyZones = [
 ];
 
 const eServices = [
-  { label: "Apply for New Connection", href: "https://serviceonline.gov.in/jammu/" },
+  { label: "Apply for New Connection", href: "https://jansugam.jk.gov.in/" },
   { label: "PDD E-Services Portal", href: "https://jmc.jk.gov.in/pddeservices.html" },
   { label: "Pay Water Bill Online", href: "/pay-online" },
   { label: "Register Water Complaint", href: "https://jmc.jk.gov.in/OnlineGrievances.aspx" },

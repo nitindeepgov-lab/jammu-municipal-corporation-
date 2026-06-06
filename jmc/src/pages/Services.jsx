@@ -55,8 +55,8 @@ const topServices = [
   },
   {
     name: "Birth / Death Certificate",
-    desc: "Apply via JAKSMAC portal",
-    href: "https://serviceonline.gov.in/jammu/",
+    desc: "Apply via JanSugam Portal",
+    href: "https://jansugam.jk.gov.in/",
     color: "bg-teal-600",
     icon: (
       <svg
@@ -165,8 +165,8 @@ const categories = [
     items: [
       {
         name: "Birth / Death Certificate",
-        href: "https://serviceonline.gov.in/jammu/",
-        desc: "Apply online via JAKSMAC portal",
+        href: "https://jansugam.jk.gov.in/",
+        desc: "Apply online via JanSugam Portal",
       },
 
       {
