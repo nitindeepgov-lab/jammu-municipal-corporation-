@@ -5,109 +5,109 @@
 
 // ── Page Route Map (for "take me to" navigation) ─────────────────
 const pageRoutes = {
-  home:               { path: "/",                        label: "Home" },
-  about:              { path: "/about",                   label: "About JMC" },
-  officials:          { path: "/officials",               label: "JMC Officials" },
-  commissioner:       { path: "/commissioner",            label: "Commissioner" },
-  "governing-bodies": { path: "/governing-bodies",        label: "Governing Bodies" },
-  notices:            { path: "/notices",                  label: "Notices & Tenders" },
-  gallery:            { path: "/gallery",                  label: "Photo Gallery" },
-  contact:            { path: "/contact",                  label: "Contact Us" },
-  services:           { path: "/services",                 label: "Citizen Services" },
-  "smart-city":       { path: "/smart-city",               label: "Smart City" },
-  "development-works":{ path: "/development-works",        label: "Development Works" },
-  feedback:           { path: "/feedback",                 label: "Feedback" },
-  rti:                { path: "/rti",                      label: "RTI" },
-  "swachh-mission":   { path: "/swachh-mission",           label: "Swachh Mission" },
-  egov:               { path: "/egov",                     label: "E-Governance" },
-  "pay-online":       { path: "/pay-online",               label: "Pay Online" },
-  sitemap:            { path: "/sitemap",                  label: "Sitemap" },
-  "quick-links":      { path: "/quick-links",              label: "Quick Links" },
-  "councillor-details":{ path: "/councillor-details",     label: "Councillor Details" },
-  "smart-city-tenders":{ path: "/smart-city-tenders",     label: "Smart City Tenders" },
-  departments:        { path: "/departments",              label: "Departments" },
-  engineering:        { path: "/departments/engineering",  label: "Engineering Dept" },
-  health:             { path: "/departments/health",       label: "Health Dept" },
+  home: { path: "/", label: "Home" },
+  about: { path: "/about", label: "About JMC" },
+  officials: { path: "/officials", label: "JMC Officials" },
+  commissioner: { path: "/commissioner", label: "Commissioner" },
+  "governing-bodies": { path: "/governing-bodies", label: "Governing Bodies" },
+  notices: { path: "/notices", label: "Notices & Tenders" },
+  gallery: { path: "/gallery", label: "Photo Gallery" },
+  contact: { path: "/contact", label: "Contact Us" },
+  services: { path: "/services", label: "Citizen Services" },
+  "smart-city": { path: "/smart-city", label: "Smart City" },
+  "development-works": { path: "/development-works", label: "Development Works" },
+  feedback: { path: "/feedback", label: "Feedback" },
+  rti: { path: "/rti", label: "RTI" },
+  "swachh-mission": { path: "/swachh-mission", label: "Swachh Mission" },
+  egov: { path: "/egov", label: "E-Governance" },
+  "pay-online": { path: "/pay-online", label: "Pay Online" },
+  sitemap: { path: "/sitemap", label: "Sitemap" },
+  "quick-links": { path: "/quick-links", label: "Quick Links" },
+  "councillor-details": { path: "/councillor-details", label: "Councillor Details" },
+  "smart-city-tenders": { path: "/smart-city-tenders", label: "Smart City Tenders" },
+  departments: { path: "/departments", label: "Departments" },
+  engineering: { path: "/departments/engineering", label: "Engineering Dept" },
+  health: { path: "/departments/health", label: "Health Dept" },
   "revenue-taxation": { path: "/departments/revenue-taxation", label: "Revenue & Taxation" },
-  sanitation:         { path: "/departments/sanitation",   label: "Sanitation Dept" },
-  "urban-planning":   { path: "/departments/urban-planning", label: "Urban Planning" },
-  "water-supply":     { path: "/departments/water-supply", label: "Water Supply" },
-  horticulture:       { path: "/departments/horticulture", label: "Horticulture Dept" },
-  information:        { path: "/information",              label: "Information" },
-  "privacy-policy":   { path: "/privacy-policy",           label: "Privacy Policy" },
-  disclaimer:         { path: "/disclaimer",               label: "Disclaimer" },
-  accessibility:      { path: "/accessibility",            label: "Accessibility" },
-  "terms-conditions": { path: "/terms-conditions",         label: "Terms & Conditions" },
-  
+  sanitation: { path: "/departments/sanitation", label: "Sanitation Dept" },
+  "urban-planning": { path: "/departments/urban-planning", label: "Urban Planning" },
+  "water-supply": { path: "/departments/water-supply", label: "Water Supply" },
+  horticulture: { path: "/departments/horticulture", label: "Horticulture Dept" },
+  information: { path: "/information", label: "Information" },
+  "privacy-policy": { path: "/privacy-policy", label: "Privacy Policy" },
+  disclaimer: { path: "/disclaimer", label: "Disclaimer" },
+  accessibility: { path: "/accessibility", label: "Accessibility" },
+  "terms-conditions": { path: "/terms-conditions", label: "Terms & Conditions" },
+
   // New employee corner subpage paths
-  "employee-corner":    { path: "/employee-corner",                    label: "Employee Corner" },
-  "salary-certificate":  { path: "/employee-corner/salary-certificate",  label: "Salary Certificate" },
-  "pay-slip":            { path: "/employee-corner/pay-slip",            label: "Pay Slip" },
-  "pay-statement":       { path: "/employee-corner/pay-statement",       label: "Pay Statement" },
-  "file-dropbox":        { path: "/employee-corner/file-dropbox",        label: "File Dropbox" },
-  "knowledge-base":      { path: "/employee-corner/knowledge-base",      label: "Knowledge Base" },
-  "file-monitoring":     { path: "/employee-corner/file-monitoring",     label: "File Monitoring" },
-  
+  "employee-corner": { path: "/employee-corner", label: "Employee Corner" },
+  "salary-certificate": { path: "/employee-corner/salary-certificate", label: "Salary Certificate" },
+  "pay-slip": { path: "/employee-corner/pay-slip", label: "Pay Slip" },
+  "pay-statement": { path: "/employee-corner/pay-statement", label: "Pay Statement" },
+  "file-dropbox": { path: "/employee-corner/file-dropbox", label: "File Dropbox" },
+  "knowledge-base": { path: "/employee-corner/knowledge-base", label: "Knowledge Base" },
+  "file-monitoring": { path: "/employee-corner/file-monitoring", label: "File Monitoring" },
+
   // Missing pages paths
-  "officers-directory":  { path: "/officers-directory",                  label: "Officer Directory" },
-  "web-info-manager":    { path: "/web-info-manager",                    label: "Web Information Manager" },
-  "smart-city-initiatives": { path: "/smart-city-initiatives",           label: "Smart City Initiatives" },
-  "payment-status":      { path: "/payment-status",                      label: "Payment Status" },
-  "hyperlink-policy":    { path: "/hyperlink-policy",                    label: "Hyperlink Policy" },
-  "copyright-policy":    { path: "/copyright-policy",                    label: "Copyright Policy" },
+  "officers-directory": { path: "/officers-directory", label: "Officer Directory" },
+  "web-info-manager": { path: "/web-info-manager", label: "Web Information Manager" },
+  "smart-city-initiatives": { path: "/smart-city-initiatives", label: "Smart City Initiatives" },
+  "payment-status": { path: "/payment-status", label: "Payment Status" },
+  "hyperlink-policy": { path: "/hyperlink-policy", label: "Hyperlink Policy" },
+  "copyright-policy": { path: "/copyright-policy", label: "Copyright Policy" },
 };
 
 // ── Keyword → route aliases (for fuzzy nav matching) ─────────────
 const navAliases = [
-  { kw: ["home", "main", "homepage", "landing", "front"],                                               route: "home" },
-  { kw: ["about", "about jmc", "about us", "history", "vision", "mission", "who are you"],              route: "about" },
-  { kw: ["officials", "officers", "who is who", "whos who", "staff", "people"],                         route: "officials" },
-  { kw: ["commissioner", "municipal commissioner"],                                                      route: "commissioner" },
-  { kw: ["governing", "mayor", "deputy mayor", "governing bodies", "council"],                          route: "governing-bodies" },
-  { kw: ["notices", "notice", "circular", "order", "tender", "tenders", "bids", "bid", "procurement"],  route: "notices" },
-  { kw: ["gallery", "photos", "images", "pictures", "albums", "photo gallery"],                         route: "gallery" },
-  { kw: ["contact", "phone", "helpline", "address", "reach", "call", "contact us", "number"],           route: "contact" },
-  { kw: ["services", "citizen services", "citizen", "all services"],                                     route: "services" },
-  { kw: ["smart city", "smartcity"],                                                                     route: "smart-city" },
+  { kw: ["home", "main", "homepage", "landing", "front"], route: "home" },
+  { kw: ["about", "about jmc", "about us", "history", "vision", "mission", "who are you"], route: "about" },
+  { kw: ["officials", "officers", "who is who", "whos who", "staff", "people"], route: "officials" },
+  { kw: ["commissioner", "municipal commissioner"], route: "commissioner" },
+  { kw: ["governing", "mayor", "deputy mayor", "governing bodies", "council"], route: "governing-bodies" },
+  { kw: ["notices", "notice", "circular", "order", "tender", "tenders", "bids", "bid", "procurement"], route: "notices" },
+  { kw: ["gallery", "photos", "images", "pictures", "albums", "photo gallery"], route: "gallery" },
+  { kw: ["contact", "phone", "helpline", "address", "reach", "call", "contact us", "number"], route: "contact" },
+  { kw: ["services", "citizen services", "citizen", "all services"], route: "services" },
+  { kw: ["smart city", "smartcity"], route: "smart-city" },
   { kw: ["development", "works", "projects", "infrastructure", "ongoing projects", "development works"], route: "development-works" },
-  { kw: ["feedback", "suggestion", "review", "compliment", "feedback form"],                             route: "feedback" },
-  { kw: ["rti", "right to information", "disclosure", "information officer", "pio"],                     route: "rti" },
-  { kw: ["swachh", "swachh bharat", "clean india", "swachh mission", "clean city"],                      route: "swachh-mission" },
-  { kw: ["egov", "e-governance", "digital services", "e governance", "egovernance", "online services"],  route: "egov" },
+  { kw: ["feedback", "suggestion", "review", "compliment", "feedback form"], route: "feedback" },
+  { kw: ["rti", "right to information", "disclosure", "information officer", "pio"], route: "rti" },
+  { kw: ["swachh", "swachh bharat", "clean india", "swachh mission", "clean city"], route: "swachh-mission" },
+  { kw: ["egov", "e-governance", "digital services", "e governance", "egovernance", "online services"], route: "egov" },
   { kw: ["pay", "payment", "pay online", "fee", "pay fee", "online payment", "bill", "pay bill", "payment form"], route: "pay-online" },
-  { kw: ["sitemap", "site map", "all pages", "full map"],                                                route: "sitemap" },
-  { kw: ["quick links", "quick link", "shortcuts"],                                                      route: "quick-links" },
-  { kw: ["councillor", "councilor", "ward", "councillors", "ward member", "council member"],             route: "councillor-details" },
-  { kw: ["smart city tender", "smart city tenders", "smart tenders"],                                    route: "smart-city-tenders" },
-  { kw: ["departments", "department", "all departments", "dept"],                                        route: "departments" },
-  { kw: ["engineering", "roads", "drainage", "engineering dept", "road"],                                route: "engineering" },
-  { kw: ["health", "health department", "health dept", "hospital", "epidemic"],                          route: "health" },
-  { kw: ["revenue", "taxation", "tax", "property tax", "revenue dept", "tax payment"],                  route: "revenue-taxation" },
-  { kw: ["sanitation", "garbage", "waste", "cleaning", "sweeping", "dustbin", "trash"],                  route: "sanitation" },
-  { kw: ["urban planning", "zoning", "town planner", "master plan", "building plan"],                   route: "urban-planning" },
-  { kw: ["water supply", "water", "phe", "tanker", "water tanker", "drinking water", "pipeline"],       route: "water-supply" },
-  { kw: ["horticulture", "parks", "gardens", "trees", "plantation", "green"],                            route: "horticulture" },
-  { kw: ["information", "info"],                                                                         route: "information" },
-  { kw: ["privacy", "privacy policy"],                                                                   route: "privacy-policy" },
-  { kw: ["disclaimer"],                                                                                  route: "disclaimer" },
-  { kw: ["accessibility", "accessible"],                                                                 route: "accessibility" },
-  { kw: ["terms", "conditions", "terms and conditions"],                                                 route: "terms-conditions" },
-  { kw: ["complaint", "grievance", "complain", "lodge complaint"],                                       route: "contact" },
-  
+  { kw: ["sitemap", "site map", "all pages", "full map"], route: "sitemap" },
+  { kw: ["quick links", "quick link", "shortcuts"], route: "quick-links" },
+  { kw: ["councillor", "councilor", "ward", "councillors", "ward member", "council member"], route: "councillor-details" },
+  { kw: ["smart city tender", "smart city tenders", "smart tenders"], route: "smart-city-tenders" },
+  { kw: ["departments", "department", "all departments", "dept"], route: "departments" },
+  { kw: ["engineering", "roads", "drainage", "engineering dept", "road"], route: "engineering" },
+  { kw: ["health", "health department", "health dept", "hospital", "epidemic"], route: "health" },
+  { kw: ["revenue", "taxation", "tax", "property tax", "revenue dept", "tax payment"], route: "revenue-taxation" },
+  { kw: ["sanitation", "garbage", "waste", "cleaning", "sweeping", "dustbin", "trash"], route: "sanitation" },
+  { kw: ["urban planning", "zoning", "town planner", "master plan", "building plan"], route: "urban-planning" },
+  { kw: ["water supply", "water", "phe", "tanker", "water tanker", "drinking water", "pipeline"], route: "water-supply" },
+  { kw: ["horticulture", "parks", "gardens", "trees", "plantation", "green"], route: "horticulture" },
+  { kw: ["information", "info"], route: "information" },
+  { kw: ["privacy", "privacy policy"], route: "privacy-policy" },
+  { kw: ["disclaimer"], route: "disclaimer" },
+  { kw: ["accessibility", "accessible"], route: "accessibility" },
+  { kw: ["terms", "conditions", "terms and conditions"], route: "terms-conditions" },
+  { kw: ["complaint", "grievance", "complain", "lodge complaint"], route: "contact" },
+
   // New aliases matching Employee Corner and miscellaneous pages
-  { kw: ["employee corner", "staff portal", "employee portal", "employee", "staff"],                     route: "employee-corner" },
-  { kw: ["salary certificate", "salary bill", "salary sheet", "certificate of salary"],                  route: "salary-certificate" },
-  { kw: ["pay slip", "payslip", "salary slip", "monthly pay slip"],                                      route: "pay-slip" },
-  { kw: ["pay statement", "salary statement", "annual salary", "tax statement"],                         route: "pay-statement" },
-  { kw: ["file dropbox", "dropbox", "upload file", "file upload", "submit file"],                        route: "file-dropbox" },
-  { kw: ["knowledge base", "knowledgebase", "employee manual", "sops", "circular archives"],              route: "knowledge-base" },
-  { kw: ["file monitoring", "track file", "file status", "file tracker", "file check"],                  route: "file-monitoring" },
-  { kw: ["officer directory", "officer list", "telephone directory", "phonebook", "directory"],           route: "officers-directory" },
-  { kw: ["web information manager", "web info manager", "wim"],                                          route: "web-info-manager" },
-  { kw: ["smart city initiatives", "initiatives", "smart city projects"],                                route: "smart-city-initiatives" },
+  { kw: ["employee corner", "staff portal", "employee portal", "employee", "staff"], route: "employee-corner" },
+  { kw: ["salary certificate", "salary bill", "salary sheet", "certificate of salary"], route: "salary-certificate" },
+  { kw: ["pay slip", "payslip", "salary slip", "monthly pay slip"], route: "pay-slip" },
+  { kw: ["pay statement", "salary statement", "annual salary", "tax statement"], route: "pay-statement" },
+  { kw: ["file dropbox", "dropbox", "upload file", "file upload", "submit file"], route: "file-dropbox" },
+  { kw: ["knowledge base", "knowledgebase", "employee manual", "sops", "circular archives"], route: "knowledge-base" },
+  { kw: ["file monitoring", "track file", "file status", "file tracker", "file check"], route: "file-monitoring" },
+  { kw: ["officer directory", "officer list", "telephone directory", "phonebook", "directory"], route: "officers-directory" },
+  { kw: ["web information manager", "web info manager", "wim"], route: "web-info-manager" },
+  { kw: ["smart city initiatives", "initiatives", "smart city projects"], route: "smart-city-initiatives" },
   { kw: ["payment status", "check payment", "verify transaction", "payment transaction", "verify pay"], route: "payment-status" },
-  { kw: ["hyperlink policy", "hyperlink"],                                                               route: "hyperlink-policy" },
-  { kw: ["copyright policy", "copyright"],                                                               route: "copyright-policy" },
+  { kw: ["hyperlink policy", "hyperlink"], route: "hyperlink-policy" },
+  { kw: ["copyright policy", "copyright"], route: "copyright-policy" },
 ];
 
 // ── Knowledge Entries ────────────────────────────────────────────
@@ -428,7 +428,7 @@ const knowledgeBase = [
     cat: "certificates",
     kw: ["birth", "death", "certificate", "born", "died"],
     q: "How do I apply for birth/death certificate?",
-    a: "You can apply for a Birth or Death Certificate through the official **JanSugam Portal**:\n\nhttps://jansugam.jk.gov.in/\n\n**Process:**\n1. Register or log in to the portal using the link above.\n2. Search for the \"Birth Certificate\" or \"Death Certificate\" service.\n3. Complete the online application form with parentage, date, and location details.\n4. Upload the required documents and submit the form.\n5. Pay the processing fee online (if applicable).\n6. Track application status; once approved, download the certificate from the portal.\n\n**Eligibility:** The birth or death must have occurred within Jammu municipal limits.\n**Required Documents:** Hospital discharge slip / institutional reporting format OR ward councillor/local authority verification report (for home births), identity proof of parent/applicant, and address proof.\n**Timeline & Fees:** Free if registered within 21 days of occurrence (According to the staff working in Birth/Death certificate section fee of Rs. 40 paid by the user or applicant after successful verification of the application. There is no provision for the late fee for registered within 21 days or later). Standard processing takes 7-15 working days.\n\nYes there is provision for late fee for REGISTRATION OF PRE RECORDS. But thats a different process.",
+    a: "application fee 40 rupees \n , and Processing takes 7-15 working days.",
     followUps: ["egov-services", "contact-helpline"],
   },
   {
@@ -936,7 +936,7 @@ const synonymGroups = [
     keys: ["tender", "notice", "bid", "contractor", "nit"],
     canonical: "tenders"
   },
-  
+
   // New synonym groups for employee corner subpages
   {
     keys: ["salary certificate", "salary bill", "salary sheet", "certificate of salary", "cpis"],
@@ -987,7 +987,7 @@ const synonymGroups = [
 function diceCoefficient(str1, str2) {
   if (str1 === str2) return 1.0;
   if (str1.length < 2 || str2.length < 2) return 0.0;
-  
+
   const getBigrams = (str) => {
     const bigrams = new Set();
     for (let i = 0; i < str.length - 1; i++) {
@@ -995,29 +995,29 @@ function diceCoefficient(str1, str2) {
     }
     return bigrams;
   };
-  
+
   const bigrams1 = getBigrams(str1);
   const bigrams2 = getBigrams(str2);
-  
+
   let intersection = 0;
   for (const bigram of bigrams1) {
     if (bigrams2.has(bigram)) {
       intersection++;
     }
   }
-  
+
   return (2.0 * intersection) / (bigrams1.size + bigrams2.size);
 }
 
 function levenshteinDistance(a, b) {
   if (a.length === 0) return b.length;
   if (b.length === 0) return a.length;
-  
+
   let prevRow = Array(a.length + 1);
   let currRow = Array(a.length + 1);
-  
+
   for (let i = 0; i <= a.length; i++) prevRow[i] = i;
-  
+
   for (let j = 1; j <= b.length; j++) {
     currRow[0] = j;
     for (let i = 1; i <= a.length; i++) {
@@ -1039,14 +1039,14 @@ function areWordsFuzzyEqual(word1, word2) {
   const w1 = word1.toLowerCase().trim();
   const w2 = word2.toLowerCase().trim();
   if (w1 === w2) return true;
-  
+
   if (w1.length < 4 || w2.length < 4) {
     return levenshteinDistance(w1, w2) <= 1;
   }
-  
+
   const dice = diceCoefficient(w1, w2);
   if (dice >= 0.72) return true;
-  
+
   const maxDistance = Math.floor(Math.min(w1.length, w2.length) / 3);
   const dist = levenshteinDistance(w1, w2);
   return dist <= maxDistance;
@@ -1054,21 +1054,21 @@ function areWordsFuzzyEqual(word1, word2) {
 
 function linkifyText(text) {
   if (!text) return text;
-  
+
   let formatted = text;
-  
+
   // Linkify emails
   formatted = formatted.replace(
     /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
     "[$1](mailto:$1)"
   );
-  
+
   // Linkify raw URLs that are not already in a markdown format [label](url) or HTML href
   formatted = formatted.replace(
     /(?<!\]\()(?<!href=["'])(https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=]+(?<![.,;:?)]))/g,
     "[$1]($1)"
   );
-  
+
   const knownNumbers = [
     { num: "18001807207", label: "1800-180-7207 (Toll Free)" },
     { num: "1800-180-7207", label: "1800-180-7207 (Toll Free)" },
@@ -1098,13 +1098,13 @@ function linkifyText(text) {
     { num: "2547846", label: "0191-2547846 (Office)" },
     { num: "2546252", label: "0191-2546252 (Office)" }
   ];
-  
+
   for (const item of knownNumbers) {
     const escapedNum = item.num.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     const regex = new RegExp(`(?<!\\[)(?<!tel:)(?<!\\]\\()\\b${escapedNum}\\b(?!\\))`, 'g');
     formatted = formatted.replace(regex, `[${item.label}](tel:${item.num.replace(/[^0-9]/g, "")})`);
   }
-  
+
   return formatted;
 }
 
@@ -1130,7 +1130,7 @@ function findAnswer(query) {
 
   const matchedCanonicalIds = new Set();
   const queryLower = query.toLowerCase();
-  
+
   for (const group of synonymGroups) {
     for (const key of group.keys) {
       if (queryLower.includes(key.toLowerCase())) {
@@ -1151,11 +1151,11 @@ function findAnswer(query) {
 
   for (const entry of knowledgeBase) {
     let score = 0;
-    
+
     if (matchedCanonicalIds.has(entry.id)) {
       score += 12; // High synonym boost
     }
-    
+
     for (const token of tokens) {
       for (const kw of entry.kw) {
         if (areWordsFuzzyEqual(token, kw)) {
@@ -1170,7 +1170,7 @@ function findAnswer(query) {
         score += 1.5;
       }
     }
-    
+
     for (const kw of entry.kw) {
       if (kw.includes(" ") && queryLower.includes(kw.toLowerCase())) {
         score += 6;
@@ -1470,7 +1470,7 @@ async function aiAnswer(query, history = []) {
   }
 
   const contextStr = contextParts.join("\n\n");
-  const systemPromptWithContext = contextStr 
+  const systemPromptWithContext = contextStr
     ? `${AI_SYSTEM_PROMPT}\n\n=== RETRIEVED CONTEXT FROM DATABASE & KNOWLEDGE BASE ===\nUse the following official records to answer the user query accurately:\n${contextStr}\n======================================================`
     : AI_SYSTEM_PROMPT;
 
@@ -1697,10 +1697,10 @@ async function getDatabaseAnswer(queryText) {
     const matched = wardNo
       ? councillors.filter((item) => Number(item.ward_no) === wardNo)
       : councillors
-          .map((item) => ({ item, score: getTextScore(`${item.name} ${item.party_name || ""} ${item.address || ""}`, queryTokens) }))
-          .filter((entry) => entry.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .map((entry) => entry.item);
+        .map((item) => ({ item, score: getTextScore(`${item.name} ${item.party_name || ""} ${item.address || ""}`, queryTokens) }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => entry.item);
 
     const list = matched.length ? matched : councillors.slice(0, 5);
     if (list.length === 0) return null;
@@ -1854,10 +1854,10 @@ async function getDatabaseAnswer(queryText) {
     const matched = wardNo
       ? locations.filter((item) => Number(item.ward_no) === wardNo)
       : locations
-          .map((item) => ({ item, score: getTextScore(`${item.name} ward ${item.ward_no}`, queryTokens) }))
-          .filter((entry) => entry.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .map((entry) => entry.item);
+        .map((item) => ({ item, score: getTextScore(`${item.name} ward ${item.ward_no}`, queryTokens) }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => entry.item);
 
     const list = matched.length ? matched : locations.slice(0, 5);
     if (list.length === 0) return null;
