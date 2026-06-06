@@ -53,7 +53,7 @@ const STATIC_COLUMNS = [
       { name: "Register a Complaint", url: "/feedback", is_external: false },
       { name: "Apply for Rehri License", url: "/egov", is_external: false },
       { name: "Building Permission", url: "/egov", is_external: false },
-      { name: "Birth / Death Certificate", url: "https://serviceonline.gov.in/jammu/", is_external: true },
+      { name: "Birth / Death Certificate", url: "https://jansugam.jk.gov.in/", is_external: true },
       { name: "Trade License", url: "/egov", is_external: false },
       { name: "E-Tendering", url: "/egov", is_external: false },
     ],

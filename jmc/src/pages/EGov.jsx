@@ -19,13 +19,13 @@ const egovServices = [
   },
   {
     name: "Building Plan Permission",
-    href: "https://jkhuddobps.in/",
-    desc: "Apply for building plan sanction via HUDD BPS portal.",
+    href: "https://obps.jk.gov.in/BPAMSClient/Home.aspx",
+    desc: "Apply for building plan sanction via OBPS portal.",
   },
   {
     name: "Birth & Death Certificate",
-    href: "https://serviceonline.gov.in/jammu/",
-    desc: "Apply via JAKSMAC e-service portal.",
+    href: "https://jansugam.jk.gov.in/",
+    desc: "Apply via JanSugam Portal.",
   },
   {
     name: "Online NOC / Trade License",
@@ -34,13 +34,13 @@ const egovServices = [
   },
   {
     name: "Rehri License",
-    href: "https://serviceonline.gov.in/jammu/",
-    desc: "Apply for Rehri (street vendor) license via JAKSMAC portal.",
+    href: "https://jansugam.jk.gov.in/",
+    desc: "Apply for Rehri (street vendor) license via JanSugam Portal.",
   },
   {
     name: "Pet Dog Registration",
-    href: "https://serviceonline.gov.in/jammu/",
-    desc: "Register your pet dog with JMC online.",
+    href: "https://jansugam.jk.gov.in/",
+    desc: "Register your pet dog with JMC online via JanSugam Portal.",
   },
   {
     name: "Pay Rent – Municipal Shop/Flat",

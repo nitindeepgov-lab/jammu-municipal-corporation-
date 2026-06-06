@@ -25,8 +25,8 @@ const parks = [
 
 const links = [
   { label: "Register for Building Permission", href: "https://jmc.jk.gov.in/PermissionForm.aspx" },
-  { label: "Online NOC / License System", href: "https://serviceonline.gov.in/jammu/" },
-  { label: "Apply for Rehri License", href: "https://serviceonline.gov.in/jammu/" },
+  { label: "Online NOC / License System", href: "https://jansugam.jk.gov.in/" },
+  { label: "Apply for Rehri License", href: "https://jansugam.jk.gov.in/" },
   { label: "Jammu Master Plan 2032", href: "http://jmc.jk.gov.in/JMP2032.pdf" },
 ];
 
