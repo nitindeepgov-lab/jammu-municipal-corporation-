@@ -237,7 +237,7 @@ export async function generateReceiptPDF(receipt, formData = {}) {
   let logoDataUrl = null;
   try {
     logoDataUrl = await loadImageAsDataURL("/logo.jpeg");
-  } catch (_) {
+  } catch {
     // proceed without logo
   }
 

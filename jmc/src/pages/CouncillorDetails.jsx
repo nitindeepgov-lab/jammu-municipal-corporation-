@@ -97,10 +97,15 @@ export default function CouncillorDetails() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 7;
 
+  const [prevParams, setPrevParams] = useState({ currentPage, selectedWard });
+
+  if (currentPage !== prevParams.currentPage || selectedWard !== prevParams.selectedWard) {
+    setPrevParams({ currentPage, selectedWard });
+    setLoading(true);
+  }
+
   // Fetch data whenever page or ward changes
   useEffect(() => {
-    setLoading(true);
-
     getCouncillorsPaginated(currentPage, pageSize, selectedWard)
       .then((res) => {
         const data = res.data.data || [];

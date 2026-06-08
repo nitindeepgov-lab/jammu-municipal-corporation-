@@ -1,5 +1,8 @@
 'use strict';
 
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+console.log('🔌 Database URL in environment:', process.env.DATABASE_URL ? 'PRESENT (starts with ' + process.env.DATABASE_URL.substring(0, 15) + '...)' : 'MISSING');
+
 const OFFICES = [
   {
     title: 'Main Office (Head Quarters)',
@@ -27,7 +30,9 @@ const OFFICES = [
 async function main() {
   const { createStrapi, compileStrapi } = require('@strapi/strapi');
 
+  console.log('🔄 Compiling Strapi application...');
   const appContext = await compileStrapi();
+  console.log('🔄 Loading Strapi application...');
   const app = await createStrapi(appContext).load();
 
   try {

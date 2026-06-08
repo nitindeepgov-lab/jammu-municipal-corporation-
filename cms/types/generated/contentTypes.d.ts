@@ -511,6 +511,41 @@ export interface ApiBulletinBoardBulletinBoard
   };
 }
 
+export interface ApiContactStripContactStrip extends Struct.SingleTypeSchema {
+  collectionName: 'contact_strips';
+  info: {
+    description: 'Footer contact information strip details managed by the CMS.';
+    displayName: '\uD83D\uDCDE Contact Strip';
+    pluralName: 'contact-strips';
+    singularName: 'contact-strip';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    address_line1: Schema.Attribute.String & Schema.Attribute.Required;
+    address_line2: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact-strip.contact-strip'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    toll_free: Schema.Attribute.String & Schema.Attribute.Required;
+    toll_free_subtext: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    website: Schema.Attribute.String & Schema.Attribute.Required;
+    website_url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface ApiCouncillorDetailCouncillorDetail
   extends Struct.CollectionTypeSchema {
   collectionName: 'councillor_details';
@@ -1627,6 +1662,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::audit-log.audit-log': ApiAuditLogAuditLog;
       'api::bulletin-board.bulletin-board': ApiBulletinBoardBulletinBoard;
+      'api::contact-strip.contact-strip': ApiContactStripContactStrip;
       'api::councillor-detail.councillor-detail': ApiCouncillorDetailCouncillorDetail;
       'api::event-activity.event-activity': ApiEventActivityEventActivity;
       'api::footer-link.footer-link': ApiFooterLinkFooterLink;

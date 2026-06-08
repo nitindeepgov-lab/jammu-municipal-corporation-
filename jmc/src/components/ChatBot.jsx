@@ -28,27 +28,10 @@ const fmtTime = () =>
     hour12: true,
   });
 
-const makeWelcome = () => ({
-  role: "bot",
-  text: "Namaste! 🙏 Welcome to **JMC Assistant** — your official digital guide for all Jammu Municipal Corporation services.\n\nI can help you with **payments**, **complaints**, **certificates**, **RTI**, **tenders**, and much more. You can also speak to me using the 🎙️ mic button!\n\nWhat would you like to do today?",
-  time: fmtTime(),
-});
-
-const quickActions = [
-  { id: "pay-fees", label: "💳 Pay Online" },
-  { id: "complaint", label: "📝 File Complaint" },
-  { id: "contacts", label: "📞 Officer Contacts" },
-  { id: "notices", label: "📋 Notices & Tenders" },
-  { id: "rti", label: "📄 RTI Info" },
-  { id: "egov", label: "🏛️ E-Governance" },
-  { id: "property-tax", label: "🏠 Property Tax" },
-  { id: "water-tanker", label: "💧 Water Tanker" },
-];
-
 /* ═══════════════════════════════════════════════════════════════
    Logo Avatar — used in header, typing indicator, and bubbles
    ═══════════════════════════════════════════════════════════════ */
-function LogoAvatar({ size = 32, className = "" }) {
+function LogoAvatar({ size = 32, className = "", shouldSpin = false }) {
   return (
     <div
       className={`rounded-full overflow-hidden flex-shrink-0 bg-white flex items-center justify-center ${className}`}
@@ -57,10 +40,10 @@ function LogoAvatar({ size = 32, className = "" }) {
       <img
         src={LOGO_SRC}
         alt="JMC"
-        className="w-full h-full object-cover"
+        className={`w-full h-full object-cover ${shouldSpin ? "animate-slow-spin" : ""}`}
         onError={(e) => {
           e.target.style.display = "none";
-          e.target.parentNode.innerHTML = `<svg width="${size * 0.55}" height="${size * 0.55}" viewBox="0 0 24 24" fill="none" stroke="#002B5E" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`;
+          e.target.parentNode.innerHTML = `<svg width="${size * 0.55}" height="${size * 0.55}" viewBox="0 0 24 24" fill="none" stroke="#003366" stroke-width="2" class="${shouldSpin ? "animate-slow-spin" : ""}"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`;
         }}
       />
     </div>
@@ -82,13 +65,13 @@ function MiniMarkdown({ text, isUser }) {
             /\*\*(.+?)\*\*/g,
             isUser
               ? '<strong class="font-bold text-white">$1</strong>'
-              : '<strong class="font-bold text-[#002B5E]">$1</strong>'
+              : '<strong class="font-extrabold text-[#003366]">$1</strong>'
           )
           .replace(
             /\[([^\]]+)\]\(([^)]+)\)/g,
             isUser
               ? '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-white underline underline-offset-2 font-semibold hover:text-white/80 transition-colors">$1</a>'
-              : '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#002B5E] font-semibold underline underline-offset-2 hover:text-[#004494] transition-colors">$1</a>'
+              : '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#003366] font-extrabold underline underline-offset-2 hover:text-[#002244] transition-colors">$1</a>'
           );
 
         const isBullet = line.trimStart().startsWith("•") || line.trimStart().startsWith("-");
@@ -96,9 +79,9 @@ function MiniMarkdown({ text, isUser }) {
         return (
           <p
             key={i}
-            className={`text-[13px] leading-[1.65] ${
-              isUser ? "text-white/95" : "text-[#2d3748]"
-            } ${isBullet ? "pl-2.5 relative before:content-['•'] before:absolute before:left-0 before:text-[#002B5E]/60" : ""}`}
+            className={`text-xs leading-relaxed ${
+              isUser ? "text-white/95" : "text-slate-600 font-medium"
+            } ${isBullet ? "pl-2.5 relative before:content-['•'] before:absolute before:left-0 before:text-[#003366]/60 font-medium" : ""}`}
             dangerouslySetInnerHTML={{ __html: isBullet ? rendered.replace(/^[•-]\s*/, "") : rendered }}
           />
         );
@@ -112,12 +95,12 @@ function MiniMarkdown({ text, isUser }) {
    ═══════════════════════════════════════════════════════════════ */
 function TypingIndicator() {
   return (
-    <div className="flex items-start gap-3 mb-5 animate-chatIn">
-      <LogoAvatar size={30} className="mt-0.5 ring-1 ring-gray-150 shadow-sm" />
-      <div className="flex gap-1.5 items-center bg-[#f8f9fb] border border-gray-100/80 rounded-2xl rounded-tl-[4px] px-4 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0ms]" />
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce [animation-delay:150ms]" />
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-200 animate-bounce [animation-delay:300ms]" />
+    <div className="flex items-start gap-2.5 mb-5 animate-chatIn">
+      <LogoAvatar size={28} className="mt-0.5 ring-1 ring-slate-100 shadow-sm" />
+      <div className="flex gap-1 items-center bg-slate-50 border border-slate-100 rounded-xl rounded-tl-[3px] px-3 py-2 shadow-sm">
+        <span className="w-1.2 h-1.2 rounded-full bg-slate-400 animate-bounce [animation-delay:0ms]" />
+        <span className="w-1.2 h-1.2 rounded-full bg-slate-300 animate-bounce [animation-delay:150ms]" />
+        <span className="w-1.2 h-1.2 rounded-full bg-slate-200 animate-bounce [animation-delay:300ms]" />
       </div>
     </div>
   );
@@ -133,39 +116,27 @@ function WelcomeDashboard({ onSelectAction }) {
       label: "Property Tax",
       desc: "Self-assessment & payments",
       icon: CreditCard,
-      gradient: "from-blue-50/60 to-indigo-50/30 hover:from-blue-50 hover:to-indigo-50/60",
-      border: "border-blue-100/80 hover:border-blue-200",
-      iconBg: "bg-blue-500/10 text-blue-600",
       query: "pay property tax"
     },
     {
       id: "complaint",
       label: "File Grievance",
-      desc: "Register and track civic complaints",
+      desc: "Register & track civic complaints",
       icon: FileText,
-      gradient: "from-emerald-50/60 to-teal-50/30 hover:from-emerald-50 hover:to-teal-50/60",
-      border: "border-emerald-100/80 hover:border-emerald-200",
-      iconBg: "bg-emerald-500/10 text-emerald-600",
       query: "file a complaint"
     },
     {
       id: "egov",
       label: "E-Governance Hub",
-      desc: "Birth certificate, trade NOCs, etc.",
+      desc: "Certificates, trade NOCs, etc.",
       icon: Building2,
-      gradient: "from-indigo-50/60 to-purple-50/30 hover:from-indigo-50 hover:to-purple-50/60",
-      border: "border-indigo-100/80 hover:border-indigo-200",
-      iconBg: "bg-indigo-500/10 text-indigo-600",
       query: "e-governance services"
     },
     {
       id: "helpline",
       label: "Official Helplines",
-      desc: "Direct contact numbers of key officers",
+      desc: "Direct contact numbers",
       icon: PhoneCall,
-      gradient: "from-amber-50/60 to-orange-50/30 hover:from-amber-50 hover:to-orange-50/60",
-      border: "border-amber-100/80 hover:border-amber-200",
-      iconBg: "bg-amber-500/10 text-amber-600",
       query: "officer contacts"
     }
   ];
@@ -179,25 +150,17 @@ function WelcomeDashboard({ onSelectAction }) {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center py-6 px-1.5 text-center animate-chatIn select-none">
-      {/* Sparkle icon at top */}
-      <div className="relative mb-5 flex items-center justify-center">
-        <span className="absolute w-14 h-14 rounded-2xl bg-[#002B5E]/5 animate-ping [animation-duration:2.5s]" />
-        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#002B5E] to-[#004a9f] flex items-center justify-center shadow-[0_8px_24px_rgba(0,43,94,0.2)]">
-          <Sparkles className="text-amber-300 w-5 h-5 animate-spin [animation-duration:8s]" />
-        </div>
+    <div className="flex flex-col items-center justify-center py-6 px-1 text-center animate-chatIn select-none">
+      
+      <div className="relative mb-4 w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-[#003366] shadow-sm">
+        <LogoAvatar size={28} />
       </div>
 
-      <h2 className="text-[22px] font-extrabold tracking-tight flex items-center justify-center gap-2 select-none">
-        <span className="bg-gradient-to-r from-[#002B5E] to-[#004a9f] bg-clip-text text-transparent">
-          Namaste JMC!
-        </span>
+      <h2 className="text-base font-extrabold tracking-tight text-slate-800">
+        Welcome to JMC Guide
       </h2>
-      <h3 className="text-slate-800 text-[15px] font-extrabold mt-1 tracking-tight">
-        How can I help you today?
-      </h3>
-      <p className="text-slate-500 text-[11.5px] max-w-[310px] mt-2 leading-relaxed font-medium">
-        Ask me about municipal taxes, certificates, tenders, online payments, or file a complaint.
+      <p className="text-slate-400 text-[11px] max-w-[280px] mt-1.5 leading-relaxed font-semibold">
+        How can I help you find municipal services today?
       </p>
 
       {/* Grid actions */}
@@ -208,12 +171,12 @@ function WelcomeDashboard({ onSelectAction }) {
             <button
               key={item.id}
               onClick={() => onSelectAction(item.query, item.label)}
-              className={`group text-left p-3.5 rounded-2xl border bg-gradient-to-br transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-slate-100 active:scale-[0.97] ${item.gradient} ${item.border}`}
+              className="text-left p-3.5 rounded-xl border border-slate-100 bg-white hover:bg-slate-50/50 hover:border-slate-200 transition-all duration-200 active:scale-[0.98]"
             >
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${item.iconBg} transition-transform duration-300 group-hover:scale-105`}>
-                <IconComponent size={18} strokeWidth={2.2} />
+              <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-[#003366]">
+                <IconComponent size={15} strokeWidth={2.2} />
               </div>
-              <h4 className="text-[13px] font-extrabold text-slate-800 mt-3 group-hover:text-[#002B5E] transition-colors leading-tight">
+              <h4 className="text-[12.5px] font-extrabold text-slate-700 mt-3.5 leading-tight">
                 {item.label}
               </h4>
               <p className="text-[10px] text-slate-400 mt-1 leading-normal font-semibold">
@@ -226,7 +189,7 @@ function WelcomeDashboard({ onSelectAction }) {
 
       {/* Secondary Quick Action pills */}
       <div className="w-full mt-6 text-left">
-        <p className="text-[10.5px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-1 select-none">
+        <p className="text-[9.5px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-1">
           Popular Queries
         </p>
         <div className="flex flex-wrap gap-1.5">
@@ -234,7 +197,7 @@ function WelcomeDashboard({ onSelectAction }) {
             <button
               key={idx}
               onClick={() => onSelectAction(pill.query, pill.label.replace(/^[^a-zA-Z\s]+/, "").trim())}
-              className="text-[11.5px] font-bold text-[#002B5E] bg-slate-50 hover:bg-[#e0ecfc] border border-slate-100 hover:border-[#002B5E]/15 px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-sm"
+              className="text-[11px] font-bold text-[#003366] bg-slate-50 hover:bg-[#eaf1fb] border border-slate-100 hover:border-[#003366]/15 px-3 py-1.5 rounded-lg transition-all shadow-sm"
             >
               {pill.label}
             </button>
@@ -252,18 +215,17 @@ function NavButton({ nav, onNavigate }) {
   return (
     <button
       onClick={() => onNavigate(nav.path)}
-      className="group flex items-center gap-3 w-full mt-3 px-4 py-3 bg-[#f8f9fb] border border-gray-200/80 rounded-xl hover:border-[#002B5E]/30 hover:bg-[#f0f4fa] transition-all duration-200"
+      className="group flex items-center gap-3 w-full mt-3 px-3.5 py-2.5 bg-white border border-slate-150 rounded-xl hover:border-[#003366]/30 hover:bg-slate-50 transition-all duration-200"
     >
-      <div className="w-7 h-7 rounded-lg bg-[#002B5E]/10 flex items-center justify-center flex-shrink-0">
-        <ArrowRight size={13} className="text-[#002B5E]" />
+      <div className="w-6 h-6 rounded-lg bg-[#003366]/5 flex items-center justify-center flex-shrink-0">
+        <ArrowRight size={11} className="text-[#003366]" />
       </div>
-      <div className="flex-1 text-left">
-        <p className="text-[12.5px] font-semibold text-gray-800">Visit {nav.label}</p>
-        <p className="text-[10.5px] text-gray-400 mt-0.5">jmc.gov.in{nav.path}</p>
+      <div className="flex-1 text-left min-w-0">
+        <p className="text-[11.5px] font-extrabold text-slate-700 truncate">Visit {nav.label}</p>
       </div>
       <ArrowRight
-        size={14}
-        className="text-gray-300 group-hover:text-[#002B5E] group-hover:translate-x-0.5 transition-all duration-200"
+        size={12}
+        className="text-slate-300 group-hover:text-[#003366] group-hover:translate-x-0.5 transition-all duration-200"
       />
     </button>
   );
@@ -276,9 +238,9 @@ function PageGrid({ pages, onNavigate }) {
         <button
           key={p.path}
           onClick={() => onNavigate(p.path)}
-          className="group flex items-center gap-2 px-3 py-2 bg-[#f8f9fb] border border-gray-200/60 hover:border-[#002B5E]/20 rounded-lg text-left transition-all duration-200"
+          className="group flex items-center gap-2 px-3 py-2 bg-white border border-slate-150 hover:border-[#003366]/20 rounded-lg text-left transition-all duration-200"
         >
-          <span className="text-[11.5px] font-medium text-gray-600 group-hover:text-[#002B5E] truncate">
+          <span className="text-[11px] font-bold text-slate-600 group-hover:text-[#003366] truncate">
             {p.label}
           </span>
         </button>
@@ -300,29 +262,29 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
     >
       {/* Avatar */}
       {isUser ? (
-        <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-tr from-[#002B5E] to-[#004494] flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
-          <User size={13} className="text-white" />
+        <div className="w-[30px] h-[30px] rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+          <User size={12} className="text-slate-500" />
         </div>
       ) : (
-        <LogoAvatar size={30} className="mt-0.5 ring-1 ring-gray-150 shadow-sm" />
+        <LogoAvatar size={30} className="mt-0.5 ring-1 ring-slate-100 shadow-sm" />
       )}
 
       {/* Content */}
       <div
-        className={`flex flex-col gap-1 max-w-[82%] ${
+        className={`flex flex-col gap-0.5 max-w-[82%] ${
           isUser ? "items-end" : "items-start"
         }`}
       >
         {/* Label */}
-        <span className="text-[9.5px] font-bold text-gray-400 tracking-wider uppercase px-0.5 select-none">
+        <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase px-0.5 select-none">
           {isUser ? "You" : "JMC Assistant"}
         </span>
 
         <div
           className={`px-3.5 py-2.5 ${
             isUser
-              ? "bg-gradient-to-br from-[#002B5E] to-[#004494] text-white rounded-2xl rounded-tr-[4px] shadow-[0_3px_12px_rgba(0,43,94,0.15)]"
-              : "bg-[#f8f9fb] text-[#2d3748] rounded-2xl rounded-tl-[4px] border border-gray-100 shadow-[0_2px_6px_rgba(0,0,0,0.01)]"
+              ? "bg-[#003366] text-white rounded-2xl rounded-tr-[4px] shadow-sm"
+              : "bg-slate-50/70 text-slate-700 rounded-2xl rounded-tl-[4px] border border-slate-105/80 shadow-sm"
           }`}
         >
           <MiniMarkdown text={msg.text} isUser={isUser} />
@@ -339,7 +301,7 @@ function Bubble({ msg, onFollowUp, onNavigate }) {
               <button
                 key={f.id}
                 onClick={() => onFollowUp(f)}
-                className="text-[11px] font-semibold text-[#002B5E] bg-white hover:bg-[#f0f4fa] border border-[#002B5E]/15 hover:border-[#002B5E]/30 px-3 py-1.5 rounded-full transition-all duration-200 shadow-sm active:scale-95"
+                className="text-[10.5px] font-semibold text-[#003366] bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm active:scale-95"
               >
                 {f.label}
               </button>
@@ -371,7 +333,6 @@ export default function ChatBot() {
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Persisted speech language selection (defaults to English "en-IN")
   const [voiceLang, setVoiceLang] = useState(() => {
     return localStorage.getItem("jmc_chat_voice_lang") || "en-IN";
   });
@@ -380,13 +341,11 @@ export default function ChatBot() {
     localStorage.setItem("jmc_chat_voice_lang", voiceLang);
   }, [voiceLang]);
 
-  // msgs reference to prevent stale closures in callbacks
   const msgsRef = useRef([]);
   useEffect(() => {
     msgsRef.current = msgs;
   }, [msgs]);
 
-  /* Auto-scroll */
   const scrollToBottom = useCallback((smooth = true) => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTo({
@@ -413,7 +372,6 @@ export default function ChatBot() {
     }
   }, [open]);
 
-  /* ── Core query processor ────────────────────────────────── */
   const addBotMsg = useCallback((msg) => {
     setTyping(false);
     setMsgs((prev) => [...prev, msg]);
@@ -427,7 +385,6 @@ export default function ChatBot() {
       ]);
       setTyping(true);
 
-      // Build history from msgsRef
       const recentMsgs = msgsRef.current.slice(-10);
       const historyData = recentMsgs.map((m) => ({
         role: m.role,
@@ -481,13 +438,6 @@ export default function ChatBot() {
     [processQuery]
   );
 
-  const handleQuickAction = useCallback(
-    (action) => {
-      processQuery(action.label, action.label);
-    },
-    [processQuery]
-  );
-
   const handleFollowUp = useCallback(
     (f) => {
       processQuery(f.label, f.label);
@@ -509,7 +459,6 @@ export default function ChatBot() {
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
-  /* ── Voice input with Bilingual support & Auto-Close/Auto-Search ── */
   const [voiceTranscript, setVoiceTranscript] = useState("");
   const transcriptRef = useRef("");
 
@@ -582,8 +531,6 @@ export default function ChatBot() {
     [handleSend]
   );
 
-  const showQuickActions = msgs.length === 1 && !typing;
-
   return (
     <>
       {/* ── Backdrop blur when open on mobile ─────────────────── */}
@@ -602,34 +549,31 @@ export default function ChatBot() {
             : "scale-[0.7] opacity-0 translate-y-8 pointer-events-none"
         }`}
       >
-        <div className="rounded-3xl overflow-hidden flex flex-col shadow-[0_32px_64px_-16px_rgba(0,43,94,0.28),0_0_0_1px_rgba(0,43,94,0.05)] h-[650px] max-h-[calc(100dvh-7rem)] bg-white/95 backdrop-blur-md border border-white/20 transition-all duration-300">
+        <div className="rounded-2xl overflow-hidden flex flex-col shadow-[0_12px_40px_rgba(0,0,0,0.08)] h-[650px] max-h-[calc(100dvh-7rem)] bg-white border border-slate-100 transition-all duration-300">
           {/* ── Header ── */}
-          <div className="relative bg-gradient-to-r from-[#00152b] via-[#002B5E] to-[#00418c] px-4 py-4 flex-shrink-0 border-b border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+          <div className="relative bg-white px-5 py-4 flex-shrink-0 border-b border-slate-100 shadow-sm">
             <div className="flex items-center gap-3">
-              <LogoAvatar size={36} className="ring-2 ring-white/20 shadow-md" />
+              <LogoAvatar size={34} className="ring-1 ring-slate-100 shadow-sm" />
               <div className="flex-1 min-w-0">
-                <h3 className="text-white font-bold text-[14px] tracking-[-0.01em]">
+                <h3 className="text-slate-800 font-extrabold text-[13.5px] tracking-tight">
                   JMC Assistant
                 </h3>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-white/60 text-[10.5px] font-medium">
-                    Online — Jammu Municipal Corporation
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    Online
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
-                {/* Universal Language Toggle inside Header */}
-                <div className="flex items-center bg-white/10 p-0.5 rounded-full relative select-none border border-white/5 mr-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+              <div className="flex items-center gap-1.5">
+                {/* Language Toggle */}
+                <div className="flex items-center bg-slate-50 p-0.5 rounded-full border border-slate-200/50 mr-1 select-none">
                   <button
                     onClick={() => setVoiceLang("en-IN")}
                     className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider transition-all duration-200 ${
                       voiceLang === "en-IN"
-                        ? "bg-white text-[#002B5E] shadow-sm"
-                        : "text-white/60 hover:text-white"
+                        ? "bg-[#003366] text-white shadow-sm"
+                        : "text-slate-400 hover:text-slate-600"
                     }`}
                   >
                     EN
@@ -638,27 +582,27 @@ export default function ChatBot() {
                     onClick={() => setVoiceLang("hi-IN")}
                     className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wider transition-all duration-200 ${
                       voiceLang === "hi-IN"
-                        ? "bg-white text-[#002B5E] shadow-sm"
-                        : "text-white/60 hover:text-white"
+                        ? "bg-[#003366] text-white shadow-sm"
+                        : "text-slate-400 hover:text-slate-600"
                     }`}
                   >
-                    हिंदी
+                    हि
                   </button>
                 </div>
 
                 <button
                   onClick={handleReset}
                   title="New conversation"
-                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  className="w-7 h-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors border border-transparent hover:border-slate-100"
                 >
                   <RotateCcw size={13} />
                 </button>
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  className="w-7 h-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors border border-transparent hover:border-slate-100"
                   aria-label="Close"
                 >
-                  <X size={16} />
+                  <X size={15} />
                 </button>
               </div>
             </div>
@@ -692,7 +636,7 @@ export default function ChatBot() {
           {showScroll && (
             <button
               onClick={() => scrollToBottom()}
-              className="absolute bottom-[92px] left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/95 backdrop-blur-md border border-slate-200 text-slate-600 text-[11px] font-bold px-4 py-2 rounded-full shadow-xl hover:bg-white active:scale-95 transition-all z-10"
+              className="absolute bottom-[92px] left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 text-[11px] font-bold px-4 py-2 rounded-full shadow-xl hover:bg-slate-50 active:scale-95 transition-all z-10"
             >
               <ChevronDown size={14} className="animate-bounce" /> New messages
             </button>
@@ -700,14 +644,14 @@ export default function ChatBot() {
 
           {/* ── Voice Overlay ── */}
           {listening && (
-            <div className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 animate-chatIn rounded-3xl p-6">
+            <div className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 animate-chatIn rounded-2xl p-6">
               {/* Active Speaking Language indicator */}
-              <div className="flex items-center gap-2 bg-[#f0f4fa] px-4 py-2 rounded-full border border-[#002B5E]/10 shadow-[0_2px_10px_rgba(0,43,94,0.04)]">
+              <div className="flex items-center gap-2 bg-[#f0f4fa] px-4 py-2 rounded-full border border-[#003366]/10 shadow-[0_2px_10px_rgba(0,43,94,0.04)]">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                 </span>
-                <span className="text-[11.5px] font-extrabold text-[#002B5E] tracking-wide">
+                <span className="text-[11.5px] font-extrabold text-[#003366] tracking-wide">
                   Listening in {voiceLang === "hi-IN" ? "Hindi (हिंदी)" : "English (India)"}
                 </span>
               </div>
@@ -762,7 +706,7 @@ export default function ChatBot() {
                   onClick={() => {
                     recognitionRef.current?.stop();
                   }}
-                  className="text-[12px] text-white bg-[#002B5E] hover:bg-[#003d82] font-bold px-4 py-2 rounded-xl shadow-sm active:scale-95 transition-all duration-200"
+                  className="text-[12px] text-white bg-[#003366] hover:bg-[#002244] font-bold px-4 py-2 rounded-xl shadow-sm active:scale-95 transition-all duration-200"
                 >
                   Done
                 </button>
@@ -771,18 +715,18 @@ export default function ChatBot() {
           )}
 
           {/* ── Input Bar ── */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-100 px-4 pt-3 pb-4">
+          <div className="flex-shrink-0 bg-white border-t border-slate-100 px-4 pt-3 pb-4">
             <div
-              className="flex items-center gap-2 rounded-2xl px-4 py-2 transition-all duration-200 bg-[#f4f5f7] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#002B5E]/15 focus-within:shadow-sm"
+              className="flex items-center gap-2 rounded-2xl px-3 py-1.5 border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-[#003366] focus-within:ring-4 focus-within:ring-[#003366]/5 transition-all duration-200"
             >
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Message JMC Assistant…"
+                placeholder="Ask JMC Assistant..."
                 disabled={typing}
-                className="flex-1 bg-transparent text-[13.5px] text-gray-800 placeholder-gray-400 outline-none py-1.5 disabled:opacity-50"
+                className="flex-1 bg-transparent text-[13px] text-slate-700 placeholder-slate-400 outline-none py-1.5 disabled:opacity-50 font-medium"
               />
 
               {/* Mic button — always visible when no text */}
@@ -791,9 +735,9 @@ export default function ChatBot() {
                   onClick={handleVoice}
                   disabled={typing}
                   title="Speak your question"
-                  className="p-2 rounded-full text-gray-400 hover:text-[#002B5E] hover:bg-[#002B5E]/8 transition-all duration-200"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-[#003366] hover:bg-slate-100 transition-all duration-200"
                 >
-                  <Mic size={18} />
+                  <Mic size={16} />
                 </button>
               )}
 
@@ -801,17 +745,17 @@ export default function ChatBot() {
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || typing}
-                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
                   input.trim() && !typing
-                    ? "bg-[#002B5E] text-white shadow-sm hover:bg-[#003d82] active:scale-95"
-                    : "bg-gray-200/70 text-gray-400 cursor-not-allowed"
+                    ? "bg-[#003366] text-white shadow-sm hover:bg-[#002244] active:scale-95"
+                    : "bg-slate-100 text-slate-350 cursor-not-allowed border border-slate-150"
                 }`}
               >
-                <Send size={13} />
+                <Send size={12} />
               </button>
             </div>
-            <p className="text-center text-[9.5px] text-gray-400 mt-2.5 tracking-wide">
-              Powered by Jammu Municipal Corporation
+            <p className="text-center text-[9px] text-slate-400 mt-2.5 tracking-wider font-semibold">
+              Official Jammu Municipal Corporation Assistant
             </p>
           </div>
         </div>
@@ -822,17 +766,11 @@ export default function ChatBot() {
         {/* Tooltip */}
         {!tooltipDismissed && !open && (
           <div className="absolute bottom-full right-0 mb-3 animate-chatIn">
-            <div className="relative bg-gradient-to-br from-[#002B5E] to-[#004494] text-white text-[12px] font-semibold px-4 py-2.5 rounded-xl shadow-[0_8px_24px_rgba(0,43,94,0.25)] whitespace-nowrap flex items-center gap-2 select-none border border-white/5">
-              <Sparkles size={12} className="text-amber-350" />
-              Need help? Ask JMC Assistant
+            <div className="relative bg-white text-slate-700 text-xs font-semibold px-4 py-2 rounded-xl shadow-md border border-slate-100 whitespace-nowrap flex items-center gap-2 select-none">
+              Ask JMC Assistant
             </div>
-            <div className="w-2.5 h-2.5 bg-[#002B5E] rotate-45 absolute -bottom-1 right-7 border-r border-b border-white/5" />
+            <div className="w-2.5 h-2.5 bg-white rotate-45 absolute -bottom-1 right-7 border-r border-b border-slate-100" />
           </div>
-        )}
-
-        {/* Subtle pulse — only when closed */}
-        {!open && (
-          <span className="absolute -inset-1.5 rounded-full bg-[#002B5E]/15 animate-ping [animation-duration:3s] pointer-events-none" />
         )}
 
         {/* FAB Button */}
@@ -842,13 +780,13 @@ export default function ChatBot() {
           className={`relative w-[58px] h-[58px] rounded-full flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             open
               ? "bg-gray-100 hover:bg-gray-200 text-gray-500 border border-gray-200 scale-90 shadow-lg"
-              : "bg-white border border-gray-100/60 shadow-[0_8px_32px_rgba(0,43,94,0.18),0_0_0_2px_rgba(0,43,94,0.03)] hover:shadow-[0_12px_40px_rgba(0,43,94,0.28)] hover:scale-105 active:scale-95 text-[#002B5E]"
+              : "bg-white border border-gray-100/60 shadow-[0_8px_32px_rgba(0,43,94,0.18),0_0_0_2px_rgba(0,43,94,0.03)] hover:shadow-[0_12px_40px_rgba(0,43,94,0.28)] hover:scale-105 active:scale-95 text-[#003366]"
           }`}
         >
           {open ? (
             <X size={22} className="text-gray-650" />
           ) : (
-            <LogoAvatar size={42} className="ring-1 ring-[#002B5E]/5 shadow-sm" />
+            <LogoAvatar size={42} className="ring-1 ring-[#003366]/5 shadow-sm" shouldSpin={true} />
           )}
         </button>
 

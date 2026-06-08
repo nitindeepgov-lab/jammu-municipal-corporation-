@@ -4,6 +4,7 @@ import {
   getVisitorCount,
   incrementVisitorCount,
   getFooterLinks,
+  getContactStrip,
 } from "../../services/strapiApi";
 import { logError } from "../../utils/errorLogger";
 
@@ -160,6 +161,15 @@ export default function Footer() {
   const [visitorCount, setVisitorCount] = useState(null);
   // null = loading | array = ready (either CMS data or static fallback)
   const [columns, setColumns] = useState(null);
+  const [contactData, setContactData] = useState({
+    address_line1: "Jammu Municipal Corporation",
+    address_line2: "Jammu — 180001, J&K (UT)",
+    toll_free: "1800-180-7207",
+    toll_free_subtext: "10 AM – 5 PM (Working Days)",
+    email: "commissionerjmc@gmail.com",
+    website: "www.jmc.jk.gov.in",
+    website_url: "https://jmc.jk.gov.in",
+  });
 
   // ── Visitor counter ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -249,6 +259,44 @@ export default function Footer() {
     };
   }, []);
 
+  // ── Contact strip details from CMS ─────────────────────────────────────────
+  useEffect(() => {
+    let isActive = true;
+
+    const loadContactStrip = async () => {
+      try {
+        console.log("[Footer] 🔄 Fetching contact strip details from CMS...");
+        const res = await getContactStrip();
+        if (!isActive) return;
+
+        const data = res?.data?.data;
+        if (data) {
+          console.log("[Footer] ✅ Fetched contact strip details:", data);
+          setContactData({
+            address_line1: data.address_line1 || "Jammu Municipal Corporation",
+            address_line2: data.address_line2 || "Jammu — 180001, J&K (UT)",
+            toll_free: data.toll_free || "1800-180-7207",
+            toll_free_subtext: data.toll_free_subtext || "10 AM – 5 PM (Working Days)",
+            email: data.email || "commissionerjmc@gmail.com",
+            website: data.website || "www.jmc.jk.gov.in",
+            website_url: data.website_url || "https://jmc.jk.gov.in",
+          });
+        }
+      } catch (error) {
+        console.warn(
+          "[Footer] ⚠️ Error loading contact strip from CMS, using default fallback:",
+          error.message,
+        );
+        logError("ContactStrip", error);
+      }
+    };
+
+    loadContactStrip();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   const safeCount = Number.isFinite(visitorCount)
     ? Math.max(0, visitorCount)
     : 0;
@@ -268,9 +316,9 @@ export default function Footer() {
                 label: "Address",
                 value: (
                   <>
-                    Jammu Municipal Corporation
+                    {contactData.address_line1}
                     <br />
-                    Jammu — 180001, J&K (UT)
+                    {contactData.address_line2}
                   </>
                 ),
                 icon: (
@@ -286,10 +334,10 @@ export default function Footer() {
                 label: "Toll Free",
                 value: (
                   <>
-                    1800-180-7207
+                    {contactData.toll_free}
                     <br />
                     <span className="text-blue-300/60 text-[10px]">
-                      10 AM – 5 PM (Working Days)
+                      {contactData.toll_free_subtext}
                     </span>
                   </>
                 ),
@@ -304,7 +352,14 @@ export default function Footer() {
               },
               {
                 label: "Email",
-                value: "commissionerjmc@gmail.com",
+                value: (
+                  <a
+                    href={`mailto:${contactData.email}`}
+                    className="hover:text-white transition-colors"
+                  >
+                    {contactData.email}
+                  </a>
+                ),
                 icon: (
                   <path
                     strokeLinecap="round"
@@ -318,12 +373,12 @@ export default function Footer() {
                 label: "Website",
                 value: (
                   <a
-                    href="https://jmc.jk.gov.in"
+                    href={contactData.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors"
                   >
-                    www.jmc.jk.gov.in
+                    {contactData.website}
                   </a>
                 ),
                 icon: (
