@@ -40,23 +40,6 @@ function DateWidget({ dateStr }) {
   );
 }
 
-function getCategoryBadge(title) {
-  const t = title.toLowerCase();
-  if (t.includes("press release") || t.includes("press")) {
-    return { label: "Press Release", bg: "bg-emerald-50 text-emerald-700 border-emerald-100/80" };
-  }
-  if (t.includes("circular")) {
-    return { label: "Circular", bg: "bg-purple-50 text-purple-700 border-purple-100/80" };
-  }
-  if (t.includes("tender")) {
-    return { label: "Tender", bg: "bg-amber-50 text-amber-700 border-amber-100/80" };
-  }
-  if (t.includes("notice")) {
-    return { label: "Notice", bg: "bg-blue-50 text-blue-700 border-blue-100/80" };
-  }
-  return { label: "Document", bg: "bg-slate-50 text-slate-700 border-slate-100/80" };
-}
-
 export default function Notices() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -68,11 +51,15 @@ export default function Notices() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const [prevTabParam, setPrevTabParam] = useState(tabParam);
+
+  if (tabParam !== prevTabParam) {
+    setPrevTabParam(tabParam);
     if (tabParam && ["public", "tender", "council"].includes(tabParam)) {
       setActive(tabParam);
     }
-  }, [tabParam]);
+  }
+
 
   const handleTabChange = (tabId) => {
     setActive(tabId);

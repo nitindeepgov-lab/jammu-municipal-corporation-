@@ -70,7 +70,7 @@ function TenderSkeletonCard() {
 }
 
 /* ── Individual Tender Card Component ── */
-function TenderCard({ tender, idx }) {
+function TenderCard({ tender }) {
   const [expanded, setExpanded] = useState(false);
   const statusCfg = STATUS_CONFIGS[tender.status] || STATUS_CONFIGS.Active;
   const hasDesc = tender.description && tender.description.trim().length > 0;
@@ -214,7 +214,6 @@ export default function SmartCityTenders() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
     getSmartCityTenders()
       .then((res) => {
         if (!active) return;

@@ -1,0 +1,44 @@
+{
+  "kind": "singleType",
+  "collectionName": "contact_strips",
+  "info": {
+    "singularName": "contact-strip",
+    "pluralName": "contact-strips",
+    "displayName": "📞 Contact Strip",
+    "description": "Footer contact information strip details managed by the CMS."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "address_line1": {
+      "type": "string",
+      "required": true
+    },
+    "address_line2": {
+      "type": "string",
+      "required": true
+    },
+    "toll_free": {
+      "type": "string",
+      "required": true
+    },
+    "toll_free_subtext": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "string",
+      "required": true
+    },
+    "website": {
+      "type": "string",
+      "required": true
+    },
+    "website_url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

@@ -1,6 +1,23 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import SubpageTemplate from '../components/SubpageTemplate'
 
 export default function About() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        const timeoutId = setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" });
+        }, 150);
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [hash]);
+
   return (
     <SubpageTemplate title="About Jammu Municipal Corporation" breadcrumb={[{ name: 'About JMC' }]}>
       <div className="space-y-5">

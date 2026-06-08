@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PageLayout from "./PageLayout";
 import {
   Home,
@@ -68,10 +68,8 @@ const IMPORTANT_LINKS = [
 
 function Sidebar() {
   const location = useLocation();
-  const [expanded, setExpanded] = useState({});
 
-  // Auto-expand menu on mount if current page is parent or child
-  useEffect(() => {
+  const getInitialExpanded = () => {
     const initial = {};
     PAGE_NAV.forEach((item) => {
       if (item.children) {
@@ -86,8 +84,17 @@ function Sidebar() {
         }
       }
     });
-    setExpanded(initial);
-  }, [location]);
+    return initial;
+  };
+
+  const [expanded, setExpanded] = useState(getInitialExpanded);
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+
+  if (location.pathname !== prevPathname) {
+    setPrevPathname(location.pathname);
+    setExpanded(getInitialExpanded());
+  }
+
 
   const toggleExpand = (name) => {
     setExpanded((prev) => ({

@@ -157,11 +157,17 @@ export default function News() {
   const [imgError, setImgError] = useState(false);
   const articleRef = useRef(null);
 
-  useEffect(() => {
+  const [prevId, setPrevId] = useState(id);
+
+  if (id !== prevId) {
+    setPrevId(id);
     setLoading(true);
     setError(false);
     setItem(null);
     setImgError(false);
+  }
+
+  useEffect(() => {
     getBulletinItemById(id)
       .then((res) => setItem(res.data?.data || null))
       .catch(() => setError(true))

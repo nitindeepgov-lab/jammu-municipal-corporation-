@@ -28,9 +28,6 @@ export default function OfficerDirectory() {
   };
 
   useEffect(() => {
-    setLoadingOfficers(true);
-    setLoadingCouncillors(true);
-    
     // Fetch administrative officials
     getOfficials()
       .then((res) => {

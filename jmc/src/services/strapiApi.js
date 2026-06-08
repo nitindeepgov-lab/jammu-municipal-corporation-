@@ -372,6 +372,11 @@ export const getVisitorCount = () => api.get("/visitor-count/current");
 /** Increment and return the global visitor count */
 export const incrementVisitorCount = () => api.post("/visitor-count/increment");
 
+// ── Contact Strip ───────────────────────────────────────────
+
+/** Fetch contact strip details (address, toll free, email, website) */
+export const getContactStrip = () => api.get("/contact-strip");
+
 // ── Newsletters ─────────────────────────────────────────────
 
 /** Fetch all newsletters ordered by year and month */

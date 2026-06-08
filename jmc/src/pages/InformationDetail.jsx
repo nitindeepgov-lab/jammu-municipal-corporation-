@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import SubpageTemplate from '../components/SubpageTemplate'
-import { infoItems } from './Information'
+import { infoItems } from '../constants/infoItems'
 
 const details = {
   'about-jammu-city': {

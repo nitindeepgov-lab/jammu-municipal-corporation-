@@ -110,6 +110,15 @@ body {
   animation: slideDown 0.2s ease-out forwards;
 }
 
+/* Slow spinning animation for logos and badges */
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-slow-spin {
+  animation: slow-spin 15s linear infinite;
+}
+
 /* ── Accessibility contrast modes ── */
 body.ac-high-contrast {
   filter: contrast(150%) brightness(1.1);
