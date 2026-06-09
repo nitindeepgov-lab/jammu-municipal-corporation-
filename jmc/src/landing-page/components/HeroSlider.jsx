@@ -23,6 +23,7 @@ export default function HeroSlider() {
   const [slides, setSlides] = useState([])
   const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState(0)
+  const [loadedIndices, setLoadedIndices] = useState([0, 1])
   const timerRef = useRef(null)
 
   useEffect(() => {
@@ -53,6 +54,20 @@ export default function HeroSlider() {
     return () => clearInterval(timerRef.current)
   }, [slides.length])
 
+  // Smart prefetching: only load current slide and next slide to save bandwidth
+  useEffect(() => {
+    if (slides.length > 0) {
+      const nextIdx = (current + 1) % slides.length
+      setLoadedIndices((prev) => {
+        if (!prev.includes(current) || !prev.includes(nextIdx)) {
+          const nextSet = new Set([...prev, current, nextIdx])
+          return Array.from(nextSet)
+        }
+        return prev
+      })
+    }
+  }, [current, slides.length])
+
   return (
     <section className="relative overflow-hidden" aria-roledescription="carousel" aria-label="JMC Home Banner">
 
@@ -75,12 +90,15 @@ export default function HeroSlider() {
             className={`absolute inset-0 transition-opacity duration-1000 ${idx === current ? 'opacity-100' : 'opacity-0'}`}
             aria-hidden={idx !== current}
           >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover md:object-fill bg-black"
-              onError={(e) => { e.target.src = '/banner/banner10.png' }}
-            />
+            {loadedIndices.includes(idx) && (
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover md:object-fill bg-black"
+                loading={idx === 0 ? "eager" : "lazy"}
+                onError={(e) => { e.target.src = '/banner/banner10.png' }}
+              />
+            )}
             {/* gradient overlays */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />

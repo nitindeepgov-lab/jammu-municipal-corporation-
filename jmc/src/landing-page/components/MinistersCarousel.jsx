@@ -69,6 +69,7 @@ function MinisterCard({ minister }) {
             }
             alt={minister.name}
             className="w-full h-full object-cover"
+            loading="lazy"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(minister.name)}&size=256&background=f3f4f6&color=003366`;

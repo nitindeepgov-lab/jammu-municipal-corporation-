@@ -87,6 +87,7 @@ export default function WhosWho() {
                       src={imgUrl}
                       alt={official.name}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                       onError={(e) => {
                         e.target.style.display = "none";
                         e.target.parentNode.innerHTML = `<span class="text-xs font-bold">${getInitials(official.name)}</span>`;

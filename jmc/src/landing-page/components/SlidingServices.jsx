@@ -178,6 +178,7 @@ export default function SlidingServices() {
                   src="circle/circle.jpeg"
                   alt="Jammu City"
                   className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+                  loading="lazy"
                   onError={(e) => {
                     e.target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900'
                   }}

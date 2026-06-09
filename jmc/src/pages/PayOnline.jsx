@@ -308,6 +308,37 @@ export default function PayOnline() {
   const [locationOptions, setLocationOptions] = useState(["Select Location"]);
   const panelRef = useRef(null);
 
+  // Dynamically load BillDesk Web SDK scripts and styles when PayOnline mounts
+  useEffect(() => {
+    // If the BillDesk SDK function is already present in window, no need to inject again
+    if (window.loadBillDeskSdk) return;
+
+    const scriptEsm = document.createElement("script");
+    scriptEsm.type = "module";
+    scriptEsm.src = "https://uat1.billdesk.com/merchant-uat/sdk/dist/billdesksdk/billdesksdk.esm.js";
+    scriptEsm.id = "billdesk-sdk-esm";
+    document.head.appendChild(scriptEsm);
+
+    const scriptNomodule = document.createElement("script");
+    scriptNomodule.setAttribute("nomodule", "");
+    scriptNomodule.src = "https://uat1.billdesk.com/merchant-uat/sdk/dist/billdesksdk.js";
+    scriptNomodule.id = "billdesk-sdk-nomodule";
+    document.head.appendChild(scriptNomodule);
+
+    const linkCss = document.createElement("link");
+    linkCss.rel = "stylesheet";
+    linkCss.href = "https://uat1.billdesk.com/merchant-uat/sdk/dist/billdesksdk/billdesksdk.css";
+    linkCss.id = "billdesk-sdk-css";
+    document.head.appendChild(linkCss);
+
+    return () => {
+      // Clean up injected DOM elements on unmount to keep header lightweight
+      document.getElementById("billdesk-sdk-esm")?.remove();
+      document.getElementById("billdesk-sdk-nomodule")?.remove();
+      document.getElementById("billdesk-sdk-css")?.remove();
+    };
+  }, []);
+
   useEffect(() => {
     let isActive = true;
 
