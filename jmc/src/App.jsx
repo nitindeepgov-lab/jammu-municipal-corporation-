@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, Suspense, lazy } from "react";
+import { useEffect, Suspense, lazy, useState } from "react";
 import { PROD_STRAPI_URL } from "./config/api";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -98,6 +98,16 @@ const PolicyPages = lazy(() => import("./pages/PolicyPages"));
 // ChatBot — lazy loaded since it's 31KB and not needed for initial render
 const ChatBot = lazy(() => import("./components/ChatBot"));
 
+// Deferred ChatBot wrapper to prevent blocking page initialization
+function DeferredChatBot() {
+  const [shouldRender, setShouldRender] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setShouldRender(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+  return shouldRender ? <ChatBot /> : null;
+}
+
 // Wrapper for policy pages (lazy-loaded as a single chunk)
 function LazyPolicyRoute({ page }) {
   return (
@@ -193,9 +203,9 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-        {/* ChatBot lazy-loaded — not needed for initial render */}
+        {/* ChatBot lazy-loaded & deferred — not needed for initial render */}
         <Suspense fallback={null}>
-          <ChatBot />
+          <DeferredChatBot />
         </Suspense>
       </BrowserRouter>
     </ErrorBoundary>

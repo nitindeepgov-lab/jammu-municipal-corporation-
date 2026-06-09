@@ -3710,6 +3710,52 @@ const injectResilientRefreshTools = () => {
   setInterval(checkEmptyContentManager, 2000);
 };
 
+const lazyLoadCmsMedia = () => {
+  if (typeof document === "undefined") return;
+
+  const handleMedia = (root) => {
+    // Images
+    const images = root.tagName === "IMG" ? [root] : root.querySelectorAll("img");
+    images.forEach((img) => {
+      // Exclude key UI elements like branding logos or header avatars from lazy-loading
+      const src = img.src || "";
+      const isLogo = src.includes("logo") || img.closest("nav") || img.closest("header");
+      if (!isLogo && !img.hasAttribute("loading")) {
+        img.setAttribute("loading", "lazy");
+        if (!img.hasAttribute("decoding")) {
+          img.setAttribute("decoding", "async");
+        }
+      }
+    });
+
+    // Iframes (video embeds, map widgets, etc.)
+    const iframes = root.tagName === "IFRAME" ? [root] : root.querySelectorAll("iframe");
+    iframes.forEach((iframe) => {
+      if (!iframe.hasAttribute("loading")) {
+        iframe.setAttribute("loading", "lazy");
+      }
+    });
+  };
+
+  // Run on already existing media immediately
+  handleMedia(document.body);
+
+  // Set up observer to process newly appended media in the dynamic Strapi layout
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === "childList") {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) { // Element node
+            handleMedia(node);
+          }
+        });
+      }
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+};
+
 export default {
   config: {
     auth: { logo },
@@ -3751,6 +3797,7 @@ export default {
     injectAdminStyles();
     injectLoginPageEnhancements();
     injectHCaptchaOnLogin();
+    lazyLoadCmsMedia();
     setTimeout(() => {
       injectDashboardWidgets();
       injectTransactionFieldEnhancements();

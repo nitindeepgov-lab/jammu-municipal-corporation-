@@ -28,6 +28,7 @@ export default function PartnerLogos() {
                   src={partner.logo}
                   alt={partner.name}
                   className="max-h-[48px] max-w-full object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                  loading="lazy"
                   onError={(e) => { 
                     e.target.style.display = 'none'
                     e.target.parentElement.innerHTML = `<span class="text-gray-600 text-xs font-medium text-center">${partner.name}</span>`
