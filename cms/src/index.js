@@ -160,6 +160,7 @@ module.exports = {
         "api::footer-link.footer-link",
         "api::newsletter.newsletter",
         "api::office-location.office-location",
+        "api::rti-document.rti-document",
       ];
 
       const promises = [];

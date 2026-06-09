@@ -983,6 +983,40 @@ export interface ApiPhotoGalleryPhotoGallery
   };
 }
 
+export interface ApiRtiDocumentRtiDocument extends Struct.CollectionTypeSchema {
+  collectionName: 'rti_documents';
+  info: {
+    description: 'Right to Information disclosure documents managed through the CMS.';
+    displayName: '\uD83D\uDCDD RTI Document';
+    pluralName: 'rti-documents';
+    singularName: 'rti-document';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    clause: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    document: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::rti-document.rti-document'
+    > &
+      Schema.Attribute.Private;
+    particulars: Schema.Attribute.Text & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'clause'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSmartCityTenderSmartCityTender
   extends Struct.CollectionTypeSchema {
   collectionName: 'smart_city_tenders';
@@ -1675,6 +1709,7 @@ declare module '@strapi/strapi' {
       'api::office-location.office-location': ApiOfficeLocationOfficeLocation;
       'api::official.official': ApiOfficialOfficial;
       'api::photo-gallery.photo-gallery': ApiPhotoGalleryPhotoGallery;
+      'api::rti-document.rti-document': ApiRtiDocumentRtiDocument;
       'api::smart-city-tender.smart-city-tender': ApiSmartCityTenderSmartCityTender;
       'api::tender.tender': ApiTenderTender;
       'api::transaction.transaction': ApiTransactionTransaction;

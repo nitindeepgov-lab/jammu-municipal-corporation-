@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "rti_documents",
+  "info": {
+    "singularName": "rti-document",
+    "pluralName": "rti-documents",
+    "displayName": "📝 RTI Document",
+    "description": "Right to Information disclosure documents managed through the CMS."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "clause": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "clause",
+      "required": true,
+      "unique": true
+    },
+    "particulars": {
+      "type": "text",
+      "required": true
+    },
+    "document": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["files"]
+    }
+  }
+}

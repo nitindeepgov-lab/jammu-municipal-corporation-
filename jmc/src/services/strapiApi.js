@@ -61,7 +61,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const getCached = async (key, fetchFn) => {
   const cached = cache.get(key);
   const now = Date.now();
-  if (cached && !cached.promise && (now - cached.timestamp < CACHE_TTL)) {
+  if (cached && !cached.promise && now - cached.timestamp < CACHE_TTL) {
     return Promise.resolve(cached.data);
   }
   if (cached && cached.promise) {
@@ -94,13 +94,13 @@ export const getBulletinItems = () =>
   getCached("bulletin-boards", () =>
     api.get(
       "/bulletin-boards?sort=release_date:desc&populate=*&status=published",
-    )
+    ),
   );
 
 /** Fetch a single published bulletin board entry by documentId */
 export const getBulletinItemById = (documentId) =>
   getCached(`bulletin-board-${documentId}`, () =>
-    api.get(`/bulletin-boards/${documentId}?populate=*&status=published`)
+    api.get(`/bulletin-boards/${documentId}?populate=*&status=published`),
   );
 
 /** Add a new bulletin board entry */
@@ -130,7 +130,7 @@ export const getOfficials = () =>
   getCached("officials", () =>
     api.get(
       "/officials?populate=picture&sort=order:asc&filters[publishedAt][$notNull]=true",
-    )
+    ),
   );
 
 // ── Governing Bodies (Ministers) ─────────────────────────────
@@ -138,7 +138,7 @@ export const getOfficials = () =>
 /** Fetch all active governing body members ordered by the 'order' field */
 export const getMinisters = () =>
   getCached("ministers", () =>
-    api.get("/ministers?populate=image&sort=order:asc")
+    api.get("/ministers?populate=image&sort=order:asc"),
   );
 
 // ── Hero Slides ──────────────────────────────────────────────
@@ -146,7 +146,9 @@ export const getMinisters = () =>
 /** Fetch all active hero banner slides ordered by 'order' */
 export const getHeroSlides = () =>
   getCached("hero-slides", () =>
-    api.get("/hero-slides?populate=image&sort=order:asc&filters[is_active][$eq]=true")
+    api.get(
+      "/hero-slides?populate=image&sort=order:asc&filters[is_active][$eq]=true",
+    ),
   );
 
 // ── Photo Gallery ─────────────────────────────────────────────
@@ -156,7 +158,7 @@ export const getPhotoGalleryItems = () =>
   getCached("photo-galleries", () =>
     api.get(
       "/photo-galleries?populate[images][populate]=*&sort=order:asc&status=published&filters[is_active][$eq]=true",
-    )
+    ),
   );
 
 // ── Ex-Municipal Councillors ───────────────────────────────
@@ -166,7 +168,7 @@ export const getCouncillors = () =>
   getCached("councillors-all", () =>
     api.get(
       "/councillor-details?populate=photo&sort=ward_no:asc&pagination[pageSize]=100&status=published",
-    )
+    ),
   );
 
 /** Fetch councillors with backend pagination and optional ward filter */
@@ -192,9 +194,23 @@ export const getCouncillorsPaginated = (
 /** Fetch all published contact office entries ordered by display order */
 export const getOfficeLocations = () =>
   getCached("office-locations", () =>
-    api.get("/office-locations?sort=order:asc&filters[is_active][$eq]=true")
+    api.get("/office-locations?sort=order:asc&filters[is_active][$eq]=true"),
+  );
+// ── RTI Documents ─────────────────────────────────────────
+
+/** Fetch all RTI disclosure documents */
+export const getRtiDocuments = () =>
+  getCached("rti-documents", () =>
+    api.get("/rti-documents?populate=document&sort=clause:asc"),
   );
 
+/** Fetch a single RTI disclosure document by slug */
+export const getRtiDocumentBySlug = (slug) =>
+  getCached(`rti-document-${slug}`, () =>
+    api.get(
+      `/rti-documents?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=document`,
+    ),
+  );
 // ── Payment Locations ─────────────────────────────────────
 
 /** Fetch all published payment locations ordered by ward number (desc) */
@@ -202,7 +218,7 @@ export const getLocations = () =>
   getCached("locations", () =>
     api.get(
       "/locations?sort=ward_no:desc&pagination[pageSize]=200&filters[is_active][$eq]=true",
-    )
+    ),
   );
 
 // ── Smart City Tenders ──────────────────────────────────────
@@ -212,13 +228,13 @@ export const getSmartCityTenders = () =>
   getCached("smart-city-tenders", () =>
     api.get(
       "/smart-city-tenders?sort=published_date:desc&populate=*&status=published",
-    )
+    ),
   );
 
 /** Fetch a single smart city tender by documentId */
 export const getSmartCityTenderById = (documentId) =>
   getCached(`smart-city-tender-${documentId}`, () =>
-    api.get(`/smart-city-tenders/${documentId}?populate=*&status=published`)
+    api.get(`/smart-city-tenders/${documentId}?populate=*&status=published`),
   );
 
 /** Add a new smart city tender */
@@ -246,13 +262,13 @@ export const getNewsTickerItems = () =>
   getCached("news-tickers-active", () =>
     api.get(
       "/news-tickers?sort=order:asc&status=published&filters[is_active][$eq]=true",
-    )
+    ),
   );
 
 /** Fetch all news ticker items (including inactive, for admin) */
 export const getAllNewsTickerItems = () =>
   getCached("news-tickers-all", () =>
-    api.get("/news-tickers?sort=order:asc&status=published")
+    api.get("/news-tickers?sort=order:asc&status=published"),
   );
 
 /** Add a new news ticker item */
@@ -280,7 +296,7 @@ export const getEventActivities = () =>
   getCached("event-activities", () =>
     api.get(
       "/event-activities?sort=order:asc,event_date:desc&populate=image&status=published&filters[is_active][$eq]=true",
-    )
+    ),
   );
 
 // ── Notices & Tenders ───────────────────────────────────────
@@ -300,7 +316,7 @@ export const getNotices = (noticeType) => {
 /** Fetch a single notice by documentId */
 export const getNoticeById = (documentId) =>
   getCached(`notice-${documentId}`, () =>
-    api.get(`/notices/${documentId}?populate=*&status=published`)
+    api.get(`/notices/${documentId}?populate=*&status=published`),
   );
 
 /** Add a new notice */
@@ -326,13 +342,13 @@ export const deleteNotice = (documentId) => {
 /** Fetch all published JMC tenders (newest first) */
 export const getTenders = () =>
   getCached("tenders-all", () =>
-    api.get("/tenders?sort=tender_date:desc&populate=*&status=published")
+    api.get("/tenders?sort=tender_date:desc&populate=*&status=published"),
   );
 
 /** Fetch a single tender by documentId */
 export const getTenderById = (documentId) =>
   getCached(`tender-${documentId}`, () =>
-    api.get(`/tenders/${documentId}?populate=*&status=published`)
+    api.get(`/tenders/${documentId}?populate=*&status=published`),
   );
 
 /** Add a new tender */
@@ -352,7 +368,6 @@ export const deleteTender = (documentId) => {
   clearCacheByPrefix("tender");
   return api.delete(`/tenders/${documentId}`);
 };
-
 
 // ── Footer Links ─────────────────────────────────────────────
 
@@ -382,7 +397,7 @@ export const getContactStrip = () => api.get("/contact-strip");
 /** Fetch all newsletters ordered by year and month */
 export const getNewsletters = () =>
   getCached("newsletters-all", () =>
-    api.get("/newsletters?populate=*&pagination[pageSize]=250")
+    api.get("/newsletters?populate=*&pagination[pageSize]=250"),
   );
 
 export default api;
